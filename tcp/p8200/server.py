@@ -9,15 +9,17 @@ import SocketServer
 
 def prompt():
     """Basic python prompt"""
-    s = raw_input("$> ")
-    if len(s) > 0:
-        try:
+    try:
+        s = raw_input("$> ")
+        if len(s) > 0:
             return eval(s)
-        except Exception, e:
-            print "Raised Exception:", e
-            return prompt()
-    else:
+        else:
+            return None
+    except EOFError, e:
         return None
+    except Exception, e:
+        print "Raised Exception:", e
+        return prompt()
 
 
 class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
@@ -26,9 +28,8 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
     Focus on port 8200 requests.
     ============================
      - First read [8 bytes]
-       -> [0x00] Number of block?
-       -> [0x01~0x07] ???
-       *** Block Size = ~256 bytes
+       -> [0x00~0x01] Response size (uint16)
+       -> [0x02~0x07] ???
     """
     def handle(self):
         """In-game buffer address
