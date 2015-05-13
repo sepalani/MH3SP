@@ -9,17 +9,17 @@ import SocketServer
 
 def prompt():
     """Basic python prompt"""
-    try:
-        s = raw_input("$> ")
-        if len(s) > 0:
-            return eval(s)
-        else:
-            return None
-    except EOFError, e:
-        return None
-    except Exception, e:
-        print "Raised Exception:", e
-        return prompt()
+    while True:
+        try:
+            s = raw_input("$> ")
+            if len(s) < 1:
+                return
+            yield eval(s)
+        except (KeyboardInterrupt, EOFError, SyntaxError), e:
+            print "[Exiting prompt]"
+            return
+        except Exception, e:
+            print "%s: %s" % (type(e).__name__, e)
 
 
 class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
@@ -45,11 +45,9 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
             # Error 11612: Wrong data sent
             # Error 11619: Timeout
             print "[Server] Handle client"
-            data = prompt()
-            while data is not None:
+            for data in prompt():
                 self.wfile.write(data)
                 print ">>> %s" % (data)
-                data = prompt()
         print "[Server] Waiting client..."
         print "<<< %s" % self.rfile.read()
         print "[Server] Finish client"
