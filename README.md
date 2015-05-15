@@ -3,6 +3,45 @@
 The goal of this project is to reverse the game in order to make private servers.
 
 
+Current Status
+--------------
+The project isn't yet functionnal. Todo:
+ * **Loading bar:** 85%
+- [x] Bypass Nintendo Servers
+- [x] DNS Redirection
+- [x] Create SSL connection (tcp port: 8200)
+- [ ] Find/Send expected data
+- [ ] *What's next?*
+ * **Capcom ID selection:** No
+- [ ] Reverse the Capcom ID selection protocol format 
+ * **Server selection:** No
+- [ ] Reverse the Server selection protocol format
+ * **Gate selection:** No
+- [ ] Reverse the Gate selection protocol format
+ * **Time system:** No
+- [ ] Reverse the Time system protocol format
+ * **City creation:** No
+- [ ] Reverse the City creation protocol format
+ * **Join a city:** No
+- [ ] Reverse the City joining protocol format
+ * **Search a city:** No
+- [ ] Reverse the Research protocol format
+ * **Submit a quest:** No
+- [ ] Reverse the Quest submitting protocol format
+ * **Join a quest:** No
+- [ ] Reverse the Quest joining protocol format
+ * **Start a quest:** No
+- [ ] Reverse the Quest starting protocol format
+ * **Chat implemented:** No
+- [ ] Reverse the Chat protocol format
+ * **Event Quest:** No
+- [ ] Reverse the Event Quest protocol format
+ * **Arena Quest:** No
+- [ ] Reverse the Arena Quest protocol format
+ * **Sandstorm:** No
+- [ ] Reverse the Sandstorm event protocol format
+
+
 Prerequisites
 -------------
  * Softmodded Wii or Dolphin Emulator
