@@ -4,7 +4,7 @@ import sys
 sys.path.append("../..")
 
 from utils.MHTriSSLServer import *
-import SocketServer
+import utils.uSocketServer as SocketServer
 
 
 def prompt():
@@ -15,11 +15,11 @@ def prompt():
             if len(s) < 1:
                 return
             yield eval(s)
-        except (KeyboardInterrupt, EOFError, SyntaxError), e:
-            print "[Exiting prompt]"
+        except (KeyboardInterrupt, EOFError, SyntaxError) as e:
+            print("[Exiting prompt]")
             return
-        except Exception, e:
-            print "%s: %s" % (type(e).__name__, e)
+        except Exception as e:
+            print("%s: %s" % (type(e).__name__, e))
 
 
 class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
@@ -44,13 +44,13 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
             # Error 11611: Connection closed by server [TCP: FIN, ACK] + [TCP: RST, ACK]
             # Error 11612: Wrong data sent
             # Error 11619: Timeout
-            print "[Server] Handle client"
+            print("[Server] Handle client")
             for data in prompt():
                 self.wfile.write(data)
-                print ">>> %s" % (data)
-        print "[Server] Waiting client..."
-        print "<<< %s" % self.rfile.read()
-        print "[Server] Finish client"
+                print(">>> %s" % (data))
+        print("[Server] Waiting client...")
+        print("<<< %s" % self.rfile.read())
+        print("[Server] Finish client")
 
 
 if __name__ == "__main__":
@@ -60,8 +60,8 @@ if __name__ == "__main__":
     # Put the path of your private key/certificate
     server.__ssl__(certfile='../../../server.crt', keyfile='../../../server.key')
     try:
-        print "Server: %s | Port: %d" % (server.server_address[0], server.server_address[1])
+        print("Server: %s | Port: %d" % (server.server_address[0], server.server_address[1]))
         server.serve_forever()
     except KeyboardInterrupt:
-        print "[Server] Closing..."
+        print("[Server] Closing...")
         server.server_close()
