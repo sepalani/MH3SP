@@ -80,6 +80,9 @@ SSL Certificates
 TODO
 
 
-TCP Server
-----------
-TODO
+TCP Servers
+-----------
+Mainly developed in **Python 2.7**, a python interpreter is needed to run MH3SP's servers. **Python3 isn't supported yet**, so a Python2 interpreter has to be used FTM. Then, you only need to **run server.py** python executable to start the server. A usage will be printed if it requires parameters. Servers **may print details** when a client is connected and doing something, **they'll be quiet** otherwise.
+
+1. **Port 8200**
+ * This server isn't complete, a **python prompt** is available to send data (string) to the client
