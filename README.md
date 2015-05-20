@@ -77,7 +77,7 @@ To redirect requests the game sends to Capcom servers, you need to setup a **DNS
 
 SSL Certificates
 ----------------
-TODO
+OpenSSL can be used to generate your own private key/certificate to use with MH3SP servers. Then check with a notepad the server.py file and edit the path for the private key/certificate if needed.
 
 
 TCP Servers
