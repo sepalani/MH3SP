@@ -3,6 +3,7 @@
 import sys
 sys.path.append("../..")
 
+import socket
 from utils.MHTriSSLServer import *
 import utils.uSocketServer as SocketServer
 
@@ -54,7 +55,7 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
 
 
 if __name__ == "__main__":
-    HOST, PORT = '', 8200
+    HOST, PORT = socket.gethostbyname(socket.gethostname()), 8200
     server = MHTriSSLServer((HOST, PORT), MHTriP8200RequestHandler)
 
     # Put the path of your private key/certificate
