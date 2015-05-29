@@ -55,7 +55,13 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
 
 
 if __name__ == "__main__":
-    HOST, PORT = socket.gethostbyname(socket.gethostname()), 8200
+    """Usage:  python server.py [IP address]"""
+    if len(sys.argv) > 1:
+        hostname = sys.argv[1]
+    else:
+        hostname = socket.gethostname()
+    HOST = socket.gethostbyname(hostname)
+    PORT = 8200
     server = MHTriSSLServer((HOST, PORT), MHTriP8200RequestHandler)
 
     # Put the path of your private key/certificate
