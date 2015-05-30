@@ -56,6 +56,7 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
 
 if __name__ == "__main__":
     """Usage:  python server.py [IP address]"""
+
     if len(sys.argv) > 1:
         hostname = sys.argv[1]
     else:

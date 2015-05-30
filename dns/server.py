@@ -41,7 +41,14 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
 
 
 if __name__ == "__main__":
-    HOST, PORT = socket.gethostbyname(socket.gethostname()), 53
+    """Usage:  python server.py [IP address]"""
+
+    if len(sys.argv) > 1:
+        hostname = sys.argv[1]
+    else:
+        hostname = socket.gethostname()
+    HOST = socket.gethostbyname(hostname)
+    PORT = 53
     server = MHTriDNSServer((HOST, PORT), MHTriDNSRequestHandler)
 
     try:
