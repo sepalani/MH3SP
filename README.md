@@ -3,6 +3,7 @@
 The goal of this project is to reverse the game in order to make private servers.
 
 
+
 Current Status
 --------------
 The project isn't yet functionnal. Todo:
@@ -42,12 +43,14 @@ The project isn't yet functionnal. Todo:
 - [ ] Reverse the Sandstorm event protocol format
 
 
+
 Prerequisites
 -------------
  * Softmodded Wii or Dolphin Emulator
  * Monster Hunter 3 (~tri) w/ Nintendo servers patch
  * DNS server (will be optional in the future)
  * Python 2.7 or above (Python3 not supported)
+
 
 
 Monster Hunter 3 (~tri)
@@ -68,16 +71,24 @@ In order to use custom servers on Monster Hunter Tri you first need to patch the
    * Launch your **patched game**
 
 
+
 DNS Server
 ----------
 To redirect requests the game sends to Capcom servers, you need to setup a **DNS server**. This server will **redirect the traffic** to Monster Hunter Tri private servers. You need to setup **Address Records** (a.k.a. *A Record*) with **Capcom's domain names** pointing to your servers' IP. FTM, I don't propose any DNS server so you have to **find and install one yourself**. Nonetheless, I'm planing to make one to automate this task and make it easier for everyone.
 
 [MHTrIDA](https://github.com/sepalani/MHTrIDA/tree/master/server/dns) has lots of details about the **domain names** you may set for you DNS server and other data concerning the game as well.
 
+**NB for Dolphin Users:** Rather than using a DNS server, edit the **hosts file** also work.
+ * **Windows** Location: ```%SystemRoot%\system32\drivers\etc\hosts```
+ * **Mac OS X** Location: ```/private/etc/hosts```
+ * **Linux** Location: ```/etc/hosts```
+
+
 
 SSL Certificates
 ----------------
 OpenSSL can be used to generate your own private key/certificate to use with MH3SP servers. Then check with a notepad the server.py file and edit the path for the private key/certificate if needed.
+
 
 
 TCP Servers
