@@ -40,11 +40,18 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
         JAP - 0x80CA9400 | Data read size: 0x80CA93F8
         """
         for i in range(1):
+            # Error 11601: Can't get server IP from server's domain name
             # Error 11602: Connection failed / Wrong pass phrase? / Server is running?
+            # Error 11603: Connection reset before SSL/TLS negotiation
+            # Error 11604: SSL handshake failure [invalid CN]
+            # Error 11605: SSL handshake failure [invalid Root CA]
+            # Error 11606: SSL handshake failure [invalid Certificate Chain]
+            # Error 11607: SSL handshake failure [invalid Date]
             # Error 11609: Connection closed unexpectedly [TCP: RST, ACK]
             # Error 11611: Connection closed by server [TCP: FIN, ACK] + [TCP: RST, ACK]
             # Error 11612: Wrong data sent
-            # Error 11619: Timeout
+            # Error 11613: Timeout while trying to connect
+            # Error 11619: Timeout while waiting for data
             print("[Server] Handle client")
             for data in prompt():
                 self.wfile.write(data)
