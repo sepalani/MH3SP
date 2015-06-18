@@ -16,7 +16,7 @@ def prompt():
             if len(s) < 1:
                 return
             yield eval(s)
-        except (KeyboardInterrupt, EOFError, SyntaxError) as e:
+        except (KeyboardInterrupt, EOFError) as e:
             print("[Exiting prompt]")
             return
         except Exception as e:
