@@ -11,6 +11,8 @@ The CertPatcher class is the base class for these patchers.
 
 """
 
+from optparse import OptionParser
+
 
 class CertPatcher(object):
     """Generic Certificate Patcher."""
@@ -66,5 +68,35 @@ class PALCertPatcher(CertPatcher):
     CERT_LEN = 924
 
 
+regionPatcher = {
+    'RMHJ08': JAPCertPatcher,
+    'RMHE08': USACertPatcher,
+    'RMHP08': PALCertPatcher
+}
+
+
 if __name__ == '__main__':
-    pass
+    parser = OptionParser("Usage: %prog (--jap|--usa|--pal) <dol> <der cert>")
+    parser.add_option("-J", "--jap", action="store_true",
+                     default=False, dest="is_jap",
+                     help="use the Japanese patcher [RMHJ08]")
+    parser.add_option("-E", "--usa", action="store_true",
+                     default=False, dest="is_usa",
+                     help="use the American patcher [RMHE08]")
+    parser.add_option("-P", "--pal", action="store_true",
+                     default=False, dest="is_pal",
+                     help="use the European patcher [RMHP08]")
+    opt, arg = parser.parse_args()
+
+    if len(arg) < 2:
+        parser.print_help()
+    else:
+        region = 'RMHJ08' if opt.is_jap else \
+                 'RMHE08' if opt.is_usa else \
+                 'RMHP08' if opt.is_pal else \
+                 ""
+        if not region in regionPatcher:
+            parser.print_help()
+        else:
+            patcher = regionPatcher[region](arg[0])
+            patcher.patch_cert(arg[1])
