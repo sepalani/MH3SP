@@ -27,8 +27,8 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
         s = "".join("." if c < 32 else chr(c) for c in name)
         print("<<< %s" % s)
 
-        if s in MHTriDNSServer.record:
-            s = MHTriDNSServer.record[s]
+        if s in self.server.record:
+            s = self.server.record[s]
             if not s:
                 s = socket.gethostname()
 
