@@ -34,8 +34,10 @@ class CertPatcher(object):
         crt - path to the certificate file
 
         """
-
         data = b''
+
+        if self.CERT_OFF is None or self.CERT_LEN is None:
+            raise ValueError("Unsupported region!")
         with open(crt, 'rb') as f:
             data = f.read(self.CERT_LEN)
             pad = self.CERT_LEN - len(data)
