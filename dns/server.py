@@ -30,7 +30,7 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
         if s in self.server.record:
             s = self.server.record[s]
             if not s:
-                s = socket.gethostname()
+                s = self.server.server_address[0]
 
         try:
             ip = socket.gethostbyname(s)
