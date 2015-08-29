@@ -48,8 +48,8 @@ Prerequisites
 -------------
  * Softmodded Wii or Dolphin Emulator
  * Monster Hunter 3 (~tri) w/ Nintendo servers patch
- * DNS server (will be optional in the future)
- * Python 2.7 or above (Python3 not supported)
+ * DNS server (_may be optional_)
+ * Python 2.7 or above (_Python3 and above might not be supported_)
 
 
 
@@ -59,26 +59,42 @@ In order to use custom servers on Monster Hunter Tri you first need to patch the
 [Link to Wiimmfi instruction](http://wiki.tockdom.com/wiki/MKWii_Network_Protocol/Server/Wiimmfi-Patcher).
 
 1. **Patch the game on the fly**
-   * Download the **autowiimmfipatcher** from the "*Playing from a real disc*" section
-   * Copy the *apps* folder into your SD card **root directory**
-   * Launch the **Homebrew Channel**
-   * Run the MrBean35000vr **Wiimmfi Patcher**
-   * Insert your **game disc**
+   * Download the **autowiimmfipatcher** from the "*Playing from a real disc*" section.
+   * Copy the *apps* folder into your SD card **root directory**.
+   * Launch the **Homebrew Channel**.
+   * Run the MrBean35000vr **Wiimmfi Patcher**.
+   * Insert your **game disc**.
 2. **Permanent patch**
-   * Download the **wiimmfi-patcher** from the "*How-To*" section
-   * Carefully **read** the patcher's *README*
-   * **Run the patcher** corresponding to your OS
-   * Launch your **patched game**
+   * Download the **wiimmfi-patcher** from the "*How-To*" section.
+   * Carefully **read** the patcher's *README*.
+   * **Run the patcher** corresponding to your OS.
+   * Launch your **patched game**.
+
+If you want a local alternative you can try [my fork of altwfc](https://github.com/sepalani/dwc_network_server_emulator) that supports MHTri and others Wii games.
+
+Then you need to replace the in-game certificate located in the game's **main.dol** with yours.  
+**NB for Dolphin users:** This step can be skipped because the emulator doesn't verify certificate.
+
+1. Extract the **main.dol** from the game using **WiiScrubber**.
+2. Use [OpenSSL](https://github.com/sepalani/MHTrIDA/tree/master/server/cert) to **create your Root CA certificate** and server certificates.
+3. Replace the in-game certificate within the main.dol with your **Root CA certificate** using [MHTriCertPatcher](https://github.com/sepalani/MH3SP/tree/master/cert).
+4. Re-inject the patched main.dol via **WiiScrubber**.
+5. Run the patched game on the Wii.
 
 
 
 DNS Server
 ----------
-To redirect requests the game sends to Capcom servers, you need to setup a **DNS server**. This server will **redirect the traffic** to Monster Hunter Tri private servers. You need to setup **Address Records** (a.k.a. *A Record*) with **Capcom's domain names** pointing to your servers' IP. FTM, I don't propose any DNS server so you have to **find and install one yourself**. Nonetheless, I'm planing to make one to automate this task and make it easier for everyone.
+To redirect requests the game sends to Capcom servers, you need to setup a **DNS server**. This server will **redirect the traffic** to Monster Hunter Tri private servers. You need to setup **Address Records** (a.k.a. *A Record*) with **Capcom's domain names** pointing to your servers' IP. You should use a **real DNS server** but I also proposed a dummy implementation of it. You need to have **admin rights** in order to use the port 53 required by [MHTriDNSServer](https://github.com/sepalani/MH3SP/tree/master/dns).
+
+**Usage:**
+```
+python server.py [IP address]
+```
 
 [MHTrIDA](https://github.com/sepalani/MHTrIDA/tree/master/server/dns) has lots of details about the **domain names** you may set for you DNS server and other data concerning the game as well.
 
-**NB for Dolphin Users:** Rather than using a DNS server, edit the **hosts file** also work.
+**NB for Dolphin users:** Rather than using a DNS server, edit the **hosts file** also work.
  * **Windows** Location: ```%SystemRoot%\system32\drivers\etc\hosts```
  * **Mac OS X** Location: ```/private/etc/hosts```
  * **Linux** Location: ```/etc/hosts```
@@ -87,13 +103,13 @@ To redirect requests the game sends to Capcom servers, you need to setup a **DNS
 
 SSL Certificates
 ----------------
-OpenSSL can be used to generate your own private key/certificate to use with MH3SP servers. Then check with a notepad the server.py file and edit the path for the private key/certificate if needed.
+[OpenSSL](https://github.com/sepalani/MHTrIDA/tree/master/server/cert) can be used to generate your own private key/certificate to use with MH3SP servers. Then check with a notepad the server.py file and edit the path for the private key/certificate if needed.
 
 
 
 TCP Servers
 -----------
-Mainly developed in **Python 2.7**, a python interpreter is needed to run MH3SP's servers. **Python3 isn't supported yet**, so a Python2 interpreter has to be used FTM. Then, you only need to **run server.py** python executable to start the server. A usage will be printed if it requires parameters. Servers **may print details** when a client is connected and doing something, **they'll be quiet** otherwise.
+Mainly developed in **Python 2.7**, a python interpreter is needed to run MH3SP's servers. **Python3 might be supported**, so a Python2 interpreter should be used FTM. Then, you only need to **run server.py** python executable to start the server. A usage will be printed if it requires parameters. Servers **may print details** when a client is connected and doing something, **they'll be quiet** otherwise.
 
 1. **Port 8200**
  * This server isn't complete, a **python prompt** is available to send data (string) to the client
