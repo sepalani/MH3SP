@@ -70,7 +70,7 @@ In order to use custom servers on Monster Hunter Tri you first need to patch the
    * **Run the patcher** corresponding to your OS.
    * Launch your **patched game**.
 
-If you want a local alternative you can try [my fork of altwfc](https://github.com/sepalani/dwc_network_server_emulator) that supports MHTri and others Wii games.
+If you want a local alternative you can try [altwfc](https://github.com/polaris-/dwc_network_server_emulator) that now supports MHTri and others Wii games.
 
 Then you need to replace the in-game certificate located in the game's **main.dol** with yours.  
 **NB for Dolphin users:** This step can be skipped because the emulator doesn't verify certificate.
