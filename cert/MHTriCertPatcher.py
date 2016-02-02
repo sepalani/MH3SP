@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """Monster Hunter 3 (~tri) Certificate Patcher
 
 Patch the in-game certificate according to the region:
@@ -80,25 +82,28 @@ regionPatcher = {
 if __name__ == '__main__':
     parser = OptionParser("Usage: %prog (--jap|--usa|--pal) <dol> <der cert>")
     parser.add_option("-J", "--jap", action="store_true",
-                     default=False, dest="is_jap",
-                     help="use the Japanese patcher [RMHJ08]")
+                      default=False, dest="is_jap",
+                      help="use the Japanese patcher [RMHJ08]")
     parser.add_option("-E", "--usa", action="store_true",
-                     default=False, dest="is_usa",
-                     help="use the American patcher [RMHE08]")
+                      default=False, dest="is_usa",
+                      help="use the American patcher [RMHE08]")
     parser.add_option("-P", "--pal", action="store_true",
-                     default=False, dest="is_pal",
-                     help="use the European patcher [RMHP08]")
+                      default=False, dest="is_pal",
+                      help="use the European patcher [RMHP08]")
     opt, arg = parser.parse_args()
 
-    if len(arg) < 2:
+    if len(arg) != 2:
         parser.print_help()
+        print("\nERROR: Invalid parameter count!")
     else:
         region = 'RMHJ08' if opt.is_jap else \
                  'RMHE08' if opt.is_usa else \
                  'RMHP08' if opt.is_pal else \
                  ""
-        if not region in regionPatcher:
+        if region not in regionPatcher:
             parser.print_help()
+            print("\nERROR: Missing region flag!")
         else:
             patcher = regionPatcher[region](arg[0])
             patcher.patch_cert(arg[1])
+            print("DONE!")
