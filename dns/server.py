@@ -1,11 +1,18 @@
-#! /usr/bin/python
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import sys
-sys.path.append("..")
-
 import socket
-from utils.MHTriDNSServer import *
-import utils.uSocketServer as SocketServer
+
+from optparse import OptionParser
+
+try:
+    from utils.MHTriDNSServer import *
+    import utils.uSocketServer as SocketServer
+except ImportError:
+    sys.path.append('..')
+    from utils.MHTriDNSServer import *
+    import utils.uSocketServer as SocketServer
 
 
 def dns_pack(data, ip):
@@ -41,18 +48,20 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
 
 
 if __name__ == "__main__":
-    """Usage:  python server.py [IP address]"""
+    parser = OptionParser()
+    parser.add_option("-H", "--hostname", action="store", type=str,
+                      default=socket.gethostname(), dest="host",
+                      help="set server hostname")
+    parser.add_option("-P", "--port", action="store", type=int,
+                      default=53, dest="port",
+                      help="set server port")
+    opt, arg = parser.parse_args()
 
-    if len(sys.argv) > 1:
-        hostname = sys.argv[1]
-    else:
-        hostname = socket.gethostname()
-    HOST = socket.gethostbyname(hostname)
-    PORT = 53
-    server = MHTriDNSServer((HOST, PORT), MHTriDNSRequestHandler)
+    server = MHTriDNSServer((opt.host, opt.port), MHTriDNSRequestHandler)
 
     try:
-        print("Server: %s | Port: %d" % (server.server_address[0], server.server_address[1]))
+        print("Server: %s | Port: %d" %
+              (server.server_address[0], server.server_address[1]))
         server.serve_forever()
     except KeyboardInterrupt:
         print("[Server] Closing...")
