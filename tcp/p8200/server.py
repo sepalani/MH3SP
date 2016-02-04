@@ -1,21 +1,32 @@
 #! /usr/bin/python
 
 import sys
-sys.path.append("../..")
-
 import socket
-from utils.MHTriSSLServer import *
-import utils.uSocketServer as SocketServer
+
+from optparse import OptionParser
+
+try:
+    from utils.MHTriSSLServer import *
+    import utils.uSocketServer as SocketServer
+except ImportError:
+    sys.path.append("../..")
+    from utils.MHTriSSLServer import *
+    import utils.uSocketServer as SocketServer
+
+try:
+    input = raw_input
+except:
+    pass
 
 
 def prompt():
     """Basic python prompt"""
     while True:
         try:
-            s = raw_input("$> ")
-            if len(s) < 1:
+            s = input("$> ")
+            if not s:
                 return
-            yield eval(s)
+            yield str(eval(s)).encode('ascii')
         except (KeyboardInterrupt, EOFError) as e:
             print("[Exiting prompt]")
             return
@@ -25,7 +36,7 @@ def prompt():
 
 class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
     """Request Handler class for MHTri.
-    
+
     Focus on port 8200 requests.
     ============================
      - First read [8 bytes]
@@ -34,24 +45,12 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
     """
     def handle(self):
         """In-game buffer address
-        
+
         PAL - 0x80CD5318 | Data read size: 0x80CD5310
         USA - 0x80CD5318 | Data read size: 0x80CD5310
         JAP - 0x80CA9400 | Data read size: 0x80CA93F8
         """
         for i in range(1):
-            # Error 11601: Can't get server IP from server's domain name
-            # Error 11602: Connection failed / Wrong pass phrase? / Server is running?
-            # Error 11603: Connection reset before SSL/TLS negotiation
-            # Error 11604: SSL handshake failure [invalid CN]
-            # Error 11605: SSL handshake failure [invalid Root CA]
-            # Error 11606: SSL handshake failure [invalid Certificate Chain]
-            # Error 11607: SSL handshake failure [invalid Date]
-            # Error 11609: Connection closed unexpectedly [TCP: RST, ACK]
-            # Error 11611: Connection closed by server [TCP: FIN, ACK] + [TCP: RST, ACK]
-            # Error 11612: Wrong data sent
-            # Error 11613: Timeout while trying to connect
-            # Error 11619: Timeout while waiting for data
             print("[Server] Handle client")
             for data in prompt():
                 self.wfile.write(data)
@@ -62,20 +61,27 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
 
 
 if __name__ == "__main__":
-    """Usage:  python server.py [IP address]"""
+    parser = OptionParser()
+    parser.add_option("-H", "--hostname", action="store", type=str,
+                      default=socket.gethostname(), dest="host",
+                      help="set server hostname")
+    parser.add_option("-P", "--port", action="store", type=int,
+                      default=8200, dest="port",
+                      help="set server port")
+    parser.add_option("-c", "--cert", action="store", type=str,
+                      default='../../../server.crt', dest="cert",
+                      help="set SSL server certificate")
+    parser.add_option("-k", "--key", action="store", type=str,
+                      default='../../../server.key', dest="key",
+                      help="set SSL server private key")
+    opt, arg = parser.parse_args()
 
-    if len(sys.argv) > 1:
-        hostname = sys.argv[1]
-    else:
-        hostname = socket.gethostname()
-    HOST = socket.gethostbyname(hostname)
-    PORT = 8200
-    server = MHTriSSLServer((HOST, PORT), MHTriP8200RequestHandler)
+    server = MHTriSSLServer((opt.host, opt.port), MHTriP8200RequestHandler)
+    server.__ssl__(certfile=opt.cert, keyfile=opt.key)
 
-    # Put the path of your private key/certificate
-    server.__ssl__(certfile='../../../server.crt', keyfile='../../../server.key')
     try:
-        print("Server: %s | Port: %d" % (server.server_address[0], server.server_address[1]))
+        print("Server: %s | Port: %d" %
+              (server.server_address[0], server.server_address[1]))
         server.serve_forever()
     except KeyboardInterrupt:
         print("[Server] Closing...")
