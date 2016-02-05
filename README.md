@@ -87,9 +87,14 @@ DNS Server
 ----------
 To redirect requests the game sends to Capcom servers, you need to setup a **DNS server**. This server will **redirect the traffic** to Monster Hunter Tri private servers. You need to setup **Address Records** (a.k.a. *A Record*) with **Capcom's domain names** pointing to your servers' IP. You should use a **real DNS server** but I also proposed a dummy implementation of it. You need to have **admin rights** in order to use the port 53 required by [MHTriDNSServer](https://github.com/sepalani/MH3SP/tree/master/dns).
 
-**Usage:**
+**Usage (default hostname):**
 ```
-python server.py [IP address]
+python server.py
+```
+
+**Usage (with another host):**
+```
+python server.py -H <hostname or IP address>
 ```
 
 [MHTrIDA](https://github.com/sepalani/MHTrIDA/tree/master/server/dns) has lots of details about the **domain names** you may set for you DNS server and other data concerning the game as well.
