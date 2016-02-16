@@ -6,7 +6,11 @@ The goal of this project is to reverse the game in order to make private servers
 
 Current Status
 --------------
-The project isn't yet functionnal. Todo:
+The project isn't yet functionnal.
+
+![Progress](https://github.com/sepalani/MH3SP/blob/master/progress.png)
+
+Todo:
  * **Loading bar:** 85%
 - [x] Bypass Nintendo Servers
 - [x] DNS Redirection
