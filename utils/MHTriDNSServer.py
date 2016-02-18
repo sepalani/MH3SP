@@ -14,8 +14,12 @@ class MHTriDNSServer(SocketServer.UDPServer):
         'mmh-t1-opn04.mmh-service.capcom.co.jp': '',
     }
 
-    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, record={}):
-        SocketServer.UDPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
+    def __init__(self, server_address, RequestHandlerClass,
+                 bind_and_activate=True, record={}):
+        SocketServer.UDPServer.__init__(self,
+                                        server_address,
+                                        RequestHandlerClass,
+                                        bind_and_activate)
         if len(record) > 0:
             self.record = record
 
