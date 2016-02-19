@@ -2,6 +2,9 @@
 
 import sys
 import socket
+import select
+import threading
+import Queue
 
 from optparse import OptionParser
 
@@ -19,14 +22,18 @@ except:
     pass
 
 
-def prompt():
+def prompt(handler):
     """Basic python prompt"""
-    while True:
+    while handler.prompt_run:
         try:
+            while handler.prompt_wait:
+                if not handler.prompt_run:
+                    break
             s = input("$> ")
             if not s:
                 return
-            yield str(eval(s)).encode('ascii')
+            handler.message_queue.put(str(eval(s)).encode('ascii'))
+            handler.prompt_wait = True
         except (KeyboardInterrupt, EOFError) as e:
             print("[Exiting prompt]")
             return
@@ -50,14 +57,34 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
         USA - 0x80CD5318 | Data read size: 0x80CD5310
         JAP - 0x80CA9400 | Data read size: 0x80CA93F8
         """
-        for i in range(1):
-            print("[Server] Handle client")
-            for data in prompt():
-                self.wfile.write(data)
-                print(">>> %s" % (data))
-        print("[Server] Waiting client...")
-        print("<<< %s" % self.rfile.read())
-        print("[Server] Finish client")
+        print("[Server] Handle client")
+        self.prompt_run = True
+        self.prompt_wait = False
+        self.message_queue = Queue.Queue()
+        t = threading.Thread(target=prompt, args=(self,))
+        t.start()
+
+        while True:
+            r, w, e = select.select([self.rfile], [self.wfile], [], 0.2123)
+            if r:
+                response = self.rfile.read()
+                if not len(response):
+                    break
+                print("<<< %s" % response)
+            if w:
+                while not self.message_queue.empty():
+                    message = self.message_queue.get()
+                    self.wfile.write(message)
+                    print(">>> %s" % message)
+                else:
+                    self.prompt_wait = False
+            if e:
+                break
+
+        print("Press Enter to finish client")
+        self.prompt_run = False
+        t.join()
+        print("Client finished!")
 
 
 if __name__ == "__main__":
