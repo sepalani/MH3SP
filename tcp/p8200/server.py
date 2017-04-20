@@ -1,12 +1,13 @@
 #! /usr/bin/python
 
 import sys
-import socket
 import select
+import struct
 import threading
 import Queue
 
-from optparse import OptionParser
+from collections import namedtuple
+
 
 try:
     from utils.MHTriSSLServer import *
@@ -32,13 +33,40 @@ def prompt(handler):
             s = input("$> ")
             if not s:
                 return
-            handler.message_queue.put(str(eval(s)).encode('ascii'))
+            handler.message_queue.put(eval(s))
             handler.prompt_wait = True
         except (KeyboardInterrupt, EOFError) as e:
             print("[Exiting prompt]")
             return
         except Exception as e:
             print("%s: %s" % (type(e).__name__, e))
+
+
+def hexdump(data):
+    """Print data hexdump."""
+    data = bytearray(data)
+    line_format = "{line:08x} | {hex:47} | {ascii}"
+    def hex_helper(b):
+        return "{0:02x}".format(b)
+    def ascii_helper(b):
+        return chr(b) if 0x20 <= b < 0x7F else '.'
+    for i in range(0, len(data), 16):
+        line = data[i:i+16]
+        print(line_format.format(
+            line=i,
+            hex=" ".join(hex_helper(b) for b in line),
+            ascii="".join(ascii_helper(b) for b in line)
+        ))
+
+
+MHTriPacketHeader = namedtuple(
+    "MHTriPacketHeader", [
+        "size",  # uint16_t
+        "nonce", # uint16_t
+        "x",     # uint16_t
+        "y"      # uint16_t
+    ]
+)
 
 
 class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
@@ -50,6 +78,7 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
        -> [0x00~0x01] Response size (uint16)
        -> [0x02~0x07] ???
     """
+
     def handle(self):
         """In-game buffer address
 
@@ -67,10 +96,15 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
         while True:
             r, w, e = select.select([self.rfile], [self.wfile], [], 0.2123)
             if r:
-                response = self.rfile.read()
-                if not len(response):
+                print("\n<<< Reading header...")
+                data = self.rfile.read(0x8)
+                if not len(data):
                     break
-                print("<<< %s" % response)
+                print("<<< Reading data...")
+                header = MHTriPacketHeader(*struct.unpack("!HHHH", data))
+                data += self.rfile.read(header.size)
+                hexdump(data)
+                sys.stdout.write("$> ")
             if w:
                 while not self.message_queue.empty():
                     message = self.message_queue.get()
@@ -88,6 +122,9 @@ class MHTriP8200RequestHandler(SocketServer.StreamRequestHandler):
 
 
 if __name__ == "__main__":
+    import socket
+    from optparse import OptionParser
+
     parser = OptionParser()
     parser.add_option("-H", "--hostname", action="store", type=str,
                       default=socket.gethostname(), dest="host",
