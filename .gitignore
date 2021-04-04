@@ -1,3 +1,5 @@
 *.crt
 *.key
 *.pyc
+*.dol
+logs
