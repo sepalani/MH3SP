@@ -113,6 +113,14 @@ PAT_NAMES = {
     0x62310200: 'AnsNoCharge',
     0x62410100: 'ReqMediaVersionInfo',
     0x62410200: 'AnsMediaVersionInfo',
+    0x62500100: 'ReqVulgarityInfoHighJAP',
+    0x62500200: 'AnsVulgarityInfoHighJAP',
+    0x62510100: 'ReqVulgarityHighJAP',
+    0x62510200: 'AnsVulgarityHighJAP',
+    0x62520100: 'ReqVulgarityInfoLowJAP',
+    0x62520200: 'AnsVulgarityInfoLowJAP',
+    0x62530100: 'ReqVulgarityLowJAP',
+    0x62530200: 'AnsVulgarityLowJAP',
     0x62540100: 'ReqVulgarityInfoHigh',
     0x62540200: 'AnsVulgarityInfoHigh',
     0x62550100: 'ReqVulgarityHigh',
@@ -414,6 +422,14 @@ class PatID4:
     AnsNoCharge = 0x62310200
     ReqMediaVersionInfo = 0x62410100
     AnsMediaVersionInfo = 0x62410200
+    ReqVulgarityInfoHighJAP = 0x62500100
+    AnsVulgarityInfoHighJAP = 0x62500200
+    ReqVulgarityHighJAP = 0x62510100
+    AnsVulgarityHighJAP = 0x62510200
+    ReqVulgarityInfoLowJAP = 0x62520100
+    AnsVulgarityInfoLowJAP = 0x62520200
+    ReqVulgarityLowJAP = 0x62530100
+    AnsVulgarityLowJAP = 0x62530200
     ReqVulgarityInfoHigh = 0x62540100
     AnsVulgarityInfoHigh = 0x62540200
     ReqVulgarityHigh = 0x62550100
@@ -654,13 +670,3 @@ class PatServerType:
     FMP = 1
     OPN = 2
     RFP = 3
-
-
-class PatItemType:
-    Null = 0
-    Byte = 1
-    Word = 2
-    Long = 3
-    LongLong = 4
-    String = 5
-    Binary = 6
