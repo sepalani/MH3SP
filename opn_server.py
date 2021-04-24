@@ -19,7 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from mh.constants import *
 from mh.pat import PatServer, PatRequestHandler
+
 from other.utils import server_base, server_main
 
 

@@ -24,12 +24,15 @@ try:
     # Python 3.x
     import tkinter as tk
     import tkinter.scrolledtext as ScrolledText
+    from queue import Queue
 except ImportError:
     # Python 2.x
     import Tkinter as tk
     import ScrolledText
+    from Queue import Queue
 
 WINDOWS = []
+EMITTERS = Queue()
 
 
 class LoggingHandler(logging.Handler):
@@ -54,7 +57,9 @@ class LoggingHandler(logging.Handler):
             self.text.configure(state='disabled')
             self.text.yview(tk.END)  # Autoscroll to the bottom
 
-        self.text.after(0, append)
+        # Won't work on Python3.x
+        # self.text.after(0, append)
+        EMITTERS.put(lambda: self.text.after(0, append))
 
 
 class LoggerTk(tk.Tk):
@@ -92,6 +97,9 @@ class LoggerTk(tk.Tk):
 
 def update():
     """Manually update logger windows."""
+    while not EMITTERS.empty():
+        f = EMITTERS.get()
+        f()
     for window in WINDOWS:
         window.update_idletasks()
         window.update()

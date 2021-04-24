@@ -22,6 +22,8 @@
 from mh.pat import PatServer, PatRequestHandler
 from other.utils import server_base, server_main
 
+import mh.pat_item as pati
+
 
 class LmpServer(PatServer):
     """Basic LMP server class."""
@@ -30,7 +32,15 @@ class LmpServer(PatServer):
 
 class LmpRequestHandler(PatRequestHandler):
     """Basic LMP server request handler class."""
-    pass
+
+    def recvAnsConnection(self, packet_id, data, seq):
+        """AnsConnection packet."""
+        connection_data = pati.ConnectionData.unpack(data)
+        self.server.debug("Connection: {!r}".format(connection_data))
+        if hasattr(connection_data, "pat_ticket"):
+            self.sendNtcLogin(2, seq)
+        else:
+            self.sendNtcLogin(1, seq)
 
 
 BASE = server_base("LMP", LmpServer, LmpRequestHandler)

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Monster Hunter FMP server.
+"""Monster Hunter time utils module.
 
     Monster Hunter 3 Server Project
     Copyright (C) 2021  Sepalani
@@ -19,29 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from mh.pat import PatServer, PatRequestHandler
-from other.utils import server_base, server_main
+import datetime
 
-import mh.pat_item as pati
-
-
-class FmpServer(PatServer):
-    """Basic FMP server class."""
-    pass
+EPOCH = datetime.datetime(1970, 1, 1)
 
 
-class FmpRequestHandler(PatRequestHandler):
-    """Basic FMP server request handler class."""
-
-    def recvAnsConnection(self, packet_id, data, seq):
-        """AnsConnection packet."""
-        connection_data = pati.ConnectionData.unpack(data)
-        self.server.debug("Connection: {!r}".format(connection_data))
-        self.sendNtcLogin(3, seq)
-
-
-BASE = server_base("FMP", FmpServer, FmpRequestHandler)
-
-
-if __name__ == "__main__":
-    server_main(*BASE)
+def datetime_to_int(dt):
+    return int((dt - EPOCH).total_seconds())
