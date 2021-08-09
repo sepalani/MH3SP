@@ -120,7 +120,7 @@ FMP_VERSION = 1
 
 # Dummy PAT_BINARY
 PAT_BINARIES = {
-    0x01: {  # 2nd JP
+    0x01: {
         "version": 1,
         "content": make_binary_1()
     },
@@ -136,18 +136,96 @@ PAT_BINARIES = {
         "version": 1,
         "content": b"4" * 0x10  # b"titi\ttoto\ttutu\nbibi\tbobo\bubu\nouba\t"
     },
-    0x05: {
+    0x05: {  # English
         "version": 1,
         "content": b"5" * 0x10  # b"titi\ttoto\ttutu\nbibi\tbobo\bubu\nouba\t"
         # "version": 1,
         # "content": b"TEST_BINARY"
     },
-    0x0a: {  # 1st JP
+    0x0a: {  # Japanese
         "version": 1,
         "content": b"6" * 0x50  # b"foo\tbar\tfuu\nboo\tfaa\bbaa\nree\t"
-        # "version": 1,
-        # "content": b"TEST_BINARY"
-    }
+    },
+    0x10: {  # French
+        "version": 1,
+        "content": b"dummy_10\0"
+    },
+    0x11: {  # French
+        "version": 1,
+        "content": b"dummy_11\0"
+    },
+    0x12: {  # French
+        "version": 1,
+        "content": b"dummy_12\0"
+    },
+    0x13: {  # French
+        "version": 1,
+        "content": b"dummy_13\0"
+    },
+    0x14: {  # French
+        "version": 1,
+        "content": b"dummy_14\0"
+    },
+    0x1f: {  # German
+        "version": 1,
+        "content": b"dummy_1f\0"
+    },
+    0x20: {  # German
+        "version": 1,
+        "content": b"dummy_20\0"
+    },
+    0x21: {  # German
+        "version": 1,
+        "content": b"dummy_21\0"
+    },
+    0x22: {  # German
+        "version": 1,
+        "content": b"dummy_22\0"
+    },
+    0x23: {  # German
+        "version": 1,
+        "content": b"dummy_23\0"
+    },
+    0x2e: {  # Italian
+        "version": 1,
+        "content": b"dummy_2e\0"
+    },
+    0x2f: {  # Italian
+        "version": 1,
+        "content": b"dummy_2f\0"
+    },
+    0x30: {  # Italian
+        "version": 1,
+        "content": b"dummy_30\0"
+    },
+    0x31: {  # Italian
+        "version": 1,
+        "content": b"dummy_31\0"
+    },
+    0x32: {  # Italian
+        "version": 1,
+        "content": b"dummy_32\0"
+    },
+    0x3d: {  # Spanish
+        "version": 1,
+        "content": b"dummy_3d\0"
+    },
+    0x3e: {  # Spanish
+        "version": 1,
+        "content": b"dummy_3e\0"
+    },
+    0x3f: {  # Spanish
+        "version": 1,
+        "content": b"dummy_3f\0"
+    },
+    0x40: {  # Spanish
+        "version": 1,
+        "content": b"dummy_40\0"
+    },
+    0x41: {  # Spanish
+        "version": 1,
+        "content": b"dummy_41\0"
+    },
 }
 
 PAT_CATEGORIES = {
