@@ -233,7 +233,7 @@ def create_server(server_class, server_handler,
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
 
 
-def create_server_from_base(name, server_class, server_handler):
+def create_server_from_base(name, server_class, server_handler, silent=False):
     """Create a server based on its config parameters."""
     config = get_config(name)
     return create_server(
@@ -246,7 +246,7 @@ def create_server_from_base(name, server_class, server_handler):
         ssl_key=config["SSLKey"],
         log_to_file=config["LogToFile"],
         log_filename=config["LogFilename"],
-        log_to_console=config["LogToConsole"],
+        log_to_console=config["LogToConsole"] and not silent,
         log_to_window=config["LogToWindow"]
     ), config["LogToWindow"]
 
