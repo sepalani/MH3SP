@@ -99,9 +99,19 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             packet_id, seq, hexdump(data)
         )
 
-    def recvNtc0x6050(self, packet_id, data, seq):
-        """TODO: Timeout"""
-        pass
+    def recvNtcCollectionLog(self, packet_id, data, seq):
+        """NtcCollectionLog packet.
+
+        ID: 60501000
+        JP: 収集ログ通知
+        TR: Collection log notification
+
+        This packet is sent by the game when an error occurs.
+
+        TODO: Find all error codes and their meanings.
+        """
+        data = pati.CollectionLog.unpack(data)
+        self.server.debug("CollectionLog: {!r}".format(data))
 
     def sendReqLineCheck(self):
         """ReqLineCheck packet.

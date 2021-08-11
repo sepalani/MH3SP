@@ -363,6 +363,14 @@ class DummyData(PatData):
     FIELDS = tuple()
 
 
+class CollectionLog(PatData):
+    FIELDS = (
+        (0x01, "error_code"),
+        (0x02, "unk_long_0x02"),
+        (0x03, "timeout_value"),
+    )
+
+
 class ConnectionData(PatData):
     # Constants are based on the US version of the game
     FIELDS = (

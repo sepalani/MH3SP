@@ -270,7 +270,7 @@ PAT_NAMES = {
     0x60310200: 'AnsTicket',
     0x60400100: 'ReqWarning',
     0x60400200: 'AnsWarning',
-    0x60501000: 'Ntc0x6050',
+    0x60501000: 'NtcCollectionLog',
     0x60700100: 'ReqCommonKey',
     0x60700200: 'AnsCommonKey',
     0x60801000: 'NtcCheatCheck',
@@ -583,7 +583,7 @@ class PatID4:
     AnsTicket2 = 0x60310200
     ReqWarning = 0x60400100
     AnsWarning = 0x60400200
-    Ntc0x6050 = 0x60501000
+    NtcCollectionLog = 0x60501000
     ReqCommonKey = 0x60700100
     AnsCommonKey = 0x60700200
     NtcCheatCheck = 0x60801000
