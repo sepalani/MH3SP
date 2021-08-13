@@ -28,7 +28,7 @@ def pad(s, size, p=b'\0'):
     return data
 
 
-def make_binary_1():
+def make_binary_server_type_list():
     data = b""
     PROPERTIES = [
         (b"Open", b"Hunters of all Ranks\ncan gather here.", 0, 999),
@@ -122,7 +122,7 @@ FMP_VERSION = 1
 PAT_BINARIES = {
     0x01: {
         "version": 1,
-        "content": make_binary_1()
+        "content": make_binary_server_type_list()
     },
     0x02: {
         "version": 1,
@@ -148,7 +148,7 @@ PAT_BINARIES = {
     },
     0x10: {  # French
         "version": 1,
-        "content": b"dummy_10\0"
+        "content": make_binary_server_type_list()
     },
     0x11: {  # French
         "version": 1,
@@ -168,7 +168,7 @@ PAT_BINARIES = {
     },
     0x1f: {  # German
         "version": 1,
-        "content": b"dummy_1f\0"
+        "content": make_binary_server_type_list()
     },
     0x20: {  # German
         "version": 1,
@@ -188,7 +188,7 @@ PAT_BINARIES = {
     },
     0x2e: {  # Italian
         "version": 1,
-        "content": b"dummy_2e\0"
+        "content": make_binary_server_type_list()
     },
     0x2f: {  # Italian
         "version": 1,
@@ -208,7 +208,7 @@ PAT_BINARIES = {
     },
     0x3d: {  # Spanish
         "version": 1,
-        "content": b"dummy_3d\0"
+        "content": make_binary_server_type_list()
     },
     0x3e: {  # Spanish
         "version": 1,
