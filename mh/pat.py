@@ -1430,6 +1430,76 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
 
+    def recvReqLayerDetailSearchHead(self, packet_id, data, seq):
+        """ReqLayerDetailSearchHead packet.
+
+        ID: 64900100
+        JP: レイヤ検索詳細数要求
+        TR: Layer detail search count request
+
+        TODO: Parse the search data.
+        """
+        self.sendAnsLayerDetailSearchHead(data, seq)
+
+    def sendAnsLayerDetailSearchHead(self, data, seq):
+        """AnsLayerDetailSearchHead packet.
+
+        ID: 64900200
+        JP: レイヤ検索詳細数返答
+        TR: Layer detail search count response
+
+        TODO: Find what to send.
+        """
+        unk1 = 0
+        unk2 = 0
+        count = 0
+        data = struct.pack(">III", unk1, count, unk2)
+        self.send_packet(PatID4.AnsLayerDetailSearchHead, data, seq)
+
+    def recvReqLayerDetailSearchData(self, packet_id, data, seq):
+        """ReqLayerDetailSearchData packet.
+
+        ID: 64910100
+        JP: レイヤ検索詳細データ要求
+        TR: Layer detail search data request
+
+        TODO: Handle this request.
+        """
+        unk1, unk2 = struct.unpack_from(">II", data)
+        self.sendAnsLayerDetailSearchData(unk1, unk2, seq)
+
+    def sendAnsLayerDetailSearchData(self, unk1, unk2, seq):
+        """AnsLayerDetailSearchData packet.
+
+        ID: 64910200
+        JP: レイヤ検索詳細データ返答
+        TR: Layer detail search data response
+
+        TODO: Handle this response.
+        """
+        unk = 0
+        count = 0
+        data = struct.pack(">II", 0, 0)
+        self.send_packet(PatID4.AnsLayerDetailSearchData, data, seq)
+
+    def recvReqLayerDetailSearchFoot(self, packet_id, data, seq):
+        """ReqLayerDetailSearchFoot packet.
+
+        ID: 64920100
+        JP: レイヤ検索詳細終了要求
+        TR: Layer detail search end of transmission request
+        """
+        self.sendAnsLayerDetailSearchFoot(data, seq)
+
+    def sendAnsLayerDetailSearchFoot(self, data, seq):
+        """AnsLayerDetailSearchFoot packet.
+
+        ID: 64920200
+        JP: レイヤ検索詳細終了返答
+        TR: Layer detail search end of transmission response
+        """
+        self.send_packet(PatID4.AnsLayerDetailSearchFoot, b"", seq)
+
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
         if packet_id not in PAT_NAMES:
