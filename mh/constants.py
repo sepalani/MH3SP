@@ -48,6 +48,27 @@ def make_binary_server_type_list():
     return data
 
 
+def make_binary_npc_greeters():
+    """Binary with NPC City Greeter.
+
+    Data offset:
+     - 0x000: Tool Shop
+     - 0x180: material shop
+     - 0x300: Trading Post
+     - 0x480: Quest Receptionist
+     - 0x600: Arena Clerk
+     - 0x780: Guildmaster
+    """
+    data = b""
+    data += pad(b"Plaza Tool Shop\n\nNot supported yet.", 0x180)
+    data += pad(b"Material shop unavailable\nyet.", 0x180)
+    data += pad(b"Trading post closed at\nthe moment.", 0x180)
+    data += pad(b"No event quests.", 0x180)
+    data += pad(b"No arena quests.", 0x180)
+    data += pad(b"To all hunters:\n\nThis is a test server.", 0x180)
+    return data
+
+
 # msf-pattern_create -l 0xe50
 MSF_PATTERN = \
     "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac" \
@@ -130,7 +151,7 @@ PAT_BINARIES = {
     },
     0x03: {
         "version": 1,
-        "content": b"3" * 0x10  # b"titi\ttoto\ttutu\nbibi\tbobo\bubu\nouba\t"
+        "content": make_binary_npc_greeters()
     },
     0x04: {
         "version": 1,
@@ -156,7 +177,7 @@ PAT_BINARIES = {
     },
     0x12: {  # French
         "version": 1,
-        "content": b"dummy_12\0"
+        "content": make_binary_npc_greeters()
     },
     0x13: {  # French
         "version": 1,
@@ -176,7 +197,7 @@ PAT_BINARIES = {
     },
     0x21: {  # German
         "version": 1,
-        "content": b"dummy_21\0"
+        "content": make_binary_npc_greeters()
     },
     0x22: {  # German
         "version": 1,
@@ -196,7 +217,7 @@ PAT_BINARIES = {
     },
     0x30: {  # Italian
         "version": 1,
-        "content": b"dummy_30\0"
+        "content": make_binary_npc_greeters()
     },
     0x31: {  # Italian
         "version": 1,
@@ -216,7 +237,7 @@ PAT_BINARIES = {
     },
     0x3f: {  # Spanish
         "version": 1,
-        "content": b"dummy_3f\0"
+        "content": make_binary_npc_greeters()
     },
     0x40: {  # Spanish
         "version": 1,
