@@ -45,6 +45,14 @@ def make_binary_server_type_list():
     for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
         data[0x13AC + i*4:0x13AE + i*4] = struct.pack(">H", hr_min)
         data[0x13AE + i*4:0x13B0 + i*4] = struct.pack(">H", hr_max)
+    SEEKINGS = [
+        b"Seeking0", b"Seeking1", b"Seeking2",
+    ]
+    for i, seeking in enumerate(SEEKINGS):
+        p = 0x30C + i * 52  # struct size
+        data[p:p+len(seeking)] = seeking
+        data[0x33D + i * 52] = 0x01
+        data[0x33E + i * 52] = 0xFF
     return data
 
 
@@ -174,9 +182,45 @@ PAT_BINARIES = {
         # "version": 1,
         # "content": b"TEST_BINARY"
     },
+    0x06: {
+        "version": 1,
+        "content": b"dummy_06\0"
+    },
+    0x07: {
+        "version": 1,
+        "content": b"dummy_07\0"
+    },
+    0x08: {
+        "version": 1,
+        "content": b"dummy_08\0"
+    },
+    0x09: {
+        "version": 1,
+        "content": b"dummy_09\0"
+    },
     0x0a: {  # Japanese
         "version": 1,
         "content": b"6" * 0x50  # b"foo\tbar\tfuu\nboo\tfaa\bbaa\nree\t"
+    },
+    0x0b: {
+        "version": 1,
+        "content": b"dummy_0b\0"
+    },
+    0x0c: {
+        "version": 1,
+        "content": b"dummy_0c\0"
+    },
+    0x0d: {
+        "version": 1,
+        "content": b"dummy_0d\0"
+    },
+    0x0e: {
+        "version": 1,
+        "content": b"dummy_0e\0"
+    },
+    0x0f: {
+        "version": 1,
+        "content": b"dummy_0f\0"
     },
     0x10: {  # French
         "version": 1,

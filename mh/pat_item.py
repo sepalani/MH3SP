@@ -456,17 +456,17 @@ class LayerData(PatData):
     FIELDS = (
         (0x01, "unk_long_0x01"),
         (0x02, "unk_custom_0x02"),
-        (0x03, "unk_string_0x03"),
+        (0x03, "name"),
         (0x05, "unk_worddec_0x05"),
-        (0x06, "unk_long_0x06"),
+        (0x06, "size"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
-        (0x09, "unk_long_0x09"),
+        (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
-        (0x10, "unk_byte_0x10"),
+        (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
         (0x11, "unk_long_0x11"),
         (0x12, "unk_byte_0x12"),
         (0x15, "unk_bytedec_0x15"),
@@ -499,24 +499,66 @@ class UserStatusSet(PatData):
     )
 
 
+class LayerSet(PatData):
+    FIELDS = (
+        (0x01, "unk_long_0x01"),
+        (0x02, "unk_binary_0x02"),
+        (0x03, "unk_string_0x03"),
+        (0x05, "unk_binary_0x05"),
+        (0x09, "unk_long_0x09"),
+        (0x0a, "unk_long_0x0a"),
+        (0x0c, "unk_long_0x0c"),
+        (0x17, "unk_binary_0x17"),
+    )
+
+
+class MediationListItem(PatData):
+    FIELDS = (
+        (0x01, "name"),
+        (0x02, "unk_byte_0x02"),
+        (0x03, "unk_byte_0x03"),
+    )
+
+
+class CircleInfo(PatData):
+    FIELDS = (
+        (0x01, "unk_long_0x01"),
+        (0x02, "unk_string_0x02"),
+        (0x03, "unk_byte_0x03"),
+        (0x05, "unk_binary_0x05"),
+        (0x06, "unk_string_0x06"),
+        (0x07, "unk_long_0x07"),
+        (0x08, "unk_long_0x08"),
+        (0x09, "unk_long_0x09"),
+        (0x0a, "unk_long_0x0a"),
+        (0x0b, "unk_long_0x0b"),
+        (0x0c, "unk_long_0x0c"),
+        (0x0d, "unk_string_0x0d"),
+        (0x0e, "unk_byte_0x0e"),
+        (0x0f, "unk_byte_0x0f"),
+        (0x0f, "unk_byte_0x10"),
+    )
+
+
 def getDummyLayerData():
     layer = LayerData()
     layer.unk_long_0x01 = Long(1)
     # layer.unk_custom_0x02 = Custom(b"")
-    layer.unk_string_0x03 = String("LayerStart")
-    layer.unk_worddec_0x05 = Word(2)
-    layer.unk_long_0x06 = Long(1)
-    layer.unk_long_0x07 = Long(1)
-    layer.unk_long_0x08 = Long(1)
-    layer.unk_long_0x09 = Long(1)
-    layer.unk_long_0x0a = Long(1)
-    layer.unk_long_0x0b = Long(1)
-    layer.unk_long_0x0c = Long(1)
-    layer.unk_word_0x0d = Word(3)
-    layer.unk_byte_0x10 = Byte(1)
-    layer.unk_long_0x11 = Long(1)
-    layer.unk_byte_0x12 = Byte(1)
-    layer.unk_bytedec_0x15 = Byte(2)
-    layer.unk_string_0x16 = String("UnkStart")
+    layer.name = String("LayerStart")
+    # layer.unk_worddec_0x05 = Word(2)  # City no longer exists message
+    layer.size = Long(0)
+    # layer.unk_long_0x07 = Long(1)
+    # layer.unk_long_0x08 = Long(1)
+    layer.capacity = Long(4)
+    # layer.unk_long_0x0a = Long(1)
+    layer.unk_long_0x0b = Long(0)  # In city population
+    # layer.unk_long_0x0c = Long(1)
+    # layer.unk_word_0x0d = Word(1)
+    layer.state = Byte(1)
+    # layer.unk_long_0x11 = Long(1)
+    # layer.unk_long_0x11 = Long(1)
+    # layer.unk_byte_0x12 = Byte(1)
+    # layer.unk_bytedec_0x15 = Byte(1)
+    # layer.unk_string_0x16 = String("UnkStart")
     # layer.unk_binary_0x17 = Binary(b"binStart")
     return layer

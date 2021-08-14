@@ -1500,6 +1500,127 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         self.send_packet(PatID4.AnsLayerDetailSearchFoot, b"", seq)
 
+    def recvReqLayerCreateHead(self, packet_id, data, seq):
+        """ReqLayerCreateHead packet.
+
+        ID: 64110100
+        JP: レイヤ作成要求（番号指定）
+        TR: Layer creation request (number specified)
+        """
+        number, = struct.unpack(">H", data)
+        self.sendAnsLayerCreateHead(number, seq)
+
+    def sendAnsLayerCreateHead(self, number, seq):
+        """AnsLayerCreateHead packet.
+
+        ID: 64110200
+        JP: レイヤ作成返答
+        TR: Layer creation response
+        """
+        data = struct.pack(">H", number)
+        self.send_packet(PatID4.AnsLayerCreateHead, data, seq)
+
+    def recvReqLayerCreateSet(self, packet_id, data, seq):
+        """ReqLayerCreateSet packet.
+
+        ID: 64120100
+        JP: レイヤ作成設定要求（番号指定）
+        TR: Layer creation settings request (number specified)
+        """
+        number, = struct.unpack_from(">H", data)
+        layer_set = pati.LayerSet.unpack(data, 2)
+        unk = data[2+len(layer_set.pack()):]
+        self.server.debug("LayerCreateSet: {}, {!r}, {}".format(
+            number, layer_set, unk))
+        self.sendAnsLayerCreateSet(number, layer_set, unk, seq)
+
+    def sendAnsLayerCreateSet(self, number, layer_set, unk, seq):
+        """AnsLayerCreateSet packet.
+
+        ID: 64120200
+        JP: レイヤ作成設定返答
+        TR: Layer creation settings response
+        """
+        data = struct.pack(">H", number)
+        self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
+
+    def recvReqLayerCreateFoot(self, packet_id, data, seq):
+        """ReqLayerCreateFoot packet.
+
+        ID: 64130100
+        JP: レイヤ作成完了要求（番号指定）
+        TR: Layer creation end of transmission request
+        """
+        number, unk = struct.unpack(">HB", data)
+        self.sendAnsLayerCreateFoot(number, unk, seq)
+
+    def sendAnsLayerCreateFoot(self, number, unk, seq):
+        """AnsLayerCreateFoot packet.
+
+        ID: 64130200
+        JP: レイヤ作成完了返答
+        TR: Layer creation end of transmission response
+        """
+        data = struct.pack(">H", number)
+        self.send_packet(PatID4.AnsLayerCreateFoot, data, seq)
+
+    def recvReqLayerMediationList(self, packet_id, data, seq):
+        """ReqLayerMediationList packet.
+
+        ID: 64820100
+        JP: レイヤ調停データリスト取得要求
+        TR: Get layer mediation list request
+        """
+        unk1, unk2 = struct.unpack_from(">BB", data)
+        unk3 = data[2:]
+        self.sendAnsLayerMediationList(unk1, unk2, unk3, seq)
+
+    def sendAnsLayerMediationList(self, unk1, unk2, unk3, seq):
+        """AnsLayerMediationList packet.
+
+        ID: 64820200
+        JP: レイヤ調停データリスト取得返答
+        TR: Get layer mediation list response
+        """
+        unk = 0
+        count = 1
+        item = pati.MediationListItem()
+        item.name = pati.String(b"Test")
+        item.unk_byte_0x02 = pati.Byte(0)
+        item.unk_byte_0x03 = pati.Byte(0)
+        data = struct.pack(">BB", unk, count)
+        items = [item]
+        for item in items:
+            data += item.pack()
+        self.send_packet(PatID4.AnsLayerMediationList, data, seq)
+
+    def recvReqCircleListLayer(self, packet_id, data, seq):
+        """ReqCircleListLayer packet.
+
+        ID: 65270100
+        JP: サークル同期リスト要求 (レイヤ)
+        TR: Circle sync list request (layer)
+        """
+        self.sendAnsCircleListLayer(data, seq)
+
+    def sendAnsCircleListLayer(self, data, seq):
+        """AnsCircleListLayer packet.
+
+        ID: 65270200
+        JP: サークル同期リスト返答 (レイヤ)
+        TR: Circle sync list response (layer)
+        """
+        unk = 0
+        count = 1
+        data = struct.pack(">II", unk, count)
+        circle = pati.CircleInfo()
+        data += circle.pack()  # TODO: Fill this struct
+
+        # A strange struct is also used, try to skip it
+        data += struct.pack(">B", 0) + b"\0" * 2
+
+        self.send_packet(PatID4.AnsCircleListLayer, data, seq)
+
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
         if packet_id not in PAT_NAMES:
