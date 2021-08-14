@@ -58,14 +58,25 @@ def make_binary_npc_greeters():
      - 0x480: Quest Receptionist
      - 0x600: Arena Clerk
      - 0x780: Guildmaster
+
+     Japanese offset:
+     - 0x000: Tool Shop
+     - 0x100: material shop
+     - 0x200: Trading Post
+     - 0x300: Quest Receptionist
+     - 0x400: Arena Clerk
+     - 0x500: Guildmaster
     """
+    US_OFFSET = 0x180
+    JP_OFFSET = 0x100
+    offset = US_OFFSET
     data = b""
-    data += pad(b"Plaza Tool Shop\n\nNot supported yet.", 0x180)
-    data += pad(b"Material shop unavailable\nyet.", 0x180)
-    data += pad(b"Trading post closed at\nthe moment.", 0x180)
-    data += pad(b"No event quests.", 0x180)
-    data += pad(b"No arena quests.", 0x180)
-    data += pad(b"To all hunters:\n\nThis is a test server.", 0x180)
+    data += pad(b"Plaza Tool Shop\n\nNot supported yet.", offset)
+    data += pad(b"Material shop unavailable\nyet.", offset)
+    data += pad(b"Trading post closed at\nthe moment.", offset)
+    data += pad(b"No event quests.", offset)
+    data += pad(b"No arena quests.", offset)
+    data += pad(b"To all hunters:\n\nThis is a test server.", offset)
     return data
 
 
