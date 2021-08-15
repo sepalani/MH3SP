@@ -114,7 +114,7 @@ class Word(Item):
     def __new__(cls, w):
         return Item.__new__(cls, pack_word(w))
 
-    def __repr__(Word):
+    def __repr__(self):
         return "Word({!r})".format(unpack_word(self))
 
 
@@ -524,12 +524,13 @@ class CircleInfo(PatData):
     FIELDS = (
         (0x01, "unk_long_0x01"),
         (0x02, "unk_string_0x02"),
-        (0x03, "unk_byte_0x03"),
-        (0x05, "unk_binary_0x05"),
-        (0x06, "unk_string_0x06"),
+        (0x03, "has_password"),
+        (0x04, "password"),
+        (0x05, "unk_binary_0x05"),  # party members?
+        (0x06, "remarks"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
-        (0x09, "unk_long_0x09"),
+        (0x09, "team_size"),
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
         (0x0c, "unk_long_0x0c"),
@@ -537,6 +538,14 @@ class CircleInfo(PatData):
         (0x0e, "unk_byte_0x0e"),
         (0x0f, "unk_byte_0x0f"),
         (0x0f, "unk_byte_0x10"),
+    )
+
+
+class MatchOptionSet(PatData):
+    FIELDS = (
+        (0x01, "unk_binary_0x01"),
+        (0x02, "unk_word_0x02"),
+        (0x03, "unk_byte_0x03"),
     )
 
 

@@ -37,6 +37,9 @@ except ImportError:
     import SocketServer
 
 
+g_circle = None
+
+
 class PatServer(SocketServer.TCPServer, Logger):
     """Generic PAT server class."""
 
@@ -1712,15 +1715,125 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle sync list response (layer)
         """
         unk = 0
-        count = 1
+        count = 0
         data = struct.pack(">II", unk, count)
+        """
         circle = pati.CircleInfo()
         data += circle.pack()  # TODO: Fill this struct
 
         # A strange struct is also used, try to skip it
         data += struct.pack(">B", 0) + b"\0" * 2
+        """
 
         self.send_packet(PatID4.AnsCircleListLayer, data, seq)
+
+    def recvReqCircleCreate(self, packet_id, data, seq):
+        """ReqCircleCreate packet.
+
+        ID: 65010100
+        JP: サークル作成要求
+        TR: Circle creation request
+        """
+        circle = pati.CircleInfo.unpack(data)
+        unk = data[len(circle.pack()):]
+        self.server.debug("CircleCreate: {!r}, {}".format(circle, unk))
+        self.sendAnsCircleCreate(circle, unk, seq)
+
+    def sendAnsCircleCreate(self, circle, unk, seq):
+        """AnsCircleCreate packet.
+
+        ID: 65010200
+        JP: サークル作成返答
+        TR: Circle creation response
+        """
+        data = struct.pack(">I", 1)
+        global g_circle
+        g_circle = circle
+        self.send_packet(PatID4.AnsCircleCreate, data, seq)
+
+    def recvReqCircleMatchOptionSet(self, packet_id, data, seq):
+        """ReqCircleMatchOptionSet packet.
+
+        ID: 65100100
+        JP: マッチングオプション設定要求
+        TR: Match option settings request
+        """
+        options = pati.MatchOptionSet.unpack(data)
+        self.server.debug("MatchOptionSet: {!r}".format(options))
+        self.sendAnsCircleMatchOptionSet(options, seq)
+
+    def sendAnsCircleMatchOptionSet(self, options, seq):
+        """AnsCircleMatchOptionSet packet.
+
+        ID: 65100200
+        JP: マッチングオプション設定返答
+        TR: Match option settings response
+        """
+        self.send_packet(PatID4.AnsCircleMatchOptionSet, b"", seq)
+
+    def recvReqCircleInfo(self, packet_id, data, seq):
+        """ReqCircleInfo packet.
+
+        ID: 65020100
+        JP: サークルデータ取得要求
+        TR: Get circle data request
+        """
+        unk1, = struct.unpack_from(">I", data)
+        unk2 = data[4:4+0xd]
+        unk3 = data[4+0xd:]
+        self.server.debug("ReqCircleInfo: {}, {}, {}".format(unk1, unk2, unk3))
+        self.sendAnsCircleInfo(unk1, unk2, unk3, seq)
+
+    def sendAnsCircleInfo(self, unk1, unk2, unk3, seq):
+        """AnsCircleInfo packet.
+
+        ID: 65020200
+        JP: サークルデータ取得返答
+        TR: Get circle data response
+        """
+        data = struct.pack(">I", 0)  # unk1)
+        global g_circle
+        circle = g_circle  # pati.CircleInfo()
+
+        # Fuzzing
+        circle.unk_long_0x01 = pati.Long(1)
+        circle.unk_string_0x02 = pati.String("192.168.23.1")
+        circle.unk_long_0x07 = pati.Long(1)
+        circle.unk_long_0x08 = pati.Long(1)
+        circle.unk_long_0x0a = pati.Long(1)
+        circle.unk_long_0x0b = pati.Long(1)
+        circle.unk_long_0x0c = pati.Long(1)
+        circle.unk_string_0x0d = pati.String("192.168.23.1")
+        circle.unk_byte_0x0f = pati.Byte(1)
+        circle.unk_byte_0x10 = pati.Byte(1)
+
+        self.server.debug("AnsCircleInfo: {!r}".format(circle))
+        data += circle.pack()  # TODO: Fill this struct
+
+        # A strange struct is also used, try to skip it
+        data += struct.pack(">B", 0) + b"\0" * 2
+
+        self.send_packet(PatID4.AnsCircleInfo, data, seq)
+
+    def recvReqCircleLeave(self, packet_id, data, seq):
+        """ReqCircleLeave packet.
+
+        ID: 65040100
+        JP: サークルアウト要求
+        TR: Circle out request
+        """
+        unk, = struct.unpack(">I", data)
+        self.sendAnsCircleLeave(unk, seq)
+
+    def sendAnsCircleLeave(self, unk, seq):
+        """AnsCircleLeave packet.
+
+        ID: 65040200
+        JP: サークルアウト返答
+        TR: Circle out response
+        """
+        data = struct.pack(">I", unk)
+        self.send_packet(PatID4.AnsCircleLeave, data, seq)
 
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
