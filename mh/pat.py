@@ -1564,6 +1564,27 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">H", number)
         self.send_packet(PatID4.AnsLayerCreateFoot, data, seq)
 
+    def recvReqLayerUp(self, packet_id, data, seq):
+        """ReqLayerUp packet.
+
+        ID: 64150100
+        JP: レイヤアップ要求
+        TR: Layer up request
+
+        Sent by the game when leaving the gate via the entrance:
+         - Relocate > Select Server
+        """
+        self.sendAnsLayerUp(data, seq)
+
+    def sendAnsLayerUp(self, data, seq):
+        """AnsLayerUp packet.
+
+        ID: 64150200
+        JP: レイヤアップ返答
+        TR: Layer up response
+        """
+        self.send_packet(PatID4.AnsLayerUp, b"", seq)
+
     def recvReqLayerMediationList(self, packet_id, data, seq):
         """ReqLayerMediationList packet.
 

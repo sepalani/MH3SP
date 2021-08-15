@@ -28,7 +28,7 @@ def pad(s, size, p=b'\0'):
     return data
 
 
-def make_binary_server_type_list():
+def make_binary_server_type_list(is_jap=False):
     data = b""
     PROPERTIES = [
         (b"Open", b"Hunters of all Ranks\ncan gather here.", 0, 999),
@@ -39,8 +39,11 @@ def make_binary_server_type_list():
         (b"Modding", b"Mods are allowed here.", 0, 999)
     ]
     for name, desc, hr_min, hr_max in PROPERTIES:
-        data += pad(name, 24)
-        data += pad(desc, 168)
+        data += pad(name, 16 if is_jap else 24)
+        data += pad(desc, 112 if is_jap else 168)
+    if is_jap:
+        # TODO: Reverse the japanese struct
+        return data
     data = pad(data, 0x13AC + len(PROPERTIES) * 5)
     for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
         data[0x13AC + i*4:0x13AE + i*4] = struct.pack(">H", hr_min)
@@ -56,7 +59,7 @@ def make_binary_server_type_list():
     return data
 
 
-def make_binary_npc_greeters():
+def make_binary_npc_greeters(is_jap=False):
     """Binary with NPC City Greeter.
 
     Data offset:
@@ -77,7 +80,7 @@ def make_binary_npc_greeters():
     """
     US_OFFSET = 0x180
     JP_OFFSET = 0x100
-    offset = US_OFFSET
+    offset = JP_OFFSET if is_jap else US_OFFSET
     data = b""
     data += pad(b"Plaza Tool Shop\n\nNot supported yet.", offset)
     data += pad(b"Material shop unavailable\nyet.", offset)
@@ -162,7 +165,7 @@ FMP_VERSION = 1
 PAT_BINARIES = {
     0x01: {
         "version": 1,
-        "content": make_binary_server_type_list()
+        "content": make_binary_server_type_list(is_jap=False)
     },
     0x02: {
         "version": 1,
@@ -170,7 +173,7 @@ PAT_BINARIES = {
     },
     0x03: {
         "version": 1,
-        "content": make_binary_npc_greeters()
+        "content": make_binary_npc_greeters(is_jap=False)
     },
     0x04: {
         "version": 1,
@@ -610,7 +613,7 @@ PAT_NAMES = {
     0x64140100: 'ReqLayerDown',
     0x64140200: 'AnsLayerDown',
     0x64141000: 'NtcLayerIn',
-    0x64150100: 'ReqLayerOut',
+    0x64150100: 'ReqLayerUp',
     0x64150200: 'AnsLayerUp',
     0x64151000: 'NtcLayerOut',
     0x64160100: 'ReqLayerJumpReady',
@@ -923,7 +926,7 @@ class PatID4:
     ReqLayerDown = 0x64140100
     AnsLayerDown = 0x64140200
     NtcLayerIn = 0x64141000
-    ReqLayerOut = 0x64150100
+    ReqLayerUp = 0x64150100
     AnsLayerUp = 0x64150200
     NtcLayerOut = 0x64151000
     ReqLayerJumpReady = 0x64160100
