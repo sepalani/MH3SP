@@ -242,6 +242,46 @@ PAT_BINARIES = {
         "version": 1,
         "content": b"dummy_14\0"
     },
+    0x15: {  # French
+        "version": 1,
+        "content": b"dummy_15\0"
+    },
+    0x16: {  # French
+        "version": 1,
+        "content": b"dummy_16\0"
+    },
+    0x17: {  # French
+        "version": 1,
+        "content": b"dummy_17\0"
+    },
+    0x18: {  # French
+        "version": 1,
+        "content": b"dummy_18\0"
+    },
+    0x19: {  # French
+        "version": 1,
+        "content": b"dummy_19\0"
+    },
+    0x1a: {  # French
+        "version": 1,
+        "content": b"dummy_1a\0"
+    },
+    0x1b: {  # French
+        "version": 1,
+        "content": b"dummy_1b\0"
+    },
+    0x1c: {  # French
+        "version": 1,
+        "content": b"dummy_1c\0"
+    },
+    0x1d: {  # French
+        "version": 1,
+        "content": b"dummy_1d\0"
+    },
+    0x1e: {  # French
+        "version": 1,
+        "content": b"dummy_1e\0"
+    },
     0x1f: {  # German
         "version": 1,
         "content": make_binary_server_type_list()
@@ -261,6 +301,46 @@ PAT_BINARIES = {
     0x23: {  # German
         "version": 1,
         "content": b"dummy_23\0"
+    },
+    0x24: {  # German
+        "version": 1,
+        "content": b"dummy_24\0"
+    },
+    0x25: {  # German
+        "version": 1,
+        "content": b"dummy_25\0"
+    },
+    0x26: {  # German
+        "version": 1,
+        "content": b"dummy_26\0"
+    },
+    0x27: {  # German
+        "version": 1,
+        "content": b"dummy_27\0"
+    },
+    0x28: {  # German
+        "version": 1,
+        "content": b"dummy_28\0"
+    },
+    0x29: {  # German
+        "version": 1,
+        "content": b"dummy_29\0"
+    },
+    0x2a: {  # German
+        "version": 1,
+        "content": b"dummy_2a\0"
+    },
+    0x2b: {  # German
+        "version": 1,
+        "content": b"dummy_2b\0"
+    },
+    0x2c: {  # German
+        "version": 1,
+        "content": b"dummy_2c\0"
+    },
+    0x2d: {  # German
+        "version": 1,
+        "content": b"dummy_2d\0"
     },
     0x2e: {  # Italian
         "version": 1,
@@ -282,6 +362,46 @@ PAT_BINARIES = {
         "version": 1,
         "content": b"dummy_32\0"
     },
+    0x33: {  # Italian
+        "version": 1,
+        "content": b"dummy_33\0"
+    },
+    0x34: {  # Italian
+        "version": 1,
+        "content": b"dummy_34\0"
+    },
+    0x35: {  # Italian
+        "version": 1,
+        "content": b"dummy_35\0"
+    },
+    0x36: {  # Italian
+        "version": 1,
+        "content": b"dummy_36\0"
+    },
+    0x37: {  # Italian
+        "version": 1,
+        "content": b"dummy_37\0"
+    },
+    0x38: {  # Italian
+        "version": 1,
+        "content": b"dummy_38\0"
+    },
+    0x39: {  # Italian
+        "version": 1,
+        "content": b"dummy_39\0"
+    },
+    0x3a: {  # Italian
+        "version": 1,
+        "content": b"dummy_3a\0"
+    },
+    0x3b: {  # Italian
+        "version": 1,
+        "content": b"dummy_3b\0"
+    },
+    0x3c: {  # Italian
+        "version": 1,
+        "content": b"dummy_3c\0"
+    },
     0x3d: {  # Spanish
         "version": 1,
         "content": make_binary_server_type_list()
@@ -301,6 +421,46 @@ PAT_BINARIES = {
     0x41: {  # Spanish
         "version": 1,
         "content": b"dummy_41\0"
+    },
+    0x42: {  # Spanish
+        "version": 1,
+        "content": b"dummy_42\0"
+    },
+    0x43: {  # Spanish
+        "version": 1,
+        "content": b"dummy_43\0"
+    },
+    0x44: {  # Spanish
+        "version": 1,
+        "content": b"dummy_44\0"
+    },
+    0x45: {  # Spanish
+        "version": 1,
+        "content": b"dummy_45\0"
+    },
+    0x46: {  # Spanish
+        "version": 1,
+        "content": b"dummy_46\0"
+    },
+    0x47: {  # Spanish
+        "version": 1,
+        "content": b"dummy_47\0"
+    },
+    0x48: {  # Spanish
+        "version": 1,
+        "content": b"dummy_48\0"
+    },
+    0x49: {  # Spanish
+        "version": 1,
+        "content": b"dummy_49\0"
+    },
+    0x4a: {  # Spanish
+        "version": 1,
+        "content": b"dummy_4a\0"
+    },
+    0x4b: {  # Spanish
+        "version": 1,
+        "content": b"dummy_4b\0"
     },
 }
 
