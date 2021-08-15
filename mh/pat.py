@@ -1343,6 +1343,86 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         self.send_packet(PatID4.AnsLayerChildListFoot, b"", seq)
 
+    def recvReqLayerSiblingListHead(self, packet_id, data, seq):
+        """ReqLayerSiblingListHead packet.
+
+        ID: 64270100
+        JP: 兄弟レイヤリスト数要求
+        TR: Layer sibling list count request
+
+        Sent by the game when leaving the gate via the entrance:
+         - Relocate > Change Gates
+
+        TODO: Merge this with ReqLayerChildListHead?
+        """
+        unk1, unk2 = struct.unpack_from(">II", data)  # 1st/last index?
+        layer_info = data[8:8+0xf]
+        self.sendAnsLayerSiblingListHead(unk1, unk2, layer_info, seq)
+
+    def sendAnsLayerSiblingListHead(self, unk1, unk2, layer_info, seq):
+        """AnsLayerSiblingListHead packet.
+
+        ID: 64270200
+        JP: 兄弟レイヤリスト数返答
+        TR: Layer sibling list count response
+
+        TODO: Merge this with AnsLayerChildListHead?
+        """
+        unk = 0
+        count = 1
+        data = struct.pack(">II", unk, count)
+        self.send_packet(PatID4.AnsLayerSiblingListHead, data, seq)
+
+    def recvReqLayerSiblingListData(self, packet_id, data, seq):
+        """ReqLayerSiblingListData packet.
+
+        ID: 64280100
+        JP: 兄弟レイヤリスト要求
+        TR: Layer sibling list request
+
+        TODO: Merge this with ReqLayerChildListData?
+        """
+        first_index, count = struct.unpack_from(">II", data)
+        self.sendAnsLayerSiblingListData(first_index, count, seq)
+
+    def sendAnsLayerSiblingListData(self, first_index, count, seq):
+        """AnsLayerSiblingListData packet.
+
+        ID: 64280200
+        JP: 兄弟レイヤリスト返答
+        TR: Layer sibling list response
+
+        TODO: Merge this with AnsLayerChildListData?
+        """
+        unk = first_index
+        data = struct.pack(">II", unk, count)
+        layer = pati.getDummyLayerData()
+        data += layer.pack()
+
+        # A strange struct is also used, try to skip it
+        count = 0
+        data += struct.pack(">B", count) + b"\0" * 2
+
+        self.send_packet(PatID4.AnsLayerSiblingListData, data, seq)
+
+    def recvReqLayerSiblingListFoot(self, packet_id, data, seq):
+        """ReqLayerSiblingListFoot packet.
+
+        ID: 64290100
+        JP: 兄弟レイヤリスト終了要求
+        TR: Layer sibling list end of transmission request
+        """
+        self.sendAnsLayerSiblingListFoot(seq)
+
+    def sendAnsLayerSiblingListFoot(self, seq):
+        """AnsLayerSiblingListFoot packet.
+
+        ID: 64290200
+        JP: 兄弟レイヤリスト終了返答
+        TR: Layer sibling list end of transmission response
+        """
+        self.send_packet(PatID4.AnsLayerSiblingListFoot, b"", seq)
+
     def recvReqLayerChildInfo(self, packet_id, data, seq):
         """ReqLayerChildInfo packet.
 
