@@ -1698,6 +1698,65 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             data += item.pack()
         self.send_packet(PatID4.AnsLayerMediationList, data, seq)
 
+    def recvReqLayerMediationLock(self, packet_id, data, seq):
+        """ReqLayerMediationLock packet.
+
+        ID: 64800100
+        JP: レイヤ調停データ確保要求
+        TR: Layer mediation data lock request
+
+        Sent by the game when the player want to acquire a resource that
+        cannot be shared by multiple players at the same time.
+         - Seats are from index 1 to 12
+         - Arm wrestling is from index 13 to 14
+        """
+        index, = struct.unpack_from(">B", data)
+        mediation_data = pati.MediationListItem.unpack(data, 1)
+        self.server.debug("LayerMediationLock: {}, {!r}".format(
+            index, mediation_data))
+        self.sendAnsLayerMediationLock(index, mediation_data, seq)
+
+    def sendAnsLayerMediationLock(self, index, mediation_data, seq):
+        """AnsLayerMediationLock packet.
+
+        ID: 64800200
+        JP: レイヤ調停データ確保返答
+        TR: Layer mediation data lock response
+
+        TODO: Implement this properly.
+        """
+        success = 1
+        data = struct.pack(">B", success)
+        self.send_packet(PatID4.AnsLayerMediationLock, data, seq)
+
+    def recvReqLayerMediationUnlock(self, packet_id, data, seq):
+        """ReqLayerMediationUnlock packet.
+
+        ID: 64810100
+        JP: レイヤ調停データ開放要求
+        TR: Layer mediation data unlock request
+
+        The game doesn't seem to care about this packet.
+        """
+        index, = struct.unpack_from(">B", data)
+        mediation_data = pati.MediationListItem.unpack(data, 1)
+        self.server.debug("LayerMediationUnlock: {}, {!r}".format(
+            index, mediation_data))
+        self.sendAnsLayerMediationUnlock(index, mediation_data, seq)
+
+    def sendAnsLayerMediationUnlock(self, index, mediation_data, seq):
+        """AnsLayerMediationUnlock packet.
+
+        ID: 64810200
+        JP: レイヤ調停データ開放要求
+        TR: Layer mediation data unlock response
+
+        TODO: Implement this properly.
+        """
+        success = 1
+        data = struct.pack(">B", success)
+        self.send_packet(PatID4.AnsLayerMediationUnlock, data, seq)
+
     def recvReqCircleListLayer(self, packet_id, data, seq):
         """ReqCircleListLayer packet.
 
