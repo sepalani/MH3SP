@@ -525,7 +525,7 @@ class MediationListItem(PatData):
 
 class CircleInfo(PatData):
     FIELDS = (
-        (0x01, "unk_long_0x01"),
+        (0x01, "index"),
         (0x02, "unk_string_0x02"),
         (0x03, "has_password"),
         (0x04, "password"),

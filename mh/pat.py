@@ -1872,15 +1872,52 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle sync list response (layer)
         """
         unk = 0
-        count = 0
-        data = struct.pack(">II", unk, count)
-        """
-        circle = pati.CircleInfo()
-        data += circle.pack()  # TODO: Fill this struct
+        circles = []
 
-        # A strange struct is also used, try to skip it
-        data += struct.pack(">B", 0) + b"\0" * 2
-        """
+        circle = pati.CircleInfo()
+        circle.index = pati.Long(1)
+        circle.unk_string_0x02 = pati.String("192.168.23.1")
+        circle.unk_binary_0x05 = pati.Binary(
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'HUNTER\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x07\x00\x00\x00\x00\x00\x00\x00')
+        circle.unk_long_0x07 = pati.Long(0)
+        circle.unk_long_0x08 = pati.Long(0)
+        circle.team_size = pati.Long(1)
+        circle.unk_long_0x0a = pati.Long(0)
+        circle.unk_long_0x0b = pati.Long(0)
+        circle.unk_long_0x0c = pati.Long(0)
+        circle.unk_string_0x0d = pati.String("192.168.23.1")
+        circle.unk_byte_0x0e = pati.Byte(0)
+        circle.unk_byte_0x0f = pati.Byte(0)
+
+        # Can't be empty, otherwise quests can't be submitted
+        # Stubbing it for now
+        circle = pati.CircleInfo()
+        circle.index = pati.Long(2)
+        circle.unk_string_0x02 = pati.String("192.168.23.1")
+        circle.unk_long_0x07 = pati.Long(1)
+        circle.unk_long_0x08 = pati.Long(0)
+        circle.team_size = pati.Long(1)
+        circle.unk_long_0x0a = pati.Long(1)
+        circle.unk_long_0x0b = pati.Long(1)
+        circle.unk_long_0x0c = pati.Long(1)
+        circle.unk_string_0x0d = pati.String("192.168.23.1")
+        circle.unk_byte_0x0f = pati.Byte(1)
+        circles.append(circle)
+
+        count = len(circles)
+        data = struct.pack(">II", unk, count)
+        for circle in circles:
+            data += circle.pack()
+            # A strange struct is also used, try to skip it
+            data += struct.pack(">B", 0) + b"\0" * 2
 
         self.send_packet(PatID4.AnsCircleListLayer, data, seq)
 
@@ -1903,7 +1940,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: サークル作成返答
         TR: Circle creation response
         """
-        data = struct.pack(">I", 1)
+        data = struct.pack(">I", 2)
         global g_circle
         g_circle = circle
         self.send_packet(PatID4.AnsCircleCreate, data, seq)
@@ -1948,11 +1985,12 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: サークルデータ取得返答
         TR: Get circle data response
         """
-        data = struct.pack(">I", 0)  # unk1)
+        data = struct.pack(">I", unk1)
         global g_circle
-        circle = g_circle  # pati.CircleInfo()
+        circle = pati.CircleInfo()
 
         # Fuzzing
+        """
         circle.unk_long_0x01 = pati.Long(1)
         circle.unk_string_0x02 = pati.String("192.168.23.1")
         circle.unk_long_0x07 = pati.Long(1)
@@ -1963,7 +2001,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         circle.unk_string_0x0d = pati.String("192.168.23.1")
         circle.unk_byte_0x0f = pati.Byte(1)
         circle.unk_byte_0x10 = pati.Byte(1)
-
+        """
+        circle.index = pati.Long(unk1)
+        circle.unk_string_0x02 = pati.String("192.168.23.1")
+        circle.unk_long_0x07 = pati.Long(1)
+        circle.unk_long_0x08 = pati.Long(0)
+        circle.team_size = pati.Long(1)
+        circle.unk_long_0x0a = pati.Long(1)
+        circle.unk_long_0x0b = pati.Long(1)
         self.server.debug("AnsCircleInfo: {!r}".format(circle))
         data += circle.pack()  # TODO: Fill this struct
 
