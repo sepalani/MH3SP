@@ -38,16 +38,25 @@ def make_binary_server_type_list(is_jap=False):
          b"hunting companions\ncan gather here.", 0, 999),
         (b"Modding", b"Mods are allowed here.", 0, 999)
     ]
+
+    # Handle server type properties
     for name, desc, hr_min, hr_max in PROPERTIES:
         data += pad(name, 16 if is_jap else 24)
         data += pad(desc, 112 if is_jap else 168)
+
+    # Handle HR rank limits
+    p = 0xDDC if is_jap else 0x13AC
+    data = pad(data, p + len(PROPERTIES) * 5)
+    for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
+        data[p:p+2] = struct.pack(">H", hr_min)
+        data[p+2:p+4] = struct.pack(">H", hr_max)
+        p += 4
+
     if is_jap:
         # TODO: Reverse the japanese struct
         return data
-    data = pad(data, 0x13AC + len(PROPERTIES) * 5)
-    for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
-        data[0x13AC + i*4:0x13AE + i*4] = struct.pack(">H", hr_min)
-        data[0x13AE + i*4:0x13B0 + i*4] = struct.pack(">H", hr_max)
+
+    # Handle city seekings
     SEEKINGS = [
         b"Seeking0", b"Seeking1", b"Seeking2",
     ]
@@ -145,6 +154,7 @@ MSF_PATTERN = \
     "9Em0Em1Em2Em3Em4Em5Em6Em7Em8Em9En0En1En2En3En4En5En6En7En8En9Eo0Eo1Eo2E" \
     "o3Eo4Eo5Eo6Eo7Eo8Eo9Ep0Ep1Ep2Ep3Ep4Ep5Ep6Ep7Ep8Ep9Eq0Eq1Eq2Eq3Eq4Eq5Eq6" \
     "Eq7Eq8Eq9Er0Er1Er2Er3Er4Er5Er6Er7Er8Er9Es0E"
+
 
 TERMS_VERSION = 1
 TERMS = {
