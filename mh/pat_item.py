@@ -441,15 +441,15 @@ class FmpData(PatData):
 class UserSearchInfo(PatData):
     FIELDS = (
         (0x01, "unk_string_0x01"),
-        (0x02, "unk_string_0x02"),
-        (0x03, "unk_binary_0x03"),
-        (0x04, "unk_binary_0x04"),
+        (0x02, "name"),
+        (0x03, "unk_binary_0x03"),  # Hunter stat/HR related
+        (0x04, "unk_binary_0x04"),  # Warp related
         (0x07, "unk_byte_0x07"),
-        (0x08, "unk_string_0x08"),
+        (0x08, "server_name"),
         (0x0b, "unk_byte_0x0b"),
         (0x0c, "unk_string_0x0c"),
-        (0x0d, "unk_long_0x0d"),
-        (0x0e, "unk_long_0x0e"),
+        (0x0d, "city_size"),
+        (0x0e, "city_capacity"),
         (0x0f, "unk_long_0x0f"),
         (0x10, "unk_long_0x10"),
     )
@@ -498,7 +498,7 @@ class UserStatusSet(PatData):
         (0x04, "unk_byte_0x04"),
         (0x05, "unk_byte_0x05"),
         (0x08, "unk_byte_0x08"),
-        (0x09, "unk_byte_0x09"),
+        (0x09, "unk_byte_0x09"),  # Byte(4) = Deny Friend Requests
     )
 
 

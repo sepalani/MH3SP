@@ -1069,6 +1069,52 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = pati.UserSearchInfo().pack()
         self.send_packet(PatID4.AnsUserSearchInfoMine, data, seq)
 
+    def recvReqUserSearchInfo(self, packet_id, data, seq):
+        """ReqUserSearchInfo packet.
+
+        ID: 66360100
+        JP: ユーザ検索データ要求
+        TR: User search data request
+        """
+        name = pati.unpack_lp2_string(data)
+        offset = 2 + len(name)
+        search_info = pati.UserSearchInfo.unpack(data, offset)
+        self.server.debug("SearchInfo: {}, {!r}".format(name, search_info))
+        self.sendAnsUserSearchInfo(name, search_info, seq)
+
+    def sendAnsUserSearchInfo(self, name, search_info, seq):
+        """AnsUserSearchInfo packet.
+
+        ID: 66360200
+        JP: ユーザ検索データ返答
+        TR: User search data response
+        """
+        user = pati.UserSearchInfo()
+        user.unk_string_0x01 = pati.String("Str1")
+        user.name = pati.String("Drakea")
+        user.unk_binary_0x03 = pati.Binary(b"1" * 99 + b"\0")
+        # Warp location ?
+        user.unk_binary_0x04 = pati.Binary(
+            # Long: ? + server_type? / Word: server? + gate? + city?
+            b"\0\0\0\01" + b"\0\0\0\01" + b"\0\01" + b"\0\01" + b"\0\01"
+        )
+        user.unk_byte_0x07 = pati.Byte(1)
+        user.server_name = pati.String("Valor")
+        user.unk_byte_0x0b = pati.Byte(1)
+        user.unk_string_0x0c = pati.String("StrC")
+        user.city_size = pati.Long(4)
+        user.city_capacity = pati.Long(3)
+        user.unk_long_0x0f = pati.Long(5)
+        user.unk_long_0x10 = pati.Long(6)
+
+        data = user.pack()
+
+        # A strange struct is also used, try to skip it
+        count = 0
+        data += struct.pack(">B", count) + b"\0" * 2
+
+        self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
+
     def recvReqLayerStart(self, packet_id, data, seq):
         """ReqLayerStart packet.
 
