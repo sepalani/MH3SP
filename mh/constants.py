@@ -100,6 +100,60 @@ def make_binary_npc_greeters(is_jap=False):
     return data
 
 
+def make_binary_trading_post():
+    data = b""
+
+    def slot(item, qty):
+        return struct.pack(">HH", item, qty)
+
+    # Popfish x8 <- Machalite Ore x2 | Rathian Coin x2
+    data += slot(0xd2, 8) + slot(0x65, 2) + slot(0x262, 2) + slot(0, 0)
+
+    # Waterblock Seed x3 <- Bone x4 | Qurupeco Coin x1
+    data += slot(0x188, 3) + slot(0xc4, 4) + slot(0x25f, 1) + slot(0, 0)
+
+    # Bone Husk S x10 <- Bone x2 | Barroth Coin x2
+    data += slot(0x156, 10) + slot(0xc4, 2) + slot(0x260, 2) + slot(0, 0)
+
+    # Dung x5 <- Monster Fluid x1 | R.Ludroth Coin x1
+    data += slot(0xc5, 5) + slot(0x155, 1) + slot(0x261, 1) + slot(0, 0)
+
+    # Sharpened Fang x5 <- Hydro Hide x2 | R.Ludroth Coin x2
+    data += slot(0x232, 5) + slot(0x141, 1) + slot(0x261, 2) + slot(0, 0)
+
+    # Toadstool x5 <- Sharpened Fang x1 | Qurupeco Coin x1
+    data += slot(0x158, 5) + slot(0x232, 1) + slot(0x25f, 1) + slot(0, 0)
+
+    # Stone x10 <- Monster Bone M x1 | Great Jaggi Coin x2
+    data += slot(0x61, 10) + slot(0x9a, 1) + slot(0x25e, 2) + slot(0, 0)
+
+    # Spider Web x5 <- Monster Fluid x1 | Barroth Coin x1
+    data += slot(0xc6, 5) + slot(0x155, 1) + slot(0x260, 1) + slot(0, 0)
+
+    # Bughopper x10 <- Big Fin x3 | R.Ludroth Coin x2
+    data += slot(0x160, 10) + slot(0x230, 3) + slot(0x261, 2) + slot(0, 0)
+
+    # Icethaw Pellet x3 <- Mystery Bone x4 | R.Ludroth Coin x1
+    data += slot(0x189, 3) + slot(0x10e, 4) + slot(0x261, 1) + slot(0, 0)
+
+    # Rathian Scale x1 <- Rathian Coin x3 | Pinnacle Coin x2
+    data += slot(0x112, 1) + slot(0x262, 3) + slot(0x267, 2) + slot(0, 0)
+
+    # Wyvern Claw x8 <- Great Baggi Claw x1 | Rathian Coin x1
+    data += slot(0x167, 8) + slot(0x21d, 1) + slot(0x262, 1) + slot(0, 0)
+
+    # Prize Gold Sword x1 <- Lagiacrus Coin x15 | Pinnacle Coin x8
+    data += slot(0x25d, 1) + slot(0x263, 15) + slot(0x267, 8) + slot(0, 0)
+
+    # Barioth Shell x1 <- Barioth Coin x3 | Pinnacle Coin x2
+    data += slot(0x194, 1) + slot(0x24a, 3) + slot(0x267, 2) + slot(0, 0)
+
+    # Armor Stone x3 <- Deviljho Coin x1 | Pinnacle Coin x1
+    data += slot(0x1bb, 3) + slot(0x24d, 1) + slot(0x267, 1) + slot(0, 0)
+
+    return data
+
+
 # msf-pattern_create -l 0xe50
 MSF_PATTERN = \
     "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac" \
@@ -187,7 +241,7 @@ PAT_BINARIES = {
     },
     0x04: {
         "version": 1,
-        "content": b"4" * 0x10  # b"titi\ttoto\ttutu\nbibi\tbobo\bubu\nouba\t"
+        "content": make_binary_trading_post()
     },
     0x05: {  # English
         "version": 1,
@@ -249,7 +303,7 @@ PAT_BINARIES = {
     },
     0x13: {  # French
         "version": 1,
-        "content": b"dummy_13\0"
+        "content": make_binary_trading_post()
     },
     0x14: {  # French
         "version": 1,
@@ -309,7 +363,7 @@ PAT_BINARIES = {
     },
     0x22: {  # German
         "version": 1,
-        "content": b"dummy_22\0"
+        "content": make_binary_trading_post()
     },
     0x23: {  # German
         "version": 1,
@@ -369,7 +423,7 @@ PAT_BINARIES = {
     },
     0x31: {  # Italian
         "version": 1,
-        "content": b"dummy_31\0"
+        "content": make_binary_trading_post()
     },
     0x32: {  # Italian
         "version": 1,
@@ -429,7 +483,7 @@ PAT_BINARIES = {
     },
     0x40: {  # Spanish
         "version": 1,
-        "content": b"dummy_40\0"
+        "content": make_binary_trading_post()
     },
     0x41: {  # Spanish
         "version": 1,
