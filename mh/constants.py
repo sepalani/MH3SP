@@ -28,6 +28,16 @@ def pad(s, size, p=b'\0'):
     return data
 
 
+def make_binary_type_time_events(state=0):
+    # TODO: Use the server in-game time and handle this time array properly
+    if state == 1:
+        return struct.pack(">iii", 0, -1, 0)  # Fog
+    elif state == 2:
+        return struct.pack(">iii", 0, 0, -1)  # Kujira
+    else:
+        return struct.pack(">iii", 0, 0, 0)
+
+
 def make_binary_server_type_list(is_jap=False):
     data = b""
     PROPERTIES = [
@@ -225,19 +235,22 @@ CHARGE = b"""<BODY><CENTER>MH3 Server Project - No charge.<END>"""
 VULGARITY_INFO = b""
 FMP_VERSION = 1
 
+TIME_STATE = 0
+IS_JAP = False
+
 # Dummy PAT_BINARY
 PAT_BINARIES = {
     0x01: {
         "version": 1,
-        "content": make_binary_server_type_list(is_jap=False)
+        "content": make_binary_server_type_list(is_jap=IS_JAP)
     },
     0x02: {
         "version": 1,
-        "content": b"2" * 0x10  # b"vivi\tvovo\tvuvu\nbibi\tbobo\bubu\nouba\t"
+        "content": make_binary_type_time_events(state=TIME_STATE)
     },
     0x03: {
         "version": 1,
-        "content": make_binary_npc_greeters(is_jap=False)
+        "content": make_binary_npc_greeters(is_jap=IS_JAP)
     },
     0x04: {
         "version": 1,
@@ -295,7 +308,7 @@ PAT_BINARIES = {
     },
     0x11: {  # French
         "version": 1,
-        "content": b"dummy_11\0"
+        "content": make_binary_type_time_events(state=TIME_STATE)
     },
     0x12: {  # French
         "version": 1,
@@ -355,7 +368,7 @@ PAT_BINARIES = {
     },
     0x20: {  # German
         "version": 1,
-        "content": b"dummy_20\0"
+        "content": make_binary_type_time_events(state=TIME_STATE)
     },
     0x21: {  # German
         "version": 1,
@@ -415,7 +428,7 @@ PAT_BINARIES = {
     },
     0x2f: {  # Italian
         "version": 1,
-        "content": b"dummy_2f\0"
+        "content": make_binary_type_time_events(state=TIME_STATE)
     },
     0x30: {  # Italian
         "version": 1,
@@ -475,7 +488,7 @@ PAT_BINARIES = {
     },
     0x3e: {  # Spanish
         "version": 1,
-        "content": b"dummy_3e\0"
+        "content": make_binary_type_time_events(state=TIME_STATE)
     },
     0x3f: {  # Spanish
         "version": 1,
