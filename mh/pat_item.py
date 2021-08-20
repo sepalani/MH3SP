@@ -552,6 +552,15 @@ class MatchOptionSet(PatData):
     )
 
 
+class MessageInfo(PatData):
+    FIELDS = (
+        (0x01, "unk_long_0x01"),
+        (0x02, "unk_long_0x02"),
+        (0x03, "unk_string_0x03"),
+        (0x04, "unk_string_0x04"),
+    )
+
+
 def getDummyLayerData():
     layer = LayerData()
     layer.unk_long_0x01 = Long(1)

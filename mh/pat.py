@@ -1323,6 +1323,58 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data += b"".join([item.pack() for item in blacklisted_users])
         self.send_packet(PatID4.AnsBlackList, data, seq)
 
+    def recvReqTell(self, packet_id, data, seq):
+        """ReqTell packet.
+
+        ID: 66110100
+        JP: 相手指定チャット送信
+        TR: Send partner message
+        """
+        recipient_id = pati.unpack_lp2_string(data)
+        offset = 2 + len(recipient_id)
+        info = pati.MessageInfo.unpack(data, offset)
+        offset += len(info.pack())
+        message = pati.unpack_lp2_string(data, offset)
+        self.server.debug("ReqTell: {}, {!r}, {}".format(
+            recipient_id, info, message))
+        self.sendAnsTell(self, seq)
+
+    def sendAnsTell(self, packet_id, seq):
+        """AnsTell packet.
+
+        ID: 66110200
+        JP: 相手指定チャット返信
+        TR: Receive partner message
+        """
+        self.send_packet(PatID4.AnsTell, b"", seq)
+
+    def recvReqFriendAdd(self, packet_id, data, seq):
+        """ReqFriendAdd packet.
+
+        ID: 66500100
+        JP: フレンド登録要求
+        TR: Friend registration request
+
+        TODO: Merge this with ReqTell?
+        """
+        recipient_id = pati.unpack_lp2_string(data)
+        offset = 2 + len(recipient_id)
+        info = pati.MessageInfo.unpack(data, offset)
+        offset += len(info.pack())
+        message = pati.unpack_lp2_string(data, offset)
+        self.server.debug("ReqTell: {}, {!r}, {}".format(
+            recipient_id, info, message))
+        self.sendAnsFriendAdd(self, seq)
+
+    def sendAnsFriendAdd(self, packet_id, seq):
+        """AnsFriendAdd packet.
+
+        ID: 66500200
+        JP: フレンド登録返答
+        TR: Friend registration response
+        """
+        self.send_packet(PatID4.AnsFriendAdd, b"", seq)
+
     def recvReqLayerChildListHead(self, packet_id, data, seq):
         """ReqLayerChildListHead packet.
 
