@@ -261,6 +261,9 @@ class PatData(OrderedDict):
         (4, "field_0x04")
     )
 
+    def __len__(self):
+        return len(self.pack())
+
     def __repr__(self):
         items = [
             (index, value)
