@@ -2037,6 +2037,48 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">I", unk)
         self.send_packet(PatID4.AnsCircleLeave, data, seq)
 
+    def recvReqCircleInfoSet(self, packet_id, data, seq):
+        """ReqCircleInfoSet packet.
+
+        ID: 65200100
+        JP: サークルデータ設定要求
+        TR: Circle data settings request
+        """
+        unk1, = struct.unpack_from(">I", data)
+        unk2 = data[4:4+0xd]
+        unk3 = data[4+0xd:]
+        self.server.debug("ReqCircleInfoSet: {}, {}, {}".format(
+            unk1, unk2, unk3))
+        self.sendAnsCircleInfoSet(unk1, unk2, unk3, seq)
+
+    def sendAnsCircleInfoSet(self, unk1, unk2, unk3, seq):
+        """AnsCircleInfoSet packet.
+
+        ID: 65040200
+        JP: サークルデータ設定返答
+        TR: Circle data settings response
+        """
+        data = struct.pack(">I", unk1)
+        self.send_packet(PatID4.AnsCircleInfoSet, data, seq)
+
+    def recvReqCircleMatchStart(self, packet_id, data, seq):
+        """ReqCircleMatchStart packet.
+
+        ID: 65120100
+        JP: マッチング開始要求
+        TR: Match start request
+        """
+        self.sendAnsCircleMatchStart(seq)
+
+    def sendAnsCircleMatchStart(self, seq):
+        """AnsCircleMatchStart packet.
+
+        ID: 65120200
+        JP: マッチング開始返答
+        TR: Match start response
+        """
+        self.send_packet(PatID4.AnsCircleMatchStart, b"", seq)
+
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
         if packet_id not in PAT_NAMES:
