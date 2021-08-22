@@ -1172,12 +1172,18 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         ID: 66310100
         JP: ユーザ表示用バイナリ設定要求
         TR: User display binary settings request
+
+        The game sends the updated user display binary settings to the server.
+
+        Examples:
+         - Online > Settings > Profile
+         - Online > Settings > Status Indicator
         """
         unk1, = struct.unpack_from(">I", data)
-        unk2 = pati.unpack_lp2_string(data, 4)
-        self.sendAnsUserBinarySet(unk1, unk2, seq)
+        profile_info = pati.unpack_lp2_string(data, 4)
+        self.sendAnsUserBinarySet(unk1, profile_info, seq)
 
-    def sendAnsUserBinarySet(self, unk1, unk2, seq):
+    def sendAnsUserBinarySet(self, unk1, profile_info, seq):
         """AnsUserBinarySet packet.
 
         ID: 66310200
@@ -1186,6 +1192,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         TODO: Properly handle binary settings.
         """
+        profile_title_id = profile_info[-2]  # Example: - Fabled Harpooner -
+        profile_status = profile_info[-1]    # Example: Ready for Quests!
+        profile_message = profile_info[:-2]
         self.send_packet(PatID4.AnsUserBinarySet, b"", seq)
 
     def recvReqUserSearchSet(self, packet_id, data, seq):
