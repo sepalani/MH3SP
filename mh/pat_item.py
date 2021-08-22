@@ -414,7 +414,7 @@ class LoginInfo(PatData):
 class UserObject(PatData):
     FIELDS = (
         (0x01, "slot_index"),
-        (0x02, "save_id"),
+        (0x02, "capcom_id"),
         (0x03, "hunter_name"),
         (0x04, "unk_long_0x04"),
         (0x05, "unk_long_0x05"),
@@ -554,10 +554,10 @@ class MatchOptionSet(PatData):
 
 class MessageInfo(PatData):
     FIELDS = (
-        (0x01, "unk_long_0x01"),
-        (0x02, "unk_long_0x02"),
-        (0x03, "unk_string_0x03"),
-        (0x04, "unk_string_0x04"),
+        (0x01, "text_color"),  # RGBA
+        (0x02, "unk_long_0x02"),  # Probably time related?
+        (0x03, "sender_id"),
+        (0x04, "sender_name"),
     )
 
 

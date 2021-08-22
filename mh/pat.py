@@ -636,7 +636,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         while i < end:
             user = pati.UserObject()
             user.slot_index = pati.Long(i)
-            user.save_id = pati.String(b"******")
+            user.capcom_id = pati.String(b"******")
             data += user.pack()
             i += 1
         self.send_packet(PatID4.AnsUserListData, data, seq)
@@ -693,6 +693,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         is_slot_empty, slot_index = struct.unpack_from(">BI", data)
         user_obj = pati.UserObject.unpack(data, 5)
         self.server.debug("UserObject: {!r}".format(user_obj))
+        if 'capcom_id' not in user_obj:
+            # TODO: Properly generate that
+            user_obj.capcom_id = pati.String(b"C9I7D4")
         self.sendAnsUserObject(is_slot_empty, slot_index, user_obj, seq)
 
     def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj, seq):
@@ -1331,6 +1334,43 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">II", unk, count)
         data += b"".join([item.pack() for item in blacklisted_users])
         self.send_packet(PatID4.AnsBlackList, data, seq)
+
+    def recvNtcLayerChat(self, packet_id, data, seq):
+        """NtcLayerChat packet.
+
+        ID: 64721000
+        JP: レイヤチャット通知
+        TR: Layer chat notification
+
+        The game sends a chat message to relay.
+
+        NB: The message won't be displayed if the Capcom ID is blank.
+        """
+        unk1, = struct.unpack_from(">B", data)
+        info = pati.MessageInfo.unpack(data, 1)
+        offset = 1 + len(info.pack())
+        message = pati.unpack_lp2_string(data, offset)
+        self.server.debug("NtcLayerChat: {}, {!r}, {}".format(
+            unk1, info, message))
+        # self.sendNtcLayerChat(unk1, info, message, seq)
+
+    def sendNtcLayerChat(self, unk1, info, message, seq):
+        """NtcLayerChat packet.
+
+        ID: 64721000
+        JP: レイヤチャット送信
+        TR: Layer chat transmission
+        NB: Request and response share the same packet ID
+
+        The server sends a chat message.
+        """
+        data = struct.pack(">B", unk1)
+        info.text_color = pati.Long(0xbb3385ff)
+        info.sender_id = pati.String(b"C1I2D3")
+        info.sender_name = pati.String(b"Cid")
+        data += info.pack()
+        data += pati.lp2_string(message)
+        self.send_packet(PatID4.NtcLayerChat, data, seq)
 
     def recvReqTell(self, packet_id, data, seq):
         """ReqTell packet.

@@ -740,7 +740,7 @@ PAT_NAMES = {
     0x64690200: 'AnsLayerUserSearchFoot',
     0x64701000: 'Ntc0x6470',
     0x64711000: 'Ntc0x6471',
-    0x64721000: 'Ntc0x6472',
+    0x64721000: 'NtcLayerChat',
     0x64730100: 'ReqLayerTell',
     0x64730200: 'AnsLayerTell',
     0x64731000: 'NtcLayerTell',
@@ -1053,7 +1053,7 @@ class PatID4:
     AnsLayerUserSearchFoot = 0x64690200
     Ntc0x6470 = 0x64701000
     Ntc0x6471 = 0x64711000
-    Ntc0x6472 = 0x64721000
+    NtcLayerChat = 0x64721000
     ReqLayerTell = 0x64730100
     AnsLayerTell = 0x64730200
     NtcLayerTell = 0x64731000
