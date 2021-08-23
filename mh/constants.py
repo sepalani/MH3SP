@@ -52,6 +52,13 @@ def make_binary_server_type_list(is_jap=False):
     # Handle server type properties
     for name, desc, hr_min, hr_max in PROPERTIES:
         data += pad(name, 16 if is_jap else 24)
+        if is_jap:
+            desc = bytearray(desc)
+            LINE_LENGTH = 24
+            while b'\n' in desc:
+                i = desc.index(b'\n')
+                padding = (LINE_LENGTH - i % LINE_LENGTH) % LINE_LENGTH
+                desc[i:i+1] = b' ' * padding
         data += pad(desc, 112 if is_jap else 168)
 
     # Handle HR rank limits
