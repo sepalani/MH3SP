@@ -1352,7 +1352,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         message = pati.unpack_lp2_string(data, offset)
         self.server.debug("NtcLayerChat: {}, {!r}, {}".format(
             unk1, info, message))
-        # self.sendNtcLayerChat(unk1, info, message, seq)
+        self.sendNtcLayerChat(unk1, info, message, seq)
 
     def sendNtcLayerChat(self, unk1, info, message, seq):
         """NtcLayerChat packet.
@@ -1411,11 +1411,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         info = pati.MessageInfo.unpack(data, offset)
         offset += len(info.pack())
         message = pati.unpack_lp2_string(data, offset)
-        self.server.debug("ReqTell: {}, {!r}, {}".format(
+        self.server.debug("ReqFriendAdd: {}, {!r}, {}".format(
             recipient_id, info, message))
-        self.sendAnsFriendAdd(self, seq)
+        self.sendAnsFriendAdd(recipient_id, info, message, seq)
 
-    def sendAnsFriendAdd(self, packet_id, seq):
+    def sendAnsFriendAdd(self, recipient_id, info, message, seq):
         """AnsFriendAdd packet.
 
         ID: 66500200
@@ -1423,6 +1423,62 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Friend registration response
         """
         self.send_packet(PatID4.AnsFriendAdd, b"", seq)
+        # Send a dummy friend request
+        self.sendNtcFriendAccept(recipient_id, info, message, seq)
+
+    def sendNtcFriendAdd(self, recipient_id, accepted, seq):
+        """NtcFriendAdd packet.
+
+        ID: 66501000
+        JP: フレンド登録完了通知
+        TR: Friend registration completed notification
+        """
+        if not accepted:
+            return
+        data = b""
+        data += pati.lp2_string(recipient_id)
+        friend = pati.FriendData()
+        friend.index = pati.Long(2)
+        friend.capcom_id = pati.String(recipient_id)
+        friend.hunter_name = pati.String("Cid")
+        data += friend.pack()
+        data += struct.pack(">B", accepted)
+        self.send_packet(PatID4.NtcFriendAdd, data, seq)
+
+    def recvReqFriendAccept(self, packet_id, data, seq):
+        """ReqFriendAccept packet.
+
+        ID: 66510100
+        JP: フレンド登録依頼返答要求
+        TR: Friend registration accept request
+        """
+        recipient_id = pati.unpack_lp2_string(data)
+        accepted, = struct.unpack_from(">B", data, -1)
+        self.sendAnsFriendAccept(recipient_id, accepted, seq)
+        self.sendNtcFriendAdd(recipient_id, accepted, seq)
+
+    def sendAnsFriendAccept(self, recipient_id, accepted, seq):
+        """AnsFriendAccept packet.
+
+        ID: 66510200
+        JP: フレンド登録依頼返答返答
+        TR: Friend registration accept response
+        """
+        self.send_packet(PatID4.AnsFriendAccept, b"", seq)
+
+    def sendNtcFriendAccept(self, recipient_id, info, message, seq):
+        """NtcFriendAccept packet.
+
+        ID: 66511000
+        JP: フレンド登録依頼通知
+        TR: Friend registration request notification
+        """
+        data = b""
+        data += pati.lp2_string(recipient_id)
+        info.unk_long_0x02 = pati.Long(20)
+        data += info.pack()
+        data += pati.lp2_string(message)
+        self.send_packet(PatID4.NtcFriendAccept, data, seq)
 
     def recvReqLayerChildListHead(self, packet_id, data, seq):
         """ReqLayerChildListHead packet.
