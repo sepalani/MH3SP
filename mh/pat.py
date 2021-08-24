@@ -2086,6 +2086,19 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Match option settings response
         """
         self.send_packet(PatID4.AnsCircleMatchOptionSet, b"", seq)
+        self.sendNtcCircleMatchOptionSet(options, seq)
+
+    def sendNtcCircleMatchOptionSet(self, options, seq):
+        """NtcCircleMatchOptionSet packet.
+
+        ID: 65101000
+        JP: マッチングオプション設定通知
+        TR: Match option settings notification
+        """
+        options.unk_bytedec_0x04 = pati.Byte(2)
+        options.unk_string_0x05 = pati.String("C0I2D3")
+        options.unk_string_0x06 = pati.String("Cid")
+        self.send_packet(PatID4.NtcCircleMatchOptionSet, options.pack(), seq)
 
     def recvReqCircleInfo(self, packet_id, data, seq):
         """ReqCircleInfo packet.
@@ -2138,6 +2151,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data += struct.pack(">B", 0) + b"\0" * 2
 
         self.send_packet(PatID4.AnsCircleInfo, data, seq)
+        self.send_packet(PatID4.NtcCircleInfoSet, data, seq)
 
     def recvReqCircleLeave(self, packet_id, data, seq):
         """ReqCircleLeave packet.
@@ -2200,6 +2214,25 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Match start response
         """
         self.send_packet(PatID4.AnsCircleMatchStart, b"", seq)
+        self.sendNtcCircleMatchStart(seq)
+
+    def sendNtcCircleMatchStart(self, seq):
+        """NtcCircleMatchStart packet.
+
+        ID: 65121000
+        JP: マッチング開始通知
+        TR: Match start notification
+        """
+        count = 1
+        data = struct.pack(">I", count)
+        for i in range(count):
+            data += struct.pack(">B", i+1)
+            data += pati.lp2_string("HUNTER")
+            data += pati.lp2_string(b"\1")
+            data += struct.pack(">H", 21)
+        data = struct.pack(">H", len(data)) + data
+        data += struct.pack(">I", 1)
+        self.send_packet(PatID4.NtcCircleMatchStart, data, seq)
 
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""

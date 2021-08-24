@@ -549,6 +549,9 @@ class MatchOptionSet(PatData):
         (0x01, "unk_binary_0x01"),
         (0x02, "unk_word_0x02"),
         (0x03, "unk_byte_0x03"),
+        (0x04, "unk_bytedec_0x04"),
+        (0x05, "unk_string_0x05"),
+        (0x06, "unk_string_0x06"),
     )
 
 
