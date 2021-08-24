@@ -1386,9 +1386,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         message = pati.unpack_lp2_string(data, offset)
         self.server.debug("ReqTell: {}, {!r}, {}".format(
             recipient_id, info, message))
-        self.sendAnsTell(self, seq)
+        self.sendAnsTell(recipient_id, info, message, seq)
 
-    def sendAnsTell(self, packet_id, seq):
+    def sendAnsTell(self, recipient_id, info, message, seq):
         """AnsTell packet.
 
         ID: 66110200
@@ -1396,6 +1396,21 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Receive partner message
         """
         self.send_packet(PatID4.AnsTell, b"", seq)
+        self.sendNtcTell(recipient_id, info, message, seq)
+
+    def sendNtcTell(self, recipient_id, info, message, seq):
+        """NtcTell packet.
+
+        ID: 66111000
+        JP: 相手指定チャット通知
+        TR: Partner message notification
+        """
+        data = b""
+        data += pati.lp2_string(recipient_id)
+        info.unk_long_0x02 = pati.Long(20)
+        data += info.pack()
+        data += pati.lp2_string(message)
+        self.send_packet(PatID4.NtcTell, data, seq)
 
     def recvReqFriendAdd(self, packet_id, data, seq):
         """ReqFriendAdd packet.
@@ -1472,6 +1487,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         ID: 66511000
         JP: フレンド登録依頼通知
         TR: Friend registration request notification
+
+        TODO: Merge this with NtcTell?
         """
         data = b""
         data += pati.lp2_string(recipient_id)
