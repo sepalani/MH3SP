@@ -1307,6 +1307,46 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data += b"".join([item.pack() for item in friends])
         self.send_packet(PatID4.AnsFriendList, data, seq)
 
+    def recvReqBlackAdd(self, packet_id, data, seq):
+        """ReqBlackAdd packet.
+
+        ID: 66600100
+        JP: ブラックデータ登録要求
+        TR: Black data registration request
+        """
+        capcom_id = pati.unpack_lp2_string(data)
+        offset = len(capcom_id) + 2
+        black_data = pati.BlackListUserData.unpack(data, offset)
+        self.sendAnsBlackAdd(capcom_id, black_data, seq)
+
+    def sendAnsBlackAdd(self, capcom_id, black_data, seq):
+        """AnsBlackAdd packet.
+
+        ID: 66600200
+        JP: ブラックデータ登録返答
+        TR: Black data registration response
+        """
+        self.send_packet(PatID4.AnsBlackAdd, b"", seq)
+
+    def recvReqBlackDelete(self, packet_id, data, seq):
+        """ReqBlackDelete packet.
+
+        ID: 66610100
+        JP: ブラックデータ削除要求
+        TR: Black data deletion request
+        """
+        capcom_id = pati.unpack_lp2_string(data)
+        self.sendAnsBlackDelete(capcom_id, seq)
+
+    def sendAnsBlackDelete(self, capcom_id, seq):
+        """AnsBlackDelete packet.
+
+        ID: 66610200
+        JP: ブラックデータ削除返答
+        TR: Black data deletion response
+        """
+        self.send_packet(PatID4.AnsBlackDelete, b"", seq)
+
     def recvReqBlackList(self, packet_id, data, seq):
         """ReqBlackList packet.
 
@@ -1497,6 +1537,25 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data += info.pack()
         data += pati.lp2_string(message)
         self.send_packet(PatID4.NtcFriendAccept, data, seq)
+
+    def recvReqFriendDelete(self, packet_id, data, seq):
+        """ReqFriendDelete packet.
+
+        ID: 66530100
+        JP: フレンドデータ削除要求
+        TR: Friend data deletion request
+        """
+        capcom_id = pati.unpack_lp2_string(data)
+        self.sendAnsFriendDelete(capcom_id, seq)
+
+    def sendAnsFriendDelete(self, capcom_id, seq):
+        """AnsFriendDelete packet.
+
+        ID: 66530200
+        JP: フレンドデータ削除返答
+        TR: Friend data deletion response
+        """
+        self.send_packet(PatID4.AnsFriendDelete, b"", seq)
 
     def recvReqLayerChildListHead(self, packet_id, data, seq):
         """ReqLayerChildListHead packet.
