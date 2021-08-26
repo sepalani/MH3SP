@@ -38,6 +38,7 @@ except ImportError:
 
 
 g_circle = None
+g_circle_info_set = None
 
 
 class PatServer(SocketServer.TCPServer, Logger):
@@ -1732,6 +1733,20 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: User display binary notification response
         """
         self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
+        self.sendNtcUserBinaryNotice(unk1, str_data, unk2, unk3, seq)
+
+    def sendNtcUserBinaryNotice(self, unk1, str_data, unk2, unk3, seq):
+        """NtcUserBinaryNotice packet.
+
+        ID: 66321000
+        JP: ユーザ表示用バイナリ通知通知
+        TR: User display binary notification notice
+        """
+        data = struct.pack(">B", unk1)
+        data += pati.lp2_string(str_data)
+        data += struct.pack(">I", unk2)  # What about unk3?
+        data += pati.lp2_string(b"")
+        self.send_packet(PatID4.NtcUserBinaryNotice, data, seq)
 
     def recvReqLayerDetailSearchHead(self, packet_id, data, seq):
         """ReqLayerDetailSearchHead packet.
@@ -2151,7 +2166,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data += struct.pack(">B", 0) + b"\0" * 2
 
         self.send_packet(PatID4.AnsCircleInfo, data, seq)
-        self.send_packet(PatID4.NtcCircleInfoSet, data, seq)
+        global g_circle_info_set
+        g_circle_info_set = data
+        # self.send_packet(PatID4.NtcCircleInfoSet, data, seq)
 
     def recvReqCircleLeave(self, packet_id, data, seq):
         """ReqCircleLeave packet.
@@ -2194,8 +2211,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: サークルデータ設定返答
         TR: Circle data settings response
         """
-        data = struct.pack(">I", unk1)
+        data = struct.pack(">I", 0)  # unk1)
         self.send_packet(PatID4.AnsCircleInfoSet, data, seq)
+        self.send_packet(PatID4.NtcCircleInfoSet, g_circle_info_set, seq)
 
     def recvReqCircleMatchStart(self, packet_id, data, seq):
         """ReqCircleMatchStart packet.
