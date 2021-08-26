@@ -113,6 +113,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         This packet is sent by the game when an error occurs.
 
         TODO: Find all error codes and their meanings.
+
+        Error codes:
+         - 0x80060002: Fail to warp to location (Layer index error?)
+         - 0x80070002: Empty NetworkUniqueId?
         """
         data = pati.CollectionLog.unpack(data)
         self.server.debug("CollectionLog: {!r}".format(data))
