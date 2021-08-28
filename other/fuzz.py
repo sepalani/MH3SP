@@ -19,6 +19,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import struct
+
+from other.utils import to_bytearray
+
+
 # msf-pattern_create -l 0xe50
 MSF_PATTERN = \
     "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac" \
@@ -73,3 +78,65 @@ MSF_PATTERN = \
     "9Em0Em1Em2Em3Em4Em5Em6Em7Em8Em9En0En1En2En3En4En5En6En7En8En9Eo0Eo1Eo2E" \
     "o3Eo4Eo5Eo6Eo7Eo8Eo9Ep0Ep1Ep2Ep3Ep4Ep5Ep6Ep7Ep8Ep9Eq0Eq1Eq2Eq3Eq4Eq5Eq6" \
     "Eq7Eq8Eq9Er0Er1Er2Er3Er4Er5Er6Er7Er8Er9Es0E"
+
+
+class Matches(list):
+    pass
+
+
+def repeat(pattern, size):
+    """Produce <size> bytes based on <pattern>."""
+    pattern = to_bytearray(pattern)
+    length = len(pattern)
+    return bytearray((
+        pattern[i % length]
+        for i in range(size)
+    ))
+
+
+def mutate_pack_enumerate(data, fmt, value, start=0, mod=0, matches=Matches()):
+    """Mutate found patterns using pack.
+
+    Example based on pat_item's getHunterStats (AnsUserSearchInfo):
+        # Searching the offset of the server's seeking property via fuzzing
+        # There are at most 32 possible seeking values
+        pattern = b"".join((struct.pack(">H", i) for i in range(32)))
+
+        # Seeking value displayed from friend's stats: "Seeking27"
+        data = fuzz.repeat(pattern, 0x100)
+
+        # Replace all values of "27" and find the next match
+        matches = fuzz.Matches()
+        data = fuzz.mutate_pack_enumerate(data, ">H", 27, mod=32,
+                                          matches=matches)  # "Seeking3"
+        print("Fuzz Stats: {}".format(matches))  # Out: [54, 118, 182, 246]
+
+        # We found that the seeking offset is the 4th item (246) of the list
+        # We found the offset based on the >H (u16) format, we still have to
+        # validate the size (u8, u16, or more) by testing the surrounding
+        # offsets
+    """
+    data = to_bytearray(data)
+    value = struct.pack(fmt, value)
+    length = len(value)
+
+    if not matches:
+        # Fill an empty match list
+        offset = data.find(value)
+        while offset != -1:
+            matches.append(offset)
+            offset = data.find(value, offset+length)
+    else:
+        # Filter based on previous match
+        offsets_to_remove = [
+            i for i, offset in enumerate(matches)
+            if data.find(value, offset, offset+length) == -1
+        ]
+        for i in reversed(offsets_to_remove):
+            del matches[i]
+
+    for i, offset in enumerate(matches, start):
+        if mod:
+            i %= mod
+        data[offset:offset+length] = struct.pack(fmt, i)
+    return data
