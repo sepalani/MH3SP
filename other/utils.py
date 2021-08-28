@@ -74,6 +74,16 @@ class Logger(object):
         return self.logger.critical(msg, *args, **kwargs)
 
 
+def to_bytearray(data):
+    """Python2/3 bytearray helper."""
+    if isinstance(data, str):
+        return bytearray((ord(c) for c in data))
+    elif isinstance(data, bytearray):
+        return data
+    else:
+        return bytearray(data)
+
+
 def hexdump(data):
     """Get data hexdump."""
     data = bytearray(data)
