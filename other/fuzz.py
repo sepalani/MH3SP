@@ -94,6 +94,21 @@ def repeat(pattern, size):
     ))
 
 
+def pad(data, size, pattern):
+    """Pad <data> to reach <size> bytes using <pattern>."""
+    data = to_bytearray(data)
+    pattern = to_bytearray(pattern)
+    if len(data) >= size:
+        return data
+
+    pattern_count = size // len(pattern)
+    if size % len(pattern):
+        pattern_count += 1
+    pattern *= pattern_count
+    pattern[:len(data)] = data
+    return pattern
+
+
 def mutate_pack_enumerate(data, fmt, value, start=0, mod=0, matches=Matches()):
     """Mutate found patterns using pack.
 
