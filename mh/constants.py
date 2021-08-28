@@ -75,7 +75,13 @@ def make_binary_server_type_list(is_jap=False):
 
     # Handle city seekings
     SEEKINGS = [
-        b"Seeking0", b"Seeking1", b"Seeking2",
+        b"Seeking0", b"Seeking1", b"Seeking2", b"Seeking3", b"Seeking4",
+        b"Seeking5", b"Seeking6", b"Seeking7", b"Seeking8", b"Seeking9",
+        b"Seeking10", b"Seeking11", b"Seeking12", b"Seeking13", b"Seeking14",
+        b"Seeking15", b"Seeking16", b"Seeking17", b"Seeking18", b"Seeking19",
+        b"Seeking20", b"Seeking21", b"Seeking22", b"Seeking23", b"Seeking24",
+        b"Seeking25", b"Seeking26", b"Seeking27", b"Seeking28", b"Seeking29",
+        b"Seeking30", b"Seeking31",
     ]
     for i, seeking in enumerate(SEEKINGS):
         p = 0x30C + i * 52  # struct size
