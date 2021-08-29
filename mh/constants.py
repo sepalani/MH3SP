@@ -39,14 +39,13 @@ def make_binary_type_time_events(state=0):
 
 
 def make_binary_server_type_list(is_jap=False):
-    data = b""
+    data = bytearray()
     PROPERTIES = [
         (b"Open", b"Hunters of all Ranks\ncan gather here.", 0, 999),
         (b"Rookie", b"Only hunters HR 30\nor lower may enter.", 0, 30),
         (b"Expert", b"Only hunters HR 31\nor higher may enter.", 31, 999),
         (b"Recruiting", b"Hunters in search of\n"
          b"hunting companions\ncan gather here.", 0, 999),
-        (b"Modding", b"Mods are allowed here.", 0, 999)
     ]
 
     # Handle server type properties
@@ -61,33 +60,83 @@ def make_binary_server_type_list(is_jap=False):
                 desc[i:i+1] = b' ' * padding
         data += pad(desc, 112 if is_jap else 168)
 
-    # Handle HR rank limits
-    p = 0xDDC if is_jap else 0x13AC
-    data = pad(data, p + len(PROPERTIES) * 5)
-    for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
-        data[p:p+2] = struct.pack(">H", hr_min)
-        data[p+2:p+4] = struct.pack(">H", hr_max)
-        p += 4
+    # TODO: Figure out what it is
+    data += b"\0" * 12
 
-    if is_jap:
-        # TODO: Reverse the japanese struct
-        return data
-
-    # Handle city seekings
+    # Handle city seekings (x32)
     SEEKINGS = [
-        b"Seeking0", b"Seeking1", b"Seeking2", b"Seeking3", b"Seeking4",
-        b"Seeking5", b"Seeking6", b"Seeking7", b"Seeking8", b"Seeking9",
-        b"Seeking10", b"Seeking11", b"Seeking12", b"Seeking13", b"Seeking14",
-        b"Seeking15", b"Seeking16", b"Seeking17", b"Seeking18", b"Seeking19",
-        b"Seeking20", b"Seeking21", b"Seeking22", b"Seeking23", b"Seeking24",
-        b"Seeking25", b"Seeking26", b"Seeking27", b"Seeking28", b"Seeking29",
+        b"Everyone welcome!", b"Casual play",
+        b"Huntin' and chattin'", b"Beginners welcome!",
+        b"Skilled players only", b"Let's Quest together",
+        b"Event Quest ho!", b"Arena battles!",
+        b"Earning money", b"HR grinding",
+        b"Gathering materials", b"Rare material search",
+        b"Just a Quest or two", b"In for the long haul",
+        b"Seeking14", b"Seeking15", b"Seeking16", b"Seeking17",
+        b"Seeking18", b"Seeking19", b"Seeking20", b"Seeking21",
+        b"Seeking22", b"Seeking23", b"Seeking24", b"Seeking25",
+        b"Seeking26", b"Seeking27", b"Seeking28", b"Seeking29",
         b"Seeking30", b"Seeking31",
     ]
     for i, seeking in enumerate(SEEKINGS):
-        p = 0x30C + i * 52  # struct size
-        data[p:p+len(seeking)] = seeking
-        data[0x33D + i * 52] = 0x01
-        data[0x33E + i * 52] = 0xFF
+        data += pad(seeking, 32 if is_jap else 48)
+        data += b"\0\1\xff\0"  # TODO: Figure out the 0xff flag values
+
+    # Handle city HR limits (x8)
+    HR_LIMITS = [
+        # (Name, HR min, HR max)
+        (b"None", 0, 999),
+        (b"Low", 0, 30),
+        (b"High", 31, 999),
+        (b"Limit3", 0, 999),
+        (b"Limit4", 0, 999),
+        (b"Limit5", 0, 999),
+        (b"Limit6", 0, 999),
+        (b"Limit7", 0, 999),
+    ]
+    for name, hr_min, hr_max in HR_LIMITS:
+        data += pad(name, 20 if is_jap else 30)
+        data += b"\1"  # Enable bit
+        data += b"\0"  # Unused / Defaults to HR limit restriction
+        data += struct.pack(">H", hr_min)
+        data += struct.pack(">H", hr_max)
+
+    # Handle city goals (x64)
+    GOALS = [
+        b"None", b"HR1~", b"HR9~", b"HR18~",
+        b"HR31~", b"HR40~", b"HR51~",
+        b"1* Urgent Quest", b"2* Urgent Quest", b"3* Urgent Quest",
+        b"4* Urgent Quest", b"5* Urgent Quest",
+        b"Great Jaggi", b"Qurupecco", b"Royal Ludroth", b"Barroth",
+        b"Gobul", b"Rathian", b"Great Baggi", b"Gigginox",
+        b"Lagiacrus", b"Barioth", b"Rathalos", b"Diablos",
+        b"Uragaan", b"Agnaktor", b"Jhen Mohran", b"Deviljho",
+        b"Alatreon", b"Mining Ore", b"Catching Bugs", b"Fishing",
+        b"Small Monsters", b"Gathering", b"Transporting", b"The Arena",
+        b"Goal36", b"Goal37", b"Goal38", b"Goal39",
+        b"Goal40", b"Goal41", b"Goal42", b"Goal43",
+        b"Goal44", b"Goal45", b"Goal46", b"Goal47",
+        b"Goal48", b"Goal49", b"Goal50", b"Goal51",
+        b"Goal52", b"Goal53", b"Goal54", b"Goal55",
+        b"Goal56", b"Goal57", b"Goal58", b"Goal59",
+        b"Goal60", b"Goal61", b"Goal62", b"Goal63",
+    ]
+    for name in GOALS:
+        data += pad(name, 20 if is_jap else 30)
+        # There are 3 restriction modes:
+        #  - 0x00: None
+        #  - 0x01: HR limit
+        #  - 0x02: An unknown one (TODO: Figure it out)
+        data += b"\1"  # Enable bit
+        data += b"\0"  # Restriction bit
+        data += struct.pack(">H", 0)
+        data += struct.pack(">H", 0)
+
+    # Handle server type HR limits
+    for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
+        data += struct.pack(">H", hr_min)
+        data += struct.pack(">H", hr_max)
+
     return data
 
 
