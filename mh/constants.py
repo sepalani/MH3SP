@@ -137,6 +137,13 @@ def make_binary_server_type_list(is_jap=False):
         data += struct.pack(">H", hr_min)
         data += struct.pack(">H", hr_max)
 
+    # Timeout values (x8)
+    timeout_in_sec = 30
+    for _ in range(8):
+        data += struct.pack(">H", 30 * timeout_in_sec)
+
+    # TODO: Figure out the missing data at the end
+
     return data
 
 
