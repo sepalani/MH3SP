@@ -22,6 +22,7 @@
 import struct
 
 from collections import OrderedDict
+from other.utils import to_bytearray
 
 
 class ItemType:
@@ -586,3 +587,56 @@ def getDummyLayerData():
     # layer.unk_string_0x16 = String("UnkStart")
     # layer.unk_binary_0x17 = Binary(b"binStart")
     return layer
+
+
+def getHunterStats(hr=921, profile=b"Navaldeus",
+                   title=117, status=1, hr_limit=2, goal=35, seeking=23,
+                   server_type=3):
+    """
+    Offsets:
+     - 0x00: Hunter Rank
+     - 0x10~0x7c: Equipment
+     - 0x9c: Profile description
+     - 0xf2: Profile titles
+     - 0xf3: Profile status
+     - 0xf5: City's HR limit
+     - 0xf6: City's goal
+     - 0xf7: City's seeking
+     - 0xf8: Server type
+    """
+    from other import fuzz
+
+    profile = to_bytearray(profile)
+    if profile[-1] != b"\0":
+        profile += b"\0"
+
+    data = fuzz.repeat(fuzz.MSF_PATTERN, 0x100)
+
+    def slot(type_id, equipment_id, slots=0):
+        """Equipment slot / TODO: Handle gems"""
+        return struct.pack(">BBHII", type_id, slots, equipment_id, 0, 0)
+
+    data[:2] = struct.pack(">H", hr)
+
+    # Weapon / Gun slots (Lance: Nega-Babylon)
+    data[0x10:0x1c] = slot(10, 11)
+    data[0x1c:0x28] = b"\xff" * 0xc
+    data[0x28:0x34] = b"\xff" * 0xc
+
+    # Armors (Helios+ set)
+    data[0x34:0x40] = slot(5, 111)
+    data[0x40:0x4c] = slot(1, 116)
+    data[0x4c:0x58] = slot(3, 115)
+    data[0x58:0x64] = slot(2, 109)
+    data[0x64:0x70] = slot(4, 113)
+    data[0x70:0x7c] = slot(6, 7, slots=3)
+
+    data[0x9c:0x9c+len(profile)] = profile
+    data[0xf2] = title
+    data[0xf3] = status
+    data[0xf5] = hr_limit
+    data[0xf6] = goal
+    data[0xf7] = seeking
+    data[0xf8] = server_type
+
+    return Binary(data)

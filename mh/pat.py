@@ -1100,14 +1100,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user = pati.UserSearchInfo()
         user.unk_string_0x01 = pati.String("Str1")
         user.name = pati.String("Drakea")
-        user.unk_binary_0x03 = pati.Binary(b"1" * 99 + b"\0")
+        user.unk_binary_0x03 = pati.getHunterStats(seeking=21)
         # Warp location ?
         user.unk_binary_0x04 = pati.Binary(
             # Long: ? + server_type? / Word: server? + gate? + city?
             b"\0\0\0\01" + b"\0\0\0\01" + b"\0\01" + b"\0\01" + b"\0\01"
         )
         user.unk_byte_0x07 = pati.Byte(1)
-        user.server_name = pati.String("Valor")
+        user.server_name = pati.String("Server\tGate\tCity")
         user.unk_byte_0x0b = pati.Byte(1)
         user.unk_string_0x0c = pati.String("StrC")
         user.city_size = pati.Long(4)
