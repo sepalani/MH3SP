@@ -2283,7 +2283,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         ID: 65120100
         JP: マッチング開始要求
-        TR: Match start request
+        TR: Matching start request
         """
         self.sendAnsCircleMatchStart(seq)
 
@@ -2292,7 +2292,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         ID: 65120200
         JP: マッチング開始返答
-        TR: Match start response
+        TR: Matching start response
         """
         self.send_packet(PatID4.AnsCircleMatchStart, b"", seq)
         self.sendNtcCircleMatchStart(seq)
@@ -2302,7 +2302,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         ID: 65121000
         JP: マッチング開始通知
-        TR: Match start notification
+        TR: Matching start notification
         """
         count = 1
         data = struct.pack(">I", count)
@@ -2314,6 +2314,24 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">H", len(data)) + data
         data += struct.pack(">I", 1)
         self.send_packet(PatID4.NtcCircleMatchStart, data, seq)
+
+    def recvReqCircleMatchEnd(self, packet_id, data, seq):
+        """ReqCircleMatchEnd packet.
+
+        ID: 65130100
+        JP: マッチング終了要求
+        TR: Matching end request
+        """
+        self.sendAnsCircleMatchEnd(seq)
+
+    def sendAnsCircleMatchEnd(self, seq):
+        """AnsCircleMatchEnd packet.
+
+        ID: 65130200
+        JP: マッチング終了返答
+        TR: Matching end notification
+        """
+        self.send_packet(PatID4.AnsCircleMatchEnd, b"", seq)
 
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
