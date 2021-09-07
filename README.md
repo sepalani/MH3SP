@@ -3,9 +3,9 @@
 The goal of this project is to reverse the game in order to make private servers and custom event/arena quests.
 
 ## Current Status
-The project isn't yet functionnal.
+The project is kinda functionnal, multiplayer isn't supported yet.
 
-![Progress](https://github.com/sepalani/MH3SP/blob/master/progress.png)
+![Progress](https://user-images.githubusercontent.com/7890055/132406076-baad3f30-5bce-4417-bd2b-9b32a7873380.png)
 
 ## Progress
 - [ ] Nintendo servers implementation
@@ -13,29 +13,29 @@ The project isn't yet functionnal.
   - [ ] Shop server and `gpatch.rso` (japan only?)
   - [ ] Are other Nintendo servers used?
 - [ ] Capcom servers
-  - [ ] Terms/Announce/Maintenance message 
-  - [ ] Dummy Capcom ID profile
+  - [x] Terms/Announce/Maintenance message 
+  - [x] Dummy Capcom ID profile
   - [ ] Create/retrieve Capcom ID profiles
   - [ ] Cheat detection system
 - [ ] Server selection
-  - [ ] Server type selection
-  - [ ] Gate selection
-  - [ ] HR restriction
-  - [ ] Population count
+  - [x] Server type selection
+  - [x] Gate selection
+  - [x] HR restriction
+  - [x] Population count
   - [ ] Backend to report statistics
 - [ ] Server events
-  - [ ] Day/night cycle
+  - [x] Day/night cycle
   - [ ] Market event
-  - [ ] Sandstorm event  
+  - [x] Sandstorm event  
 - [ ] Gate server
-  - [ ] Spawning at the gate
+  - [x] Spawning at the gate
   - [ ] Chat system
   - [ ] City search
-  - [ ] City selection
+  - [x] City selection
 - [ ] City
-  - [ ] Create a city
+  - [x] Create a city
   - [ ] Join a city
-  - [ ] Set city maximum capacity
+  - [x] Set city maximum capacity
   - [ ] (...)
 - [ ] Chat
   - [ ] Server message
@@ -44,9 +44,9 @@ The project isn't yet functionnal.
   - [ ] Private message
   - [ ] WiiSpeak
 - [ ] Quest
-  - [ ] Create a quest
+  - [x] Create a quest
   - [ ] Join a quest
-  - [ ] Start a quest
+  - [x] Start a quest
   - [ ] Event quests
   - [ ] Arena quests
 - [ ] Friend system
