@@ -700,7 +700,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         self.server.debug("UserObject: {!r}".format(user_obj))
         if 'capcom_id' not in user_obj:
             # TODO: Properly generate that
-            user_obj.capcom_id = pati.String(b"C9I7D4")
+            user_obj.capcom_id = pati.String(MY_CAPCOM_ID)
         self.sendAnsUserObject(is_slot_empty, slot_index, user_obj, seq)
 
     def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj, seq):
@@ -1098,8 +1098,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: User search data response
         """
         user = pati.UserSearchInfo()
-        user.unk_string_0x01 = pati.String("Str1")
-        user.name = pati.String("Drakea")
+        user.capcom_id = pati.String(OTHER_CAPCOM_ID)
+        user.name = pati.String(OTHER_HUNTER_NAME)
         user.unk_binary_0x03 = pati.getHunterStats(seeking=21)
         # Warp location ?
         user.unk_binary_0x04 = pati.Binary(
@@ -1302,8 +1302,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         friend = pati.FriendData()
         friend.index = pati.Long(1)
-        friend.capcom_id = pati.String("_DRAKEA_")
-        friend.hunter_name = pati.String("Drakea974")
+        friend.capcom_id = pati.String(OTHER_CAPCOM_ID)
+        friend.hunter_name = pati.String(OTHER_HUNTER_NAME)
         friends = [friend]
         unk = 0
         count = len(friends)

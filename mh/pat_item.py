@@ -441,7 +441,7 @@ class FmpData(PatData):
 
 class UserSearchInfo(PatData):
     FIELDS = (
-        (0x01, "unk_string_0x01"),
+        (0x01, "capcom_id"),
         (0x02, "name"),
         (0x03, "unk_binary_0x03"),  # Hunter stat/HR related
         (0x04, "unk_binary_0x04"),  # Warp related
