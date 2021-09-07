@@ -565,6 +565,16 @@ class MessageInfo(PatData):
     )
 
 
+class LayerUserInfo(PatData):
+    FIELDS = (
+        (0x01, "capcom_id"),
+        (0x02, "hunter_name"),
+        (0x03, "layer_host"),
+        (0x06, "unk_long_0x06"),
+        (0x07, "stats"),
+    )
+
+
 def getDummyLayerData():
     layer = LayerData()
     layer.unk_long_0x01 = Long(1)  # Index

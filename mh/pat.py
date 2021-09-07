@@ -1277,7 +1277,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         count = 1
         data = struct.pack(">I", count)
-        data += pati.DummyData().pack()  # TODO
+        user = pati.LayerUserInfo()
+        user.capcom_id = pati.String(MY_CAPCOM_ID)
+        data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
 
     def recvReqFriendList(self, packet_id, data, seq):
