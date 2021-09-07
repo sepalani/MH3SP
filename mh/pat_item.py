@@ -451,8 +451,8 @@ class UserSearchInfo(PatData):
         (0x0c, "unk_string_0x0c"),
         (0x0d, "city_size"),
         (0x0e, "city_capacity"),
-        (0x0f, "unk_long_0x0f"),
-        (0x10, "unk_long_0x10"),
+        (0x0f, "info_mine_0x0f"),
+        (0x10, "info_mine_0x10"),
     )
 
 
@@ -567,22 +567,32 @@ class MessageInfo(PatData):
 
 def getDummyLayerData():
     layer = LayerData()
-    layer.unk_long_0x01 = Long(1)
+    layer.unk_long_0x01 = Long(1)  # Index
     # layer.unk_custom_0x02 = Custom(b"")
     layer.name = String("LayerStart")
     # layer.unk_worddec_0x05 = Word(2)  # City no longer exists message
+
+    # Player in the city, displayed at the gate
     layer.size = Long(0)
+
     # layer.unk_long_0x07 = Long(1)
     # layer.unk_long_0x08 = Long(1)
+
+    # Maximum number of players in the city, displayed at the gate
     layer.capacity = Long(4)
     # layer.unk_long_0x0a = Long(1)
-    layer.unk_long_0x0b = Long(0)  # In city population
+
+    # In city population, displayed at the gate
+    # layer.unk_long_0x0b = Long(0)
+
     # layer.unk_long_0x0c = Long(1)
     # layer.unk_word_0x0d = Word(1)
     layer.state = Byte(1)
     # layer.unk_long_0x11 = Long(1)
     # layer.unk_long_0x11 = Long(1)
-    # layer.unk_byte_0x12 = Byte(1)
+
+    # Might be needed to be >=1 to keep NetworkConnectionStable alive
+    layer.unk_byte_0x12 = Byte(1)
     # layer.unk_bytedec_0x15 = Byte(1)
     # layer.unk_string_0x16 = String("UnkStart")
     # layer.unk_binary_0x17 = Binary(b"binStart")

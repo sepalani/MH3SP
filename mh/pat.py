@@ -115,6 +115,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Find all error codes and their meanings.
 
         Error codes:
+         - 0x80050037: Unable to find CircleListLayer Slot
          - 0x80060002: Fail to warp to location (Layer index error?)
          - 0x80070002: Empty NetworkUniqueId?
         """
@@ -1112,8 +1113,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.unk_string_0x0c = pati.String("StrC")
         user.city_size = pati.Long(4)
         user.city_capacity = pati.Long(3)
-        user.unk_long_0x0f = pati.Long(5)
-        user.unk_long_0x10 = pati.Long(6)
+        user.info_mine_0x0f = pati.Long(5)
+        user.info_mine_0x10 = pati.Long(6)
 
         data = user.pack()
 
