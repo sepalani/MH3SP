@@ -1798,7 +1798,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ユーザ表示用バイナリ通知返答
         TR: User display binary notification response
         """
-        self.sendNtcUserBinaryNotice(unk1, str_data, unk2, unk3, seq)
+        # self.sendNtcUserBinaryNotice(unk1, str_data, unk2, unk3, seq)
         self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
 
     def sendNtcUserBinaryNotice(self, unk1, str_data, unk2, unk3, seq):
@@ -2166,7 +2166,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: マッチングオプション設定返答
         TR: Match option settings response
         """
-        self.sendNtcCircleMatchOptionSet(options, seq)
+        # self.sendNtcCircleMatchOptionSet(options, seq)
         self.send_packet(PatID4.AnsCircleMatchOptionSet, b"", seq)
 
     def sendNtcCircleMatchOptionSet(self, options, seq):
@@ -2278,7 +2278,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle data settings response
         """
         data = struct.pack(">I", 0)  # unk1)
-        self.send_packet(PatID4.NtcCircleInfoSet, g_circle_info_set, seq)
+        # self.send_packet(PatID4.NtcCircleInfoSet, g_circle_info_set, seq)
         self.send_packet(PatID4.AnsCircleInfoSet, data, seq)
 
     def recvReqCircleMatchStart(self, packet_id, data, seq):
