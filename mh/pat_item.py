@@ -38,8 +38,7 @@ class ItemType:
 
 def lp_string(s):
     """1-byte length-prefixed string."""
-    if isinstance(s, str):
-        s = s.encode("ascii")
+    s = to_bytearray(s)
     return struct.pack(">B", len(s)) + s
 
 
@@ -51,8 +50,7 @@ def unpack_lp_string(data, offset=0):
 
 def lp2_string(s):
     """2-bytes length-prefixed string."""
-    if isinstance(s, str):
-        s = s.encode("ascii")
+    s = to_bytearray(s)
     return struct.pack(">H", len(s)) + s
 
 
@@ -174,8 +172,6 @@ class LongLong(Item):
 
 def pack_string(s):
     """Pack PAT item string."""
-    if isinstance(s, str):
-        s = s.encode("ascii")
     return struct.pack(">B", ItemType.String) + lp2_string(s)
 
 
@@ -200,8 +196,7 @@ class String(Item):
 
 def pack_binary(s):
     """Pack PAT item binary."""
-    if isinstance(s, str):
-        s = s.encode("ascii")
+    s = to_bytearray(s)
     return struct.pack(">BH", ItemType.Binary, len(s)) + s
 
 
