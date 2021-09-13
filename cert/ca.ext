@@ -1,0 +1,6 @@
+extensions = x509v3
+
+[ x509v3 ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer:always
+basicConstraints       = CA:true

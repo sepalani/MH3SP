@@ -6,15 +6,15 @@ exceed the original size!
 
 ## JAP Certificate
 ```bash
-python MHTriCertPatcher.py --patch-ec -J main.dol cert.der
+python MHTriCertPatcher.py --patch-ec -J main.dol ca.der
 ```
 
 ## USA Certificate
 ```bash
-python MHTriCertPatcher.py -E main.dol cert.der
+python MHTriCertPatcher.py -E main.dol ca.der
 ```
 
 ## PAL Certificate
 ```
-python MHTriCertPatcher.py -P main.dol cert.der
+python MHTriCertPatcher.py -P main.dol ca.der
 ```
