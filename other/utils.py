@@ -21,6 +21,8 @@
 
 import os
 import logging
+import socket
+
 from collections import namedtuple
 from logging.handlers import TimedRotatingFileHandler
 
@@ -162,6 +164,20 @@ def get_config(name, config_file=CONFIG_FILE):
         "LogToFile": config.getboolean(name, "LogToFile"),
         "LogToWindow": config.getboolean(name, "LogToWindow"),
     }
+
+
+def get_default_ip():
+    """Get the default IP address"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
+
+
+def get_ip(ip):
+    """Return the IP address that will be used."""
+    return get_default_ip() if ip == "0.0.0.0" else ip
 
 
 def argparse_from_config(config):

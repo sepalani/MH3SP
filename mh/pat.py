@@ -24,7 +24,7 @@ import select
 import struct
 import time
 
-from other.utils import get_config, hexdump, Logger
+from other.utils import get_config, get_ip, hexdump, Logger
 from mh.constants import *
 import mh.pat_item as pati
 import mh.time_utils as time_utils
@@ -473,7 +473,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: I don't think it's related to LMP protocol.
         """
         config = get_config("LMP")
-        self.sendAnsLmpConnect(config["IP"], config["Port"], seq)
+        self.sendAnsLmpConnect(get_ip(config["IP"]), config["Port"], seq)
 
     def sendAnsLmpConnect(self, address, port, seq):
         """AnsLmpConnect packet.
@@ -822,7 +822,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unused = 0
         data = struct.pack(">II", unused, count)
         config = get_config("FMP")
-        fmp_addr = config["IP"]
+        fmp_addr = get_ip(config["IP"])
         fmp_port = config["Port"]
         i = first_index
         end = i + count
@@ -856,7 +856,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unused = 0
         data = struct.pack(">II", unused, count)
         config = get_config("FMP")
-        fmp_addr = config["IP"]
+        fmp_addr = get_ip(config["IP"])
         fmp_port = config["Port"]
         i = first_index
         end = i + count
@@ -935,7 +935,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         index, = struct.unpack_from(">I", data)
         header = pati.unpack_bytes(data, 4)
         config = get_config("FMP")
-        fmp_addr = config["IP"]
+        fmp_addr = get_ip(config["IP"])
         fmp_port = config["Port"]
         fmp_data = pati.FmpData()
         fmp_data.index = pati.Long(1)
