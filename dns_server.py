@@ -23,6 +23,7 @@ import sys
 import socket
 
 from optparse import OptionParser
+from other.utils import get_default_ip
 
 try:
     # Python 3
@@ -102,7 +103,7 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-H", "--hostname", action="store", type=str,
-                      default=socket.gethostname(), dest="host",
+                      default=get_default_ip(), dest="host",
                       help="set server hostname")
     parser.add_option("-P", "--port", action="store", type=int,
                       default=53, dest="port",
