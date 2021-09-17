@@ -40,10 +40,41 @@ class MHTriDNSServer(SocketServer.UDPServer):
     """
 
     record = {
-        'mh.capcom.co.jp': '',
-        'mmh-t1-opn02.mmh-service.capcom.co.jp': '',
-        'mmh-t1-opn03.mmh-service.capcom.co.jp': '',
-        'mmh-t1-opn04.mmh-service.capcom.co.jp': '',
+        # Wiimmfi
+        "gpcm.gs.wiimmfi.de": "",
+        "gpsp.gs.wiimmfi.de": "",
+        "naswii.wiimmfi.de": "",
+        "nas.wiimmfi.de": "",
+        "gamestats.gs.wiimmfi.de": "",
+        "gamestats2.gs.wiimmfi.de": "",
+        "wiinat.available.gs.wiimmfi.de": "",
+        "wiinat.natneg1.gs.wiimmfi.de": "",
+        "wiinat.natneg2.gs.wiimmfi.de": "",
+        "wiinat.natneg3.gs.wiimmfi.de": "",
+        # Monster Hunter 3 (JAP)
+        "monhunter3wii.gamestats.gs.wiimmfi.de": "",
+        "monhunter3wii.gamestats2.gs.wiimmfi.de": "",
+        "monhunter3wii.available.gs.wiimmfi.de": "",
+        "monhunter3wii.natneg1.gs.wiimmfi.de": "",
+        "monhunter3wii.natneg2.gs.wiimmfi.de": "",
+        "monhunter3wii.natneg3.gs.wiimmfi.de": "",
+        "monhunter3wii.master.gs.wiimmfi.de": "",
+        "monhunter3wii.ms16.gs.wiimmfi.de": "",
+        # Monster Hunter 3 (EU/US)
+        "mh3uswii.available.gs.wiimmfi.de": "",
+        "mh3uswii.natneg1.gs.wiimmfi.de": "",
+        "mh3uswii.natneg2.gs.wiimmfi.de": "",
+        "mh3uswii.natneg3.gs.wiimmfi.de": "",
+        "mh3uswii.master.gs.wiimmfi.de": "",
+        "mh3uswii.gamestats.gs.wiimmfi.de": "",
+        "mh3uswii.gamestats2.gs.wiimmfi.de": "",
+        "mh3uswii.ms1.gs.wiimmfi.de": "",
+        # Capcom server
+        "mh.capcom.co.jp": "",
+        "mmh-t1-opn01.mmh-service.capcom.co.jp": "",
+        "mmh-t1-opn02.mmh-service.capcom.co.jp": "",
+        "mmh-t1-opn03.mmh-service.capcom.co.jp": "",
+        "mmh-t1-opn04.mmh-service.capcom.co.jp": "",
     }
 
     def __init__(self, server_address, RequestHandlerClass,
@@ -90,7 +121,7 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
         if s in self.server.record:
             s = self.server.record[s]
             if not s:
-                s = self.server.server_address[0]
+                s = get_default_ip()
 
         try:
             ip = socket.gethostbyname(s)
