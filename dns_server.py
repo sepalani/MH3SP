@@ -40,6 +40,35 @@ class MHTriDNSServer(SocketServer.UDPServer):
     """
 
     record = {
+        # Nintendo WFC
+        "gpcm.gs.nintendowifi.net": "",
+        "gpsp.gs.nintendowifi.net": "",
+        "naswii.nintendowifi.net": "",
+        "nas.nintendowifi.net": "",
+        "gamestats.gs.nintendowifi.net": "",
+        "gamestats2.gs.nintendowifi.net": "",
+        "wiinat.available.gs.nintendowifi.net": "",
+        "wiinat.natneg1.gs.nintendowifi.net": "",
+        "wiinat.natneg2.gs.nintendowifi.net": "",
+        "wiinat.natneg3.gs.nintendowifi.net": "",
+        # Monster Hunter 3 (JAP)
+        "monhunter3wii.gamestats.gs.nintendowifi.net": "",
+        "monhunter3wii.gamestats2.gs.nintendowifi.net": "",
+        "monhunter3wii.available.gs.nintendowifi.net": "",
+        "monhunter3wii.natneg1.gs.nintendowifi.net": "",
+        "monhunter3wii.natneg2.gs.nintendowifi.net": "",
+        "monhunter3wii.natneg3.gs.nintendowifi.net": "",
+        "monhunter3wii.master.gs.nintendowifi.net": "",
+        "monhunter3wii.ms16.gs.nintendowifi.net": "",
+        # Monster Hunter 3 (EU/US)
+        "mh3uswii.available.gs.nintendowifi.net": "",
+        "mh3uswii.natneg1.gs.nintendowifi.net": "",
+        "mh3uswii.natneg2.gs.nintendowifi.net": "",
+        "mh3uswii.natneg3.gs.nintendowifi.net": "",
+        "mh3uswii.master.gs.nintendowifi.net": "",
+        "mh3uswii.gamestats.gs.nintendowifi.net": "",
+        "mh3uswii.gamestats2.gs.nintendowifi.net": "",
+        "mh3uswii.ms1.gs.nintendowifi.net": "",
         # Wiimmfi
         "gpcm.gs.wiimmfi.de": "",
         "gpsp.gs.wiimmfi.de": "",
