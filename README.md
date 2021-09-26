@@ -65,6 +65,21 @@ The project is kinda functionnal, multiplayer isn't supported yet.
  - OpenSSL _(or any other tool to generate SSL certificates)_
  - Python 2.7 or Python 3.x
 
+## Setup
+You can setup the server by following the guide on the [wiki](https://github.com/sepalani/MH3SP/wiki):
+ - **Setup page**: the procedure to setup the server.
+ - **Troubleshooting page**: common issues and how to solve them.
+ - **Configuration page**: options you can use to change the server behaviour.
+
+## Community
+Feel free to join our discord server if you want to discuss MH3SP and 
+InusualZ's [MHTriServer](https://github.com/InusualZ/MHTriServer) or if you
+need help setting them up:
+ - https://discord.gg/4sBmXC55V6
+
+You might find relevant information in the `#faq` and `#help` channels of
+the discord server.
+
 ## Special thanks
 Without them, the project would never have been possible:
  - Nintendo servers emulation projects
