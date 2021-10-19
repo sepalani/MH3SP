@@ -19,10 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import sys
 import socket
 
-from optparse import OptionParser
 from other.utils import get_default_ip
 
 try:
@@ -33,6 +31,9 @@ except ImportError:
     import SocketServer
 
 
+STR2HAX = ("97.74.103.14", "173.201.71.14")
+
+
 class MHTriDNSServer(SocketServer.UDPServer):
     """Generic DNS server class for MHTri.
 
@@ -40,6 +41,7 @@ class MHTriDNSServer(SocketServer.UDPServer):
     """
 
     record = {
+        "cfh.wapp.wii.com": STR2HAX,
         # Nintendo WFC
         "gpcm.gs.nintendowifi.net": "",
         "gpsp.gs.nintendowifi.net": "",
@@ -140,41 +142,69 @@ def dns_pack(data, ip):
 class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
     """Basic DNS request handler"""
 
+    def forward(self, forwarders):
+        if not self.server.str2hax:
+            return None
+        data, sock = self.request
+        for dns_server in forwarders:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.sendto(data, (dns_server, 53))
+            response, addrinfo = s.recvfrom(256)
+            s.close()
+            if not response:
+                continue
+            sock.sendto(response, self.client_address)
+            print(">>> Forwarded via {}".format(dns_server))
+            return True
+        print("--- Failed to forward request!")
+
     def handle(self):
         data = bytearray(self.request[0])
         sock = self.request[1]
         name = data.strip()[13:].split(b'\0')[0]
         s = "".join("." if c < 32 else chr(c) for c in name)
-        print("<<< %s" % s)
+        print("<<< {}".format(s))
 
         if s in self.server.record:
-            s = self.server.record[s]
-            if not s:
+            record = self.server.record[s]
+            if not record:
                 s = get_default_ip()
+            elif isinstance(record, tuple):
+                if self.forward(record):
+                    return  # Request forwarded successfully
 
         try:
             ip = socket.gethostbyname(s)
-            print(">>> %s" % ip)
+            print(">>> {}".format(ip))
             sock.sendto(dns_pack(data, ip), self.client_address)
         except socket.gaierror:
             pass
 
 
 if __name__ == "__main__":
-    parser = OptionParser()
-    parser.add_option("-H", "--hostname", action="store", type=str,
-                      default=get_default_ip(), dest="host",
-                      help="set server hostname")
-    parser.add_option("-P", "--port", action="store", type=int,
-                      default=53, dest="port",
-                      help="set server port")
-    opt, arg = parser.parse_args()
+    from argparse import ArgumentParser
 
-    server = MHTriDNSServer((opt.host, opt.port), MHTriDNSRequestHandler)
+    parser = ArgumentParser()
+    parser.add_argument("-H", "--hostname", action="store", type=str,
+                        default=get_default_ip(), dest="host",
+                        help="set server hostname")
+    parser.add_argument("-P", "--port", action="store", type=int,
+                        default=53, dest="port",
+                        help="set server port")
+    parser.add_argument("--str2hax", action="store_true",
+                        help="Enable str2hax forwarder")
+    args = parser.parse_args()
+
+    server = MHTriDNSServer((args.host, args.port), MHTriDNSRequestHandler)
+    server.str2hax = args.str2hax
+    if args.str2hax:
+        print("!!!")
+        print("!!! USE STR2HAX AT YOUR OWN RISK! THIS METHOD IS DISCOURAGED!")
+        print("!!!  - IP(s): {}".format(", ".join(STR2HAX)))
+        print("!!!")
 
     try:
-        print("Server: %s | Port: %d" %
-              (server.server_address[0], server.server_address[1]))
+        print("Server: {} | Port: {}".format(*server.server_address))
         server.serve_forever()
     except KeyboardInterrupt:
         print("[Server] Closing...")
