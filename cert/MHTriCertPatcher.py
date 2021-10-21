@@ -123,7 +123,15 @@ class NetworkWiiMediatorIsECTicket(object):
             m.write(patch)
 
 
-if __name__ == '__main__':
+def prompt():
+    message = "\nPress Enter to exit the program\n"
+    try:
+        raw_input(message)
+    except Exception as e:
+        input(message)
+
+
+def main():
     parser = ArgumentParser()
     parser.add_argument("dol", action="store", help="main.dol file")
     region_group = parser.add_mutually_exclusive_group(required=True)
@@ -148,6 +156,10 @@ if __name__ == '__main__':
         "--dump-cert", dest="dump", action="store", metavar="OUT.DER",
         help="Extract CA certificate"
     )
+    parser.add_argument(
+        "-n", "--not-interactive", dest="interactive", action="store_false",
+        help="Disable the prompt after the program ended"
+    )
     args = parser.parse_args()
 
     patcher = \
@@ -170,3 +182,17 @@ if __name__ == '__main__':
     if args.dump:
         print("+ Dumping root CA certificate")
         patcher.dump_cert(args.dump)
+
+    if args.interactive:
+        prompt()
+
+
+if __name__ == '__main__':
+    from traceback import print_exc
+
+    try:
+        main()
+    except (Exception, SystemExit) as e:
+        if not isinstance(e, SystemExit):
+            print_exc()
+        prompt()
