@@ -14,6 +14,7 @@ The CertPatcher class is the base class for these patchers.
 It can also patch the EC ticket check for the japanese version of the game.
 """
 
+import os
 import mmap
 from argparse import ArgumentParser
 from contextlib import closing
@@ -24,6 +25,7 @@ class CertPatcher(object):
 
     CERT_OFF = None
     CERT_LEN = None
+    DOL_SIZE = 6 * 1024 ** 2
 
     def __init__(self, dol):
         """Constructor.
@@ -32,6 +34,8 @@ class CertPatcher(object):
         """
         if self.CERT_OFF is None or self.CERT_LEN is None:
             raise ValueError("Unsupported region!")
+        if os.path.getsize(dol) < self.DOL_SIZE:
+            raise ValueError("DOL doesn't seem to be from the DATA partition")
         self.dol = dol
 
     def patch_cert(self, crt):
@@ -193,6 +197,8 @@ if __name__ == '__main__':
     try:
         main()
     except (Exception, SystemExit) as e:
-        if not isinstance(e, SystemExit):
+        if isinstance(e, ValueError):
+            print("ERROR: {}!".format(e))
+        elif not isinstance(e, SystemExit):
             print_exc()
         prompt()
