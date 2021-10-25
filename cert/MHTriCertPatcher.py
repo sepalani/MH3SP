@@ -20,14 +20,25 @@ from argparse import ArgumentParser
 from contextlib import closing
 
 
+def warning(message, force):
+    if not force:
+        raise ValueError(message)
+    print("! {}". format(message))
+
+
 class CertPatcher(object):
     """Generic Certificate Patcher."""
 
     CERT_OFF = None
     CERT_LEN = None
+    CERT_HDR = bytearray([
+        # ASN.1 DER encoding
+        0x30, 0x82, 0x03, 0x98,  # 0:d=0  hl=4 l= 920 cons: SEQUENCE
+        0x30, 0x82,              # 4:d=1  hl=4 l= ??? cons:  SEQUENCE
+    ])
     DOL_SIZE = 6 * 1024 ** 2
 
-    def __init__(self, dol):
+    def __init__(self, dol, force=False):
         """Constructor.
 
         dol - path to the main.dol file
@@ -35,20 +46,23 @@ class CertPatcher(object):
         if self.CERT_OFF is None or self.CERT_LEN is None:
             raise ValueError("Unsupported region!")
         if os.path.getsize(dol) < self.DOL_SIZE:
-            raise ValueError("DOL doesn't seem to be from the DATA partition")
+            warning("DOL doesn't seem to be from the DATA partition", force)
         self.dol = dol
+        self.force = force
 
     def patch_cert(self, crt):
         """Patch the in-game certificate. Will overwrite original dol file!
 
         crt - path to the certificate file
         """
+        if os.path.getsize(crt) > self.CERT_LEN:
+            warning("Invalid certificate size", self.force)
         with open(crt, "rb") as f:
             data = f.read(self.CERT_LEN)
+            if not data.startswith(self.CERT_HDR):
+                warning("Certificate DER header seems invalid", self.force)
             pad = self.CERT_LEN - len(data)
             data += pad * b'\0'
-        if len(data) != self.CERT_LEN:
-            raise ValueError("Unable to read the certificate!")
         with open(self.dol, "rb+") as f:
             f.seek(self.CERT_OFF)
             f.write(data)
@@ -150,7 +164,7 @@ def main():
         help="use the European patcher [RMHP08]")
     parser.add_argument(
         "cert", nargs='?', action="store",
-        help="Replace root CA certificate"
+        help="replace root CA certificate"
     )
     parser.add_argument(
         "--patch-ec", dest="patch_ec", action="store_true",
@@ -158,18 +172,24 @@ def main():
     )
     parser.add_argument(
         "--dump-cert", dest="dump", action="store", metavar="OUT.DER",
-        help="Extract CA certificate"
+        help="extract CA certificate"
     )
     parser.add_argument(
         "-n", "--not-interactive", dest="interactive", action="store_false",
-        help="Disable the prompt after the program ended"
+        help="disable the prompt after the program ended"
     )
+    parser.add_argument(
+        "-f", "--force", dest="force", action="store_true",
+        help="force insecure operations"
+    )
+
     args = parser.parse_args()
 
-    patcher = \
-        JAPCertPatcher(args.dol) if args.jap else \
-        USACertPatcher(args.dol) if args.usa else \
-        PALCertPatcher(args.dol)
+    patcher_class = \
+        JAPCertPatcher if args.jap else \
+        USACertPatcher if args.usa else \
+        PALCertPatcher
+    patcher = patcher_class(args.dol, args.force)
 
     if args.cert:
         print("+ Patching root CA certificate")
