@@ -37,18 +37,25 @@ class CertPatcher(object):
         0x30, 0x82,              # 4:d=1  hl=4 l= ??? cons:  SEQUENCE
     ])
     DOL_SIZE = 6 * 1024 ** 2
+    KNOWN_OFFSETS = {
+        0x00639EA0: "Monster Hunter 3 [RMHJ08]",
+        0x0056DF80: "Monster Hunter 3 [RMHE08]",
+        0x0056E940: "Monster Hunter 3 [RMHP08]",
+        0x005153a0: "Monster Hunter G [ROMJ08]",
+    }
 
     def __init__(self, dol, force=False):
         """Constructor.
 
         dol - path to the main.dol file
         """
-        if self.CERT_OFF is None or self.CERT_LEN is None:
-            raise ValueError("Unsupported region!")
-        if os.path.getsize(dol) < self.DOL_SIZE:
-            warning("DOL doesn't seem to be from the DATA partition", force)
         self.dol = dol
         self.force = force
+        if os.path.getsize(dol) < self.DOL_SIZE:
+            warning("DOL doesn't seem to be from the DATA partition", force)
+        if self.CERT_OFF is None or self.CERT_LEN is None:
+            self.auto_detect(dol)
+        self.print_version()
 
     def patch_cert(self, crt):
         """Patch the in-game certificate. Will overwrite original dol file!
@@ -77,6 +84,34 @@ class CertPatcher(object):
             data = f.read(self.CERT_LEN)
         with open(path, "wb") as f:
             f.write(data)
+
+    def auto_detect(self, dol):
+        """Auto-detect certificate location.
+
+        dol - path to the main.dol file
+        """
+        self.CERT_LEN = 924
+        with open(dol, "rb") as f, \
+             closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)) as m:
+            matches = []
+            header = bytes(self.CERT_HDR)
+            offset = m.find(header)
+            while offset != -1:
+                if not offset % 4:
+                    matches.append(offset)
+                offset = m.find(header, offset+1)
+            if len(matches) != 1:
+                raise ValueError("Auto-detection failed: {}".format(matches))
+            self.CERT_OFF = matches[0]
+            if self.CERT_OFF not in self.KNOWN_OFFSETS:
+                warning("Unknown version detected (offset=0x{:08x})".format(
+                    self.CERT_OFF), self.force)
+
+    def print_version(self):
+        """Print detected version."""
+        print("+ Detected version: {}".format(
+            self.KNOWN_OFFSETS.get(self.CERT_OFF, "Unknown")
+        ))
 
 
 class JAPCertPatcher(CertPatcher):
@@ -152,7 +187,7 @@ def prompt():
 def main():
     parser = ArgumentParser()
     parser.add_argument("dol", action="store", help="main.dol file")
-    region_group = parser.add_mutually_exclusive_group(required=True)
+    region_group = parser.add_mutually_exclusive_group(required=False)
     region_group.add_argument(
         "-J", "--jap", action="store_true",
         help="use the Japanese patcher [RMHJ08]")
@@ -188,7 +223,8 @@ def main():
     patcher_class = \
         JAPCertPatcher if args.jap else \
         USACertPatcher if args.usa else \
-        PALCertPatcher
+        PALCertPatcher if args.pal else \
+        CertPatcher
     patcher = patcher_class(args.dol, args.force)
 
     if args.cert:
