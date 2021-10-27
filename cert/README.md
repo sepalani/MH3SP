@@ -4,7 +4,14 @@ In this directory you'll find a set of tools allowing to manipulate Monster
 Hunter Tri main.dol certificate. The size of the new certificate **MUST NOT**
 exceed the original size!
 
-## Auto-detection
+_If the CA certificate isn't specified, the default one will be used._
+
+## Auto-detection (with default certificate)
+```bash
+python MHTriCertPatcher.py main.dol
+```
+
+## Auto-detection (with specified certificate)
 ```bash
 python MHTriCertPatcher.py main.dol ca.der
 ```
