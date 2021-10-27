@@ -72,6 +72,11 @@ class CertPatcher(object):
             data += pad * b'\0'
         with open(self.dol, "rb+") as f:
             f.seek(self.CERT_OFF)
+            hdr = f.read(len(self.CERT_HDR))
+            if hdr != self.CERT_HDR:
+                warning("Region offset doesn't point to a valid certificate",
+                        self.force)
+            f.seek(self.CERT_OFF)
             f.write(data)
 
     def dump_cert(self, path):
@@ -109,7 +114,7 @@ class CertPatcher(object):
 
     def print_version(self):
         """Print detected version."""
-        print("+ Detected version: {}".format(
+        print("+ Version used: {}".format(
             self.KNOWN_OFFSETS.get(self.CERT_OFF, "Unknown")
         ))
 
