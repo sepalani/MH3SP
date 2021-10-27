@@ -16,7 +16,6 @@ It can also patch the EC ticket check for the japanese version of the game.
 
 import os
 import mmap
-from argparse import ArgumentParser
 from contextlib import closing
 
 
@@ -190,6 +189,8 @@ def prompt():
 
 
 def main():
+    from argparse import ArgumentParser
+
     parser = ArgumentParser()
     parser.add_argument("dol", action="store", help="main.dol file")
     region_group = parser.add_mutually_exclusive_group(required=False)
@@ -207,8 +208,8 @@ def main():
         help="replace root CA certificate"
     )
     parser.add_argument(
-        "--patch-ec", dest="patch_ec", action="store_true",
-        help="patch isECTicket function"
+        "--disable-ec-patch", dest="patch_ec", action="store_false",
+        help="disable isECTicket function patch"
     )
     parser.add_argument(
         "--dump-cert", dest="dump", action="store", metavar="OUT.DER",
@@ -224,6 +225,12 @@ def main():
     )
 
     args = parser.parse_args()
+    if not args.cert:
+        path = "ca.der"
+        if not os.path.exists(path):
+            script_path = os.path.realpath(__file__)
+            path = os.path.join(os.path.dirname(script_path), "ca.der")
+        args.cert = path
 
     patcher_class = \
         JAPCertPatcher if args.jap else \
@@ -232,21 +239,17 @@ def main():
         CertPatcher
     patcher = patcher_class(args.dol, args.force)
 
-    if args.cert:
-        print("+ Patching root CA certificate")
-        patcher.patch_cert(args.cert)
-
-    if args.patch_ec:
-        if args.jap:
-            print("+ Patching isECTicket function")
-            ec_patcher = NetworkWiiMediatorIsECTicket()
-            ec_patcher.patch(args.dol)
-        else:
-            print("- Patching isECTicket is for the japanese version!")
-
     if args.dump:
         print("+ Dumping root CA certificate")
         patcher.dump_cert(args.dump)
+    else:
+        print("+ Patching root CA certificate")
+        patcher.patch_cert(args.cert)
+
+        if patcher.CERT_OFF == JAPCertPatcher.CERT_OFF and args.patch_ec:
+            print("+ Patching isECTicket function")
+            ec_patcher = NetworkWiiMediatorIsECTicket()
+            ec_patcher.patch(args.dol)
 
     if args.interactive:
         prompt()
