@@ -86,6 +86,13 @@ def to_bytearray(data):
         return bytearray(data)
 
 
+def to_str(data):
+    """Python2/3 str helper."""
+    if isinstance(data, str):
+        return data
+    return "".join(chr(b) for b in to_bytearray(data))
+
+
 def hexdump(data):
     """Get data hexdump."""
     data = bytearray(data)
