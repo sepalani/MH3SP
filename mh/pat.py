@@ -23,9 +23,11 @@ from datetime import datetime, timedelta
 import select
 import struct
 import time
+import traceback
 
 from other.utils import get_config, get_ip, hexdump, Logger
 from mh.constants import *
+from mh.session import Session
 import mh.pat_item as pati
 import mh.time_utils as time_utils
 
@@ -167,11 +169,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         The games sends the PAT environment properties.
         """
-        data = pati.ConnectionData.unpack(data)
-        self.server.debug("Connection: {!r}".format(data))
-        self.sendNtcLogin(5, seq)
+        connection_data = pati.ConnectionData.unpack(data)
+        self.server.debug("Connection: {!r}".format(connection_data))
+        self.sendNtcLogin(5, connection_data, seq)
 
-    def sendNtcLogin(self, server_status, seq):
+    def sendNtcLogin(self, server_status, connection_data, seq):
         """NtcLogin packet.
 
         ID: 60211000
@@ -181,6 +183,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         The server sends upon login a notification with the server status.
         """
         data = struct.pack(">B", server_status)
+        self.session = self.session.get(connection_data)
         self.send_packet(PatID4.NtcLogin, data, seq)
 
     def recvReqAuthenticationToken(self, packet_id, data, seq):
@@ -534,7 +537,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             int(timedelta(days=1).total_seconds())
         )
         info.unk_binary_0x05 = pati.Binary("Cid")
-        info.online_support_code = pati.String("NoOnlineSupport")
+        info.online_support_code = pati.String(self.session.get_support_code())
         data = info.pack()
         self.send_packet(PatID4.AnsChargeInfo, data, seq)
 
@@ -561,8 +564,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         need_ticket = 1  # The game will call sendReqTicket if set to 1
         data = struct.pack(">B", need_ticket)
         data += pati.lp2_string("dummy_data")
-        # Send empty ChargeInfo not to override AnsChargeInfo result
-        data += pati.ChargeInfo().pack()
+        info = pati.ChargeInfo()
+        info.online_support_code = pati.String(self.session.get_support_code())
+        data += info.pack()
         self.send_packet(PatID4.AnsLoginInfo, data, seq)
 
     def recvReqTicket(self, packet_id, data, seq):
@@ -590,8 +594,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ＰＡＴチケット返答
         TR: PAT ticket response
         """
-        dummy = b"dummy_ticket"
-        data = struct.pack(">H", len(dummy)) + dummy
+        pat_ticket = self.session.new_pat_ticket()
+        data = struct.pack(">H", len(pat_ticket)) + pat_ticket
         self.send_packet(PatID4.AnsTicket, data, seq)
 
     def recvReqUserListHead(self, packet_id, data, seq):
@@ -637,14 +641,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Properly create/save/load Capcom ID profiles.
         """
         data = struct.pack(">II", first_index, count)
-        i = first_index
-        end = i + count
-        while i < end:
+        for i, obj in self.session.get_users(first_index, count):
+            capcom_id, info = obj
             user = pati.UserObject()
             user.slot_index = pati.Long(i)
-            user.capcom_id = pati.String(b"******")
+            user.capcom_id = pati.String(capcom_id)
+            if info.get("name"):
+                user.hunter_name = pati.String(info["name"])
             data += user.pack()
-            i += 1
         self.send_packet(PatID4.AnsUserListData, data, seq)
 
     def recvReqUserListFoot(self, packet_id, data, seq):
@@ -698,10 +702,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         is_slot_empty, slot_index = struct.unpack_from(">BI", data)
         user_obj = pati.UserObject.unpack(data, 5)
-        self.server.debug("UserObject: {!r}".format(user_obj))
-        if 'capcom_id' not in user_obj:
-            # TODO: Properly generate that
-            user_obj.capcom_id = pati.String(MY_CAPCOM_ID)
+        self.server.debug("UserObject: {}, {}, {!r}".format(
+            is_slot_empty, slot_index, user_obj
+        ))
+        hunter_name = ""
+        if hasattr(user_obj, "hunter_name"):
+            hunter_name = pati.unpack_string(user_obj.hunter_name)
+        self.session.use_user(slot_index, hunter_name)
+        user_obj.capcom_id = pati.String(self.session.capcom_id)
         self.sendAnsUserObject(is_slot_empty, slot_index, user_obj, seq)
 
     def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj, seq):
@@ -1278,7 +1286,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         count = 1
         data = struct.pack(">I", count)
         user = pati.LayerUserInfo()
-        user.capcom_id = pati.String(MY_CAPCOM_ID)
+        user.capcom_id = pati.String(self.session.capcom_id)
         data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
 
@@ -2378,12 +2386,17 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """Default PAT handler."""
         self.server.info("Handle client")
         self.server.add_to_debug(self)
+        self.session = Session()
 
         # There are connect errors if too fast
         # TODO: investigate if it's Dolphin's fault
         time.sleep(2)
         self.sendReqConnection()
-        self.handle_client()
+        try:
+            self.handle_client()
+        except Exception as e:
+            traceback.print_exc()
 
+        self.session.delete()
         self.server.del_from_debug(self)
         self.server.info("Client finished!")

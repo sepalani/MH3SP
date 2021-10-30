@@ -38,9 +38,9 @@ class LmpRequestHandler(PatRequestHandler):
         connection_data = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(connection_data))
         if hasattr(connection_data, "pat_ticket"):
-            self.sendNtcLogin(2, seq)
+            self.sendNtcLogin(2, connection_data, seq)
         else:
-            self.sendNtcLogin(1, seq)
+            self.sendNtcLogin(1, connection_data, seq)
 
 
 BASE = server_base("LMP", LmpServer, LmpRequestHandler)
