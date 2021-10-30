@@ -300,17 +300,7 @@ class FmpRequestHandler(PatRequestHandler):
         Sent by the game when leaving the gate via the entrance:
          - Relocate > Select Server
         """
-        if self.session.layer == 2:
-            city = self.session.get_city()
-            if city.leader == self.session:
-                if len(city.players) > 1:
-                    # TODO: Transfer the leadership to another player
-                    pass
-                city.leader = None
-
-            ntc_data = pati.lp2_string(self.session.capcom_id)
-            self.server.layer_broadcast(self.session, PatID4.NtcLayerOut,
-                                        ntc_data, seq)
+        self.leave_layer()
         self.sendAnsLayerUp(data, seq)
 
     def recvReqUserSearchInfoMine(self, packet_id, data, seq):

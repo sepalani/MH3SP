@@ -246,6 +246,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         The server sends a request to the game to establish a PAT connection.
         It also sends a parameter that seems unused on the western versions.
         """
+        self.session.graceful_shutdown = False
         data = struct.pack(">I", unused)
         self.send_packet(PatID4.ReqConnection, data, seq)
 
@@ -587,18 +588,22 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         ID: 60100100
         JP: 切断要求
         TR: Disconnection request
-        """
-        login_type, = struct.unpack(">B", data)
-        self.sendAnsShut(login_type, seq)
 
-    def sendAnsShut(self, login_type, seq):
+        # 1: full logout(?)
+        # 2: logout to different server(?)
+        """
+        shutdown_type, = struct.unpack(">B", data)
+        self.session.shutdown(shutdown_type)
+        self.sendAnsShut(shutdown_type, seq)
+
+    def sendAnsShut(self, shutdown_type, seq):
         """AnsShut packet.
 
         ID: 60100200
         JP: 切断返答
         TR: Disconnection response
         """
-        data = struct.pack(">B", login_type)
+        data = struct.pack(">B", shutdown_type)
         self.send_packet(PatID4.AnsShut, data, seq)
         self.finish()
 
@@ -809,7 +814,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.debug("UserObject: {}, {}, {!r}".format(
             is_slot_empty, slot_index, user_obj
         ))
-        hunter_name = ""
+        hunter_name = None
         if hasattr(user_obj, "hunter_name"):
             hunter_name = pati.unpack_string(user_obj.hunter_name)
         self.session.use_user(slot_index, hunter_name)
@@ -991,6 +996,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: レイヤ終了要求
         TR: Layer end request
         """
+        self.leave_layer()
         self.sendAnsLayerEnd(seq)
 
     def sendAnsLayerEnd(self, seq):
@@ -2357,6 +2363,28 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         data = struct.pack(">B", success)
         self.send_packet(PatID4.AnsLayerMediationUnlock, data, seq)
 
+    def sendNtcLayerHost(self, new_leader, seq):
+        """NtcLayerHost packet.
+        ID: 64411000
+        JP: レイヤのホスト通知
+        TR: Layer host notification
+        """
+        data = struct.pack(">HII", 0x08, 0x00, 0x00)  # unk short array patitem
+        data += pati.lp2_string(new_leader.capcom_id)
+        data += pati.lp2_string(new_leader.hunter_name)
+        self.server.layer_broadcast(self.session, PatID4.NtcLayerHost, data,
+                                    seq)
+
+    def leave_layer(self):
+        if self.session.layer == 2:
+            new_host = self.session.try_transfer_city_leadership()
+            if new_host:
+                self.sendNtcLayerHost(new_host, 0)
+        if self.session.layer > 0:
+            ntc_data = pati.lp2_string(self.session.capcom_id)
+            self.server.layer_broadcast(self.session, PatID4.NtcLayerOut,
+                                        ntc_data, 0)
+
     def finish(self):
         self.finished = True
         try:
@@ -2418,11 +2446,23 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.sendReqConnection()
         try:
             self.handle_client()
-            self.session.disconnect()
         except Exception as e:
             self.server.error(traceback.format_exc())
             self.send_error("{}: {}".format(type(e).__name__, str(e)))
-            self.session.delete()
+        finally:
+            self.session.disconnect()
+            if not self.finished:
+                try:
+                    self.leave_layer()
+                except Exception:
+                    # We tried to comunicate the error to the client but it
+                    # seems that the exception was caused by a connection
+                    # error and in that case there is nothing else we can do
+                    # to communicate that error to the client
+                    pass
+
+                self.session.shutdown(1)
+                self.session.delete()
 
         self.server.del_from_debug(self)
         self.server.info("Client finished!")

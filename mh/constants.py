@@ -236,6 +236,8 @@ def make_binary_trading_post():
 
 LAYER_CHAT_COLORS = (0xbb3385ff, 0xffffffff, 0xffffffff)
 
+LAYER_CHAT_COLORS = (0xbb3385ff, 0xffffffff, 0xffffffff)
+
 TERMS_VERSION = 1
 TERMS = {
     1: b"""MH3 Server Project - Terms.""",

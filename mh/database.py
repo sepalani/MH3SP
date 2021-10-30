@@ -383,6 +383,7 @@ class TempDatabase(object):
 
         name = name or self.capcom_ids[capcom_id]["name"]
         self.capcom_ids[capcom_id] = {"name": name, "session": session}
+        return name
 
     def use_user(self, session, index, name):
         """Use User from the slot or create one if empty"""
@@ -397,7 +398,7 @@ class TempDatabase(object):
                 break
         else:
             capcom_id = users[index]
-        self.use_capcom_id(session, capcom_id, name)
+        name = self.use_capcom_id(session, capcom_id, name)
         session.capcom_id = capcom_id
         session.hunter_name = name
 

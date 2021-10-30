@@ -150,6 +150,14 @@ class Session(object):
         return pati.getDummyLayerData()
 
     def layer_end(self):
+        if self.layer > 1:
+            # City path
+            self.leave_city()
+        if self.layer > 0:
+            # Gate path
+            self.leave_gate()
+            # Server path (executed at gate and higher)
+            self.leave_server()
         self.layer = 0
         self.state = SessionState.UNKNOWN
 
@@ -223,7 +231,10 @@ class Session(object):
         return users[start:start+count]
 
     def leave_server(self):
-        DB.leave_server(self)
+        old_server = self.local_info["server_id"]
+        if old_server is not None:
+            self.local_info["server_id"] = None
+            DB.leave_server(self, old_server)
 
     def get_gates(self):
         return DB.get_gates(self.local_info["server_id"])
@@ -256,6 +267,21 @@ class Session(object):
     def leave_city(self):
         DB.leave_city(self)
         self.state = SessionState.GATE
+
+    def try_transfer_city_leadership(self):
+        if self.local_info['city_id'] is None:
+            return None
+
+        city = self.get_city()
+        if city.leader != self:
+            return None
+
+        for _, player in city.players:
+            if player == self:
+                continue
+            city.leader = player
+            return player
+        return None
 
     def join_circle(self, circle_id):
         # TODO: Move this to the database
@@ -302,6 +328,17 @@ class Session(object):
             return city.players
         else:
             assert False, "Can't find layer"
+
+    def shutdown(self, shutdown_type):
+        assert 1 <= shutdown_type <= 2, "Invalid shutdown type"
+        if shutdown_type != 1:
+            return  # only shutdown_type 1 requires removal from layers
+        if self.local_info["city_id"]:
+            self.leave_city()
+        if self.local_info["gate_id"]:
+            self.leave_gate()
+        if self.local_info["server_id"]:
+            self.leave_server()
 
     def get_layer_host_data(self):
         """LayerUserInfo's layer_host."""
