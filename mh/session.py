@@ -84,6 +84,9 @@ class Session(object):
     def use_user(self, index, name):
         DB.use_user(self, index, name)
 
+    def get_servers(self):
+        return DB.get_servers()
+
     def join_server(self, server_id):
         DB.join_server(self, server_id)
 
