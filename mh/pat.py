@@ -787,7 +787,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: FMP list count response
         """
         unused = 0
-        count = 4  # Can be pushed up to 5 but with some menu glitches
+        count = len(self.session.get_servers())
         data = struct.pack(">II", unused, count)
         self.send_packet(PatID4.AnsFmpListHead, data, seq)
 
@@ -801,7 +801,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Check if it's always ignored compared to the previous one.
         """
         unused = 0
-        count = 0
+        count = len(self.session.get_servers())
         data = struct.pack(">II", unused, count)
         self.send_packet(PatID4.AnsFmpListHead2, data, seq)
 
@@ -825,30 +825,34 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: FMPリスト応答
         TR: FMP list response
 
-        TODO: Do not hardcode the list and find the meaning of all fields.
+        TODO:
+         - Do more reverse engineering.
+         - This packet seems to affect only the first entry.
         """
         unused = 0
         data = struct.pack(">II", unused, count)
         config = get_config("FMP")
         fmp_addr = get_ip(config["IP"])
         fmp_port = config["Port"]
-        i = first_index
-        end = i + count
-        while i < end:
+        start = first_index - 1
+        end = start + count
+        servers = self.session.get_servers()[start:end]
+        for i, server in enumerate(servers, start):
             fmp_data = pati.FmpData()
             fmp_data.index = pati.Long(i)
-            fmp_data.server_address = pati.String(fmp_addr)
-            fmp_data.server_port = pati.Word(fmp_port)
+            server.addr = server.addr or fmp_addr
+            server.port = server.port or fmp_port
+            fmp_data.server_address = pati.String(server.addr)
+            fmp_data.server_port = pati.Word(server.port)
             # Might produce invalid reads if too high
-            # fmp_data.unk_longlong_0x07 = pati.LongLong(i+0x10000000)
-            # fmp_data.unk_longlong_0x07 = pati.LongLong(i + (1<<32)) # OK
-            fmp_data.unk_longlong_0x07 = pati.LongLong(i)
-            fmp_data.player_count = pati.Long(23)
-            fmp_data.player_capacity = pati.Long(100)
-            fmp_data.server_name = pati.String("FMP_0x0A_{}".format(i))
+            # fmp_data.server_type = pati.LongLong(i+0x10000000)
+            # fmp_data.server_type = pati.LongLong(i + (1<<32)) # OK
+            fmp_data.server_type = pati.LongLong(server.server_type)
+            fmp_data.player_count = pati.Long(server.get_population())
+            fmp_data.player_capacity = pati.Long(server.get_capacity())
+            fmp_data.server_name = pati.String(server.name)
             fmp_data.unk_string_0x0b = pati.String("X")
             fmp_data.unk_long_0x0c = pati.Long(0x12345678)
-            i += 1
             data += fmp_data.pack()
         self.send_packet(PatID4.AnsFmpListData, data, seq)
 
@@ -859,27 +863,31 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: FMPリスト応答
         TR: FMP list response
 
-        TODO: Do not hardcode the list and find the meaning of all fields.
+        TODO:
+         - Do more reverse engineering.
+         - This packet seems to affect entries past the first one.
         """
         unused = 0
         data = struct.pack(">II", unused, count)
         config = get_config("FMP")
         fmp_addr = get_ip(config["IP"])
         fmp_port = config["Port"]
-        i = first_index
-        end = i + count
-        while i < end:
+        start = first_index - 1
+        end = start + count
+        servers = self.session.get_servers()[start:end]
+        for i, server in enumerate(servers, start):
             fmp_data = pati.FmpData()
             fmp_data.index = pati.Long(i)
-            fmp_data.server_address = pati.String(fmp_addr)
-            fmp_data.server_port = pati.Word(fmp_port)
-            fmp_data.unk_longlong_0x07 = pati.LongLong(i)
-            fmp_data.player_count = pati.Long(23)
-            fmp_data.player_capacity = pati.Long(100)
-            fmp_data.server_name = pati.String("FMP2_0x0A_{}".format(i))
-            fmp_data.unk_string_0x0b = pati.String("Y")
-            fmp_data.unk_long_0x0c = pati.Long(i)
-            i += 1
+            server.addr = server.addr or fmp_addr
+            server.port = server.port or fmp_port
+            fmp_data.server_address = pati.String(server.addr)
+            fmp_data.server_port = pati.Word(server.port)
+            fmp_data.server_type = pati.LongLong(server.server_type)
+            fmp_data.player_count = pati.Long(server.get_population())
+            fmp_data.player_capacity = pati.Long(server.get_capacity())
+            fmp_data.server_name = pati.String(server.name)
+            fmp_data.unk_string_0x0b = pati.String("X")
+            fmp_data.unk_long_0x0c = pati.Long(0x12345678)
             data += fmp_data.pack()
         self.send_packet(PatID4.AnsFmpListData2, data, seq)
 
@@ -949,7 +957,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         fmp_data.index = pati.Long(1)
         fmp_data.server_address = pati.String(fmp_addr)
         fmp_data.server_port = pati.Word(fmp_port)
-        fmp_data.unk_longlong_0x07 = pati.LongLong(42123)
+        fmp_data.server_type = pati.LongLong(42123)
         fmp_data.player_count = pati.Long(23)
         fmp_data.player_capacity = pati.Long(100)
         fmp_data.server_name = pati.String("FMP_0x0A")
