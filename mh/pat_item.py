@@ -425,7 +425,7 @@ class FmpData(PatData):
         (0x01, "index"),
         (0x02, "server_address"),
         (0x03, "server_port"),
-        (0x07, "unk_longlong_0x07"),
+        (0x07, "server_type"),
         (0x08, "player_count"),
         (0x09, "player_capacity"),
         (0x0a, "server_name"),

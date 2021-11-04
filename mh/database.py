@@ -35,6 +35,93 @@ def new_random_str(length=6):
     return "".join(random.choice(CHARSET) for _ in range(length))
 
 
+class ServerType(object):
+    OPEN = 1
+    ROOKIE = 2
+    EXPERT = 3
+    RECRUITING = 4
+
+
+class LayerState(object):
+    JOINABLE = 0
+    EMPTY = 1
+    FULL = 2
+
+
+class City(object):
+    def __init__(self, name, parent):
+        self.name = name
+        self.parent = parent
+        self.capacity = 4
+        self.state = LayerState.EMPTY
+        self.players = []
+
+    def get_population(self):
+        return len(self.players)
+
+    def get_capacity(self):
+        return self.capacity
+
+
+class Gate(object):
+    def __init__(self, name, parent, city_count=40, player_capacity=100):
+        self.name = name
+        self.parent = parent
+        self.state = LayerState.EMPTY
+        self.capacity = player_capacity
+        self.cities = [
+            City("City{}".format(i), self)
+            for i in range(1, city_count+1)
+        ]
+
+    def get_population(self):
+        return sum((city.get_population() for city in self.cities))
+
+    def get_capacity(self):
+        return self.capacity
+
+
+class Server(object):
+    def __init__(self, name, server_type, gate_count=40, capacity=2000,
+                 addr=None, port=None):
+        self.name = name
+        self.server_type = server_type
+        self.capacity = capacity
+        self.addr = addr
+        self.port = port
+        self.gates = [
+            Gate("City Gate{}".format(i), self)
+            for i in range(1, gate_count+1)
+        ]
+
+    def get_population(self):
+        return sum((gate.get_population() for gate in self.gates))
+
+    def get_capacity(self):
+        return self.capacity
+
+
+def new_servers():
+    servers = []
+    servers.extend([
+        Server("Valor{}".format(i), ServerType.OPEN)
+        for i in range(1, 5)
+    ])
+    servers.extend([
+        Server("Beginners{}".format(i), ServerType.ROOKIE)
+        for i in range(1, 3)
+    ])
+    servers.extend([
+        Server("Veterans{}".format(i), ServerType.EXPERT)
+        for i in range(1, 3)
+    ])
+    servers.extend([
+        Server("Greed{}".format(i), ServerType.RECRUITING)
+        for i in range(1, 5)
+    ])
+    return servers
+
+
 class TempDatabase(object):
     """A temporary database.
 
@@ -55,6 +142,7 @@ class TempDatabase(object):
             "C9I7D4": {"name": "Cid", "session": None},
             "D9R7K4": {"name": "Drakea", "session": None},
         }
+        self.servers = new_servers()
 
     def get_support_code(self, session):
         """Get the online support code or create one."""
@@ -139,8 +227,8 @@ class TempDatabase(object):
     def get_game_time(self):
         pass
 
-    def get_server_list(self):
-        pass
+    def get_servers(self):
+        return self.servers
 
     def get_gates(self, server_id):
         pass
