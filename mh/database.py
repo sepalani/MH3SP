@@ -221,6 +221,10 @@ class TempDatabase(object):
             ])
         return capcom_ids
 
+    def join_server(self, session, index):
+        session.local_info["server_id"] = index
+        return self.get_server(index)
+
     def get_server_time(self):
         pass
 
@@ -229,6 +233,10 @@ class TempDatabase(object):
 
     def get_servers(self):
         return self.servers
+
+    def get_server(self, index):
+        assert 0 < index <= len(self.servers), "Invalid server index"
+        return self.servers[index - 1]
 
     def get_gates(self, server_id):
         pass
