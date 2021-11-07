@@ -831,29 +831,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unused = 0
         data = struct.pack(">II", unused, count)
-        config = get_config("FMP")
-        fmp_addr = get_ip(config["IP"])
-        fmp_port = config["Port"]
-        start = first_index - 1
-        end = start + count
-        servers = self.session.get_servers()[start:end]
-        for i, server in enumerate(servers, start):
-            fmp_data = pati.FmpData()
-            fmp_data.index = pati.Long(i)
-            server.addr = server.addr or fmp_addr
-            server.port = server.port or fmp_port
-            fmp_data.server_address = pati.String(server.addr)
-            fmp_data.server_port = pati.Word(server.port)
-            # Might produce invalid reads if too high
-            # fmp_data.server_type = pati.LongLong(i+0x10000000)
-            # fmp_data.server_type = pati.LongLong(i + (1<<32)) # OK
-            fmp_data.server_type = pati.LongLong(server.server_type)
-            fmp_data.player_count = pati.Long(server.get_population())
-            fmp_data.player_capacity = pati.Long(server.get_capacity())
-            fmp_data.server_name = pati.String(server.name)
-            fmp_data.unk_string_0x0b = pati.String("X")
-            fmp_data.unk_long_0x0c = pati.Long(0x12345678)
-            data += fmp_data.pack()
+        data += pati.get_fmp_servers(self.session, first_index, count)
         self.send_packet(PatID4.AnsFmpListData, data, seq)
 
     def sendAnsFmpListData2(self, first_index, count, seq):
@@ -869,26 +847,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unused = 0
         data = struct.pack(">II", unused, count)
-        config = get_config("FMP")
-        fmp_addr = get_ip(config["IP"])
-        fmp_port = config["Port"]
-        start = first_index - 1
-        end = start + count
-        servers = self.session.get_servers()[start:end]
-        for i, server in enumerate(servers, start):
-            fmp_data = pati.FmpData()
-            fmp_data.index = pati.Long(i)
-            server.addr = server.addr or fmp_addr
-            server.port = server.port or fmp_port
-            fmp_data.server_address = pati.String(server.addr)
-            fmp_data.server_port = pati.Word(server.port)
-            fmp_data.server_type = pati.LongLong(server.server_type)
-            fmp_data.player_count = pati.Long(server.get_population())
-            fmp_data.player_capacity = pati.Long(server.get_capacity())
-            fmp_data.server_name = pati.String(server.name)
-            fmp_data.unk_string_0x0b = pati.String("X")
-            fmp_data.unk_long_0x0c = pati.Long(0x12345678)
-            data += fmp_data.pack()
+        data += pati.get_fmp_servers(self.session, first_index, count)
         self.send_packet(PatID4.AnsFmpListData2, data, seq)
 
     def recvReqFmpListFoot(self, packet_id, data, seq):
@@ -937,6 +896,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: レイヤ終了応答
         TR: Layer end response
         """
+        self.session.layer_end()
         self.send_packet(PatID4.AnsLayerEnd, b"", seq)
 
     def recvReqFmpInfo(self, packet_id, data, seq):
@@ -949,51 +909,38 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Do not hardcode the data and find the meaning of all fields.
         """
         index, = struct.unpack_from(">I", data)
-        header = pati.unpack_bytes(data, 4)
+        fields = pati.unpack_bytes(data, 4)
+        server = self.session.join_server(index)
         config = get_config("FMP")
         fmp_addr = get_ip(config["IP"])
         fmp_port = config["Port"]
         fmp_data = pati.FmpData()
-        fmp_data.index = pati.Long(1)
-        fmp_data.server_address = pati.String(fmp_addr)
-        fmp_data.server_port = pati.Word(fmp_port)
-        fmp_data.server_type = pati.LongLong(42123)
-        fmp_data.player_count = pati.Long(23)
-        fmp_data.player_capacity = pati.Long(100)
-        fmp_data.server_name = pati.String("FMP_0x0A")
-        fmp_data.unk_string_0x0b = pati.String("X")
-        fmp_data.unk_long_0x0c = pati.Long(21)
+        fmp_data.server_address = pati.String(server.addr or fmp_addr)
+        fmp_data.server_port = pati.Word(server.port or fmp_port)
+        fmp_data.assert_fields(fields)
         if packet_id == PatID4.ReqFmpInfo:
-            self.sendAnsFmpInfo(fmp_data, header, seq)
+            self.sendAnsFmpInfo(fmp_data, fields, seq)
         elif packet_id == PatID4.ReqFmpInfo2:
-            self.sendAnsFmpInfo2(fmp_data, header, seq)
+            self.sendAnsFmpInfo2(fmp_data, fields, seq)
 
-    def sendAnsFmpInfo(self, fmp_data, header, seq):
+    def sendAnsFmpInfo(self, fmp_data, fields, seq):
         """AnsFmpInfo packet.
 
         ID: 61340200
         JP: FMPデータ返答
         TR: FMP data response
         """
-        data = struct.pack(">B", len(header))
-        data += b"".join(
-            (struct.pack(">B", field_id) + fmp_data[field_id])
-            for field_id in header
-        )
+        data = fmp_data.pack_fields(fields)
         self.send_packet(PatID4.AnsFmpInfo, data, seq)
 
-    def sendAnsFmpInfo2(self, fmp_data, header, seq):
+    def sendAnsFmpInfo2(self, fmp_data, fields, seq):
         """AnsFmpInfo2 packet.
 
         ID: 63140200
         JP: FMPデータ返答
         TR: FMP data response
         """
-        data = struct.pack(">B", len(header))
-        data += b"".join(
-            (struct.pack(">B", field_id) + fmp_data[field_id])
-            for field_id in header
-        )
+        data = fmp_data.pack_fields(fields)
         self.send_packet(PatID4.AnsFmpInfo2, data, seq)
 
     def recvReqBinaryHead(self, packet_id, data, seq):
@@ -1158,7 +1105,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: レイヤ開始応答
         TR: Layer start response
         """
-        layer = pati.getDummyLayerData()
+        layer = self.session.layer_start()
         self.send_packet(PatID4.AnsLayerStart, layer.pack(), seq)
 
     def recvReqCircleInfoNoticeSet(self, packet_id, data, seq):
@@ -1188,7 +1135,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: チートチェックデータ送信
         TR: Send cheat check data
 
-        TODO: Handle cheat check data."""
+        TODO: Handle cheat check data.
+        """
         pass
 
     def recvReqUserBinarySet(self, packet_id, data, seq):
@@ -1771,6 +1719,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer down response
         """
         data = struct.pack(">H", unk)
+        self.session.layer_down()
         self.send_packet(PatID4.AnsLayerDown, data, seq)
 
     def recvReqUserStatusSet(self, packet_id, data, seq):
@@ -1983,6 +1932,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: レイヤアップ返答
         TR: Layer up response
         """
+        self.session.layer_up()
         self.send_packet(PatID4.AnsLayerUp, b"", seq)
 
     def recvReqLayerMediationList(self, packet_id, data, seq):

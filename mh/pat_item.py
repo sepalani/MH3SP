@@ -22,7 +22,7 @@
 import struct
 
 from collections import OrderedDict
-from other.utils import to_bytearray
+from other.utils import to_bytearray, get_config, get_ip
 
 
 class ItemType:
@@ -325,6 +325,18 @@ class PatData(OrderedDict):
             for index, value in items
         )
 
+    def pack_fields(self, fields):
+        """Pack PAT items specified fields."""
+        items = [
+            (index, value)
+            for index, value in self.items()
+            if value is not None and index in fields
+        ]
+        return struct.pack(">B", len(items)) + b"".join(
+            (struct.pack(">B", index) + value)
+            for index, value in items
+        )
+
     @classmethod
     def unpack(cls, data, offset=0):
         obj = cls()
@@ -356,6 +368,12 @@ class PatData(OrderedDict):
             else:
                 raise ValueError("Unknown type: {}".format(item_type))
         return obj
+
+    def assert_fields(self, fields):
+        items = set(self.keys())
+        fields = set(fields)
+        message = "Fields mismatch: {}\n -> Expected: {}".format(items, fields)
+        assert items == fields, message
 
 
 class DummyData(PatData):
@@ -568,6 +586,37 @@ class LayerUserInfo(PatData):
         (0x06, "unk_long_0x06"),
         (0x07, "stats"),
     )
+
+
+def get_fmp_servers(session, first_index, count):
+    assert first_index > 0, "Invalid list index"
+
+    config = get_config("FMP")
+    fmp_addr = get_ip(config["IP"])
+    fmp_port = config["Port"]
+
+    data = b""
+    start = first_index - 1
+    end = start + count
+    servers = session.get_servers()[start:end]
+    for i, server in enumerate(servers, first_index):
+        fmp_data = FmpData()
+        fmp_data.index = Long(i)  # The server might be full, if zero
+        server.addr = server.addr or fmp_addr
+        server.port = server.port or fmp_port
+        fmp_data.server_address = String(server.addr)
+        fmp_data.server_port = Word(server.port)
+        # Might produce invalid reads if too high
+        # fmp_data.server_type = LongLong(i+0x10000000)
+        # fmp_data.server_type = LongLong(i + (1<<32)) # OK
+        fmp_data.server_type = LongLong(server.server_type)
+        fmp_data.player_count = Long(server.get_population())
+        fmp_data.player_capacity = Long(server.get_capacity())
+        fmp_data.server_name = String(server.name)
+        fmp_data.unk_string_0x0b = String("X")
+        fmp_data.unk_long_0x0c = Long(0x12345678)
+        data += fmp_data.pack()
+    return data
 
 
 def getDummyLayerData():

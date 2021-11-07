@@ -49,6 +49,7 @@ class Session(object):
         self.capcom_id = ""
         self.hunter_name = ""
         self.hunter_stats = None
+        self.layer = 0
 
     def get(self, connection_data):
         """Return the session associated with the connection data, if any."""
@@ -87,17 +88,43 @@ class Session(object):
     def get_servers(self):
         return DB.get_servers()
 
+    def layer_start(self):
+        self.layer = 0
+        return pati.getDummyLayerData()
+
+    def layer_end(self):
+        self.layer = 0
+
+    def layer_down(self):
+        self.layer += 1
+
+    def layer_up(self):
+        assert self.layer > 0, "Can't go up a layer"
+        self.layer -= 1
+
     def join_server(self, server_id):
-        DB.join_server(self, server_id)
+        return DB.join_server(self, server_id)
+
+    def get_layer_children(self):
+        if self.layer == 0:
+            return self.get_gates()
+        else:
+            return self.get_cities()
 
     def leave_server(self):
         DB.leave_server(self)
+
+    def get_gates(self):
+        return DB.get_gates(self)
 
     def join_gate(self, gate_id):
         DB.join_gate(self, gate_id)
 
     def leave_gate(self):
         DB.leave_gate(self)
+
+    def get_cities(self):
+        return DB.get_cities(self)
 
     def join_city(self, city_id):
         DB.join_city(self, city)
