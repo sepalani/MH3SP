@@ -474,7 +474,7 @@ class LayerData(PatData):
         (0x01, "unk_long_0x01"),
         (0x02, "unk_custom_0x02"),
         (0x03, "name"),
-        (0x05, "unk_worddec_0x05"),
+        (0x05, "index"),
         (0x06, "size"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
@@ -618,10 +618,29 @@ def get_fmp_servers(session, first_index, count):
         data += fmp_data.pack()
     return data
 
+def get_layer_children(session, first_index, count):
+    assert first_index > 0, "Invalid list index"
+
+    data = b""
+    start = first_index - 1
+    end = start + count
+    children = session.get_layer_children()[start:end]
+    for i, child in enumerate(children, first_index):
+        layer = LayerData()
+        layer.index = Word(i)
+        layer.name = String(child.name)
+        layer.size = Long(child.get_population())
+        layer.capacity = Long(child.get_capacity())
+        layer.state = Byte(child.get_state())
+        data += layer.pack()
+         # A strange struct is also used, try to skip it
+        data += struct.pack(">B", 0)
+    return data
+
 
 def getDummyLayerData():
     layer = LayerData()
-    layer.unk_long_0x01 = Long(1)  # Index
+    layer.index = Word(1)  # Index
     # layer.unk_custom_0x02 = Custom(b"")
     layer.name = String("LayerStart")
     # layer.unk_worddec_0x05 = Word(2)  # City no longer exists message

@@ -43,7 +43,7 @@ g_circle = None
 g_circle_info_set = None
 
 
-class PatServer(SocketServer.TCPServer, Logger):
+class PatServer(SocketServer.ThreadingTCPServer, Logger):
     """Generic PAT server class."""
 
     def __init__(self, address, handler_class, logger=None):
@@ -1547,7 +1547,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Child layer list count response
         """
         unk = 0
-        count = 1
+        count = len(self.session.get_layer_children())
         data = struct.pack(">II", unk, count)
         self.send_packet(PatID4.AnsLayerChildListHead, data, seq)
 
@@ -1570,13 +1570,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk = first_index
         data = struct.pack(">II", unk, count)
-        layer = pati.getDummyLayerData()
-        data += layer.pack()
-
-        # A strange struct is also used, try to skip it
-        count = 0
-        data += struct.pack(">B", count) + b"\0" * 2
-
+        data += pati.get_layer_children(self.session, first_index, count)
         self.send_packet(PatID4.AnsLayerChildListData, data, seq)
 
     def recvReqLayerChildListFoot(self, packet_id, data, seq):
@@ -1707,19 +1701,19 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: レイヤダウン要求（番号指定）
         TR: Layer down request (number specified)
         """
-        unk, =  struct.unpack_from(">H", data)  # WordInc
+        layer_id, =  struct.unpack_from(">H", data)  # WordInc
         layer_set = data[2:]  # TODO parse LayerSet
-        self.sendAnsLayerDown(unk, layer_set, seq)
+        self.sendAnsLayerDown(layer_id, layer_set, seq)
 
-    def sendAnsLayerDown(self, unk, layer_set, seq):
+    def sendAnsLayerDown(self, layer_id, layer_set, seq):
         """AnsLayerDown packet.
 
         ID: 64140200
         JP: レイヤダウン返答
         TR: Layer down response
         """
-        data = struct.pack(">H", unk)
-        self.session.layer_down()
+        data = struct.pack(">H", layer_id)
+        self.session.layer_down(layer_id)
         self.send_packet(PatID4.AnsLayerDown, data, seq)
 
     def recvReqUserStatusSet(self, packet_id, data, seq):
