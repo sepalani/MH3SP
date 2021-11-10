@@ -95,11 +95,22 @@ class Session(object):
     def layer_end(self):
         self.layer = 0
 
-    def layer_down(self):
+    def layer_down(self, layer_id):
+        if self.layer == 0:
+            self.join_gate(layer_id)
+        elif self.layer == 1:
+            self.join_city(layer_id)
+        else:
+            assert False, "Can't go down a layer"
         self.layer += 1
 
     def layer_up(self):
-        assert self.layer > 0, "Can't go up a layer"
+        if self.layer == 1:
+            self.leave_gate()
+        elif self.layer == 2:
+            self.leave_city()
+        else:
+            assert False, "Can't go up a layer"
         self.layer -= 1
 
     def join_server(self, server_id):
@@ -115,19 +126,23 @@ class Session(object):
         DB.leave_server(self)
 
     def get_gates(self):
-        return DB.get_gates(self)
+        return DB.get_gates(self.local_info["server_id"])
 
     def join_gate(self, gate_id):
-        DB.join_gate(self, gate_id)
+        DB.join_gate(self, self.local_info["server_id"], gate_id)
 
     def leave_gate(self):
         DB.leave_gate(self)
 
     def get_cities(self):
-        return DB.get_cities(self)
+        return DB.get_cities(self.local_info["server_id"],
+                             self.local_info["gate_id"])
 
     def join_city(self, city_id):
-        DB.join_city(self, city)
+        DB.join_city(self,
+                     self.local_info["server_id"],
+                     self.local_info["gate_id"],
+                     city)
 
     def leave_city(self):
         DB.leave_city(self)
