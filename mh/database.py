@@ -54,13 +54,22 @@ class City(object):
         self.parent = parent
         self.capacity = 4
         self.state = LayerState.EMPTY
-        self.players = []
+        self.players = set()
 
     def get_population(self):
         return len(self.players)
 
     def get_capacity(self):
         return self.capacity
+
+    def get_state(self):
+        size = self.get_population()
+        if size == 0:
+            return LayerState.EMPTY
+        elif size < self.get_capacity():
+            return LayerState.JOINABLE
+        else:
+            return LayerState.FULL
 
 
 class Gate(object):
@@ -73,12 +82,25 @@ class Gate(object):
             City("City{}".format(i), self)
             for i in range(1, city_count+1)
         ]
+        self.players = set()
 
     def get_population(self):
-        return sum((city.get_population() for city in self.cities))
+        return len(self.players) + sum((
+            city.get_population()
+            for city in self.cities
+        ))
 
     def get_capacity(self):
         return self.capacity
+
+    def get_state(self):
+        size = self.get_population()
+        if size == 0:
+            return LayerState.EMPTY
+        elif size < self.get_capacity():
+            return LayerState.JOINABLE
+        else:
+            return LayerState.FULL
 
 
 class Server(object):
@@ -93,9 +115,12 @@ class Server(object):
             Gate("City Gate{}".format(i), self)
             for i in range(1, gate_count+1)
         ]
+        self.players = set()
 
     def get_population(self):
-        return sum((gate.get_population() for gate in self.gates))
+        return len(self.players) + sum((
+            gate.get_population() for gate in self.gates
+        ))
 
     def get_capacity(self):
         return self.capacity
@@ -206,6 +231,7 @@ class TempDatabase(object):
         if capcom_id in self.capcom_ids:
             self.capcom_ids[capcom_id]["session"] = None
 
+
     def get_users(self, session, first_index, count):
         """Returns Capcom IDs tied to the session."""
         users = self.consoles[session.online_support_code]
@@ -222,8 +248,10 @@ class TempDatabase(object):
         return capcom_ids
 
     def join_server(self, session, index):
+        server = self.get_server(index)
+        server.players.add(session)
         session.local_info["server_id"] = index
-        return self.get_server(index)
+        return server
 
     def get_server_time(self):
         pass
@@ -239,7 +267,53 @@ class TempDatabase(object):
         return self.servers[index - 1]
 
     def get_gates(self, server_id):
-        pass
+        return self.get_server(server_id).gates
+
+    def get_gate(self, server_id, index):
+        gates = self.get_gates(server_id)
+        assert 0 < index <= len(gates), "Invalid gate index"
+        return gates[index - 1]
+
+    def join_gate(self, session, server_id, index):
+        gate = self.get_gate(server_id, index)
+        gate.parent.players.remove(session)
+        gate.players.add(session)
+        session.local_info["gate_id"] = index
+        session.local_info["gate_name"] = gate.name
+        return gate
+
+    def leave_gate(self, session):
+        gate = self.get_gate(session.local_info["server_id"],
+                             session.local_info["gate_id"])
+        gate.parent.players.add(session)
+        gate.players.remove(session)
+        session.local_info["gate_id"] = None
+        session.local_info["gate_name"] = None
+
+    def get_cities(self, server_id, gate_id):
+        return self.get_gate(server_id, gate_id).cities
+
+    def get_city(self, server_id, gate_id, index):
+        cities = self.get_cities(server_id, gate_id)
+        assert 0 < index <= len(cities), "Invalid city index"
+        return cities[index - 1]
+
+    def join_city(self, session, server_id, gate_id, index):
+        city = self.get_city(server_id, gate_id, index)
+        city.parent.players.remove(session)
+        city.players.add(session)
+        session.local_info["city_id"] = index
+        session.local_info["city_name"] = city.name
+        return city
+
+    def leave_city(self, session):
+        city = self.get_city(session.local_info["server_id"],
+                             session.local_info["gate_id"],
+                             session.local_info["city_id"])
+        city.parent.players.add(session)
+        city.players.remove(session)
+        session.local_info["city_id"] = None
+        session.local_info["city_name"] = None
 
 
 CURRENT_DB = TempDatabase()
