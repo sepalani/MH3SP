@@ -3,3 +3,4 @@
 *.pyc
 *.dol
 logs
+.idea
