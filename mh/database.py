@@ -248,10 +248,16 @@ class TempDatabase(object):
         return capcom_ids
 
     def join_server(self, session, index):
+        old_server = session.local_info["server_id"]
+        if old_server is not None:
+            self.leave_server(session, old_server)
         server = self.get_server(index)
         server.players.add(session)
         session.local_info["server_id"] = index
         return server
+
+    def leave_server(self, session, index):
+        self.get_server(index).players.remove(session)
 
     def get_server_time(self):
         pass
