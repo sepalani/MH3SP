@@ -1617,7 +1617,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Merge this with AnsLayerChildListHead?
         """
         unk = 0
-        count = 1
+        count = len(self.session.get_layer_sibling())
         data = struct.pack(">II", unk, count)
         self.send_packet(PatID4.AnsLayerSiblingListHead, data, seq)
 
@@ -1644,13 +1644,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk = first_index
         data = struct.pack(">II", unk, count)
-        layer = pati.getDummyLayerData()
-        data += layer.pack()
-
-        # A strange struct is also used, try to skip it
-        count = 0
-        data += struct.pack(">B", count) + b"\0" * 2
-
+        data += pati.get_layer_sibling(self.session, first_index, count)
         self.send_packet(PatID4.AnsLayerSiblingListData, data, seq)
 
     def recvReqLayerSiblingListFoot(self, packet_id, data, seq):
@@ -1873,7 +1867,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         number, = struct.unpack_from(">H", data)
         layer_set = pati.LayerSet.unpack(data, 2)
         unk = data[2+len(layer_set.pack()):]
-        self.server.debug("LayerCreateSet: {}, {!r}, {}".format(
+        self.server.debug("LayerCreateSet: {}, {!r}, {!r}".format(
             number, layer_set, unk))
         self.sendAnsLayerCreateSet(number, layer_set, unk, seq)
 
@@ -1885,6 +1879,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer creation settings response
         """
         data = struct.pack(">H", number)
+        self.session.join_city(number)
         self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
 
     def recvReqLayerCreateFoot(self, packet_id, data, seq):
