@@ -618,13 +618,16 @@ def get_fmp_servers(session, first_index, count):
         data += fmp_data.pack()
     return data
 
-def get_layer_children(session, first_index, count):
+def get_layer_children(session, first_index, count, sibling=False):
     assert first_index > 0, "Invalid list index"
 
     data = b""
     start = first_index - 1
     end = start + count
-    children = session.get_layer_children()[start:end]
+    if not sibling:
+        children = session.get_layer_children()[start:end]
+    else:
+        children = session.get_layer_sibling()[start:end]
     for i, child in enumerate(children, first_index):
         layer = LayerData()
         layer.index = Word(i)
@@ -636,6 +639,10 @@ def get_layer_children(session, first_index, count):
          # A strange struct is also used, try to skip it
         data += struct.pack(">B", 0)
     return data
+
+
+def get_layer_sibling(session, first_index, count):
+    return get_layer_children(session, first_index, count, True)
 
 
 def getDummyLayerData():
