@@ -2088,7 +2088,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         circle = pati.CircleInfo.unpack(data)
         unk = data[len(circle.pack()):]
-        self.server.debug("CircleCreate: {!r}, {}".format(circle, unk))
+        self.server.debug("CircleCreate: {!r}, {!r}".format(circle, unk))
         self.sendAnsCircleCreate(circle, unk, seq)
 
     def sendAnsCircleCreate(self, circle, unk, seq):
@@ -2146,7 +2146,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unk1, = struct.unpack_from(">I", data)
         unk2 = data[4:4+0xd]
         unk3 = data[4+0xd:]
-        self.server.debug("ReqCircleInfo: {}, {}, {}".format(unk1, unk2, unk3))
+        self.server.debug("ReqCircleInfo: {}, {!r}, {!r}".format(
+            unk1, unk2, unk3))
         self.sendAnsCircleInfo(unk1, unk2, unk3, seq)
 
     def sendAnsCircleInfo(self, unk1, unk2, unk3, seq):
@@ -2221,7 +2222,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unk1, = struct.unpack_from(">I", data)
         unk2 = data[4:4+0xd]
         unk3 = data[4+0xd:]
-        self.server.debug("ReqCircleInfoSet: {}, {}, {}".format(
+        self.server.debug("ReqCircleInfoSet: {}, {!r}, {!r}".format(
             unk1, unk2, unk3))
         self.sendAnsCircleInfoSet(unk1, unk2, unk3, seq)
 
