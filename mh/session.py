@@ -119,8 +119,16 @@ class Session(object):
     def get_layer_children(self):
         if self.layer == 0:
             return self.get_gates()
-        else:
+        elif self.layer == 1:
             return self.get_cities()
+        assert False, "Unsupported layer to get children"
+
+    def get_layer_sibling(self):
+        if self.layer == 1:
+            return self.get_gates()
+        elif self.layer == 2:
+            return self.get_cities()
+        assert False, "Unsupported layer to get sibling"
 
     def leave_server(self):
         DB.leave_server(self)
@@ -142,7 +150,7 @@ class Session(object):
         DB.join_city(self,
                      self.local_info["server_id"],
                      self.local_info["gate_id"],
-                     city)
+                     city_id)
 
     def leave_city(self):
         DB.leave_city(self)
