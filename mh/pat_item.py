@@ -242,6 +242,19 @@ class Custom(Item):
         return "Custom({!r})".format(repr(self[1:]))
 
 
+class FallthroughBug(Custom):
+    """Wordaround a fallthrough bug.
+
+    After reading LayerData's field_0x17 it falls through a getItemAny call.
+    It clobbers the next field by reading the field_id. Then, the game tries
+    to read the next field which was clobbered.
+
+    The workaround uses a dummy field_0xff which will be clobbered on purpose.
+    """
+    def __new__(cls):
+        return Custom.__new__(cls, b"\xff", b"\xff")
+
+
 def unpack_bytes(data, offset=0):
     """Unpack bytes list."""
     count, = struct.unpack_from(">B", data, offset)
@@ -489,6 +502,7 @@ class LayerData(PatData):
         (0x15, "unk_bytedec_0x15"),
         (0x16, "unk_string_0x16"),
         (0x17, "unk_binary_0x17"),
+        (0xff, "fallthrough_bug")  # Fill this if field 0x17 is set !!!
     )
 
 
@@ -618,6 +632,7 @@ def get_fmp_servers(session, first_index, count):
         data += fmp_data.pack()
     return data
 
+
 def get_layer_children(session, first_index, count, sibling=False):
     assert first_index > 0, "Invalid list index"
 
@@ -635,8 +650,10 @@ def get_layer_children(session, first_index, count, sibling=False):
         layer.size = Long(child.get_population())
         layer.capacity = Long(child.get_capacity())
         layer.state = Byte(child.get_state())
+        # layer.unk_binary_0x17 = Binary("test")
+        # layer.fallthrough_bug = FallthroughBug()
         data += layer.pack()
-         # A strange struct is also used, try to skip it
+        # A strange struct is also used, try to skip it
         data += struct.pack(">B", 0)
     return data
 

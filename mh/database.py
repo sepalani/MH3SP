@@ -231,7 +231,6 @@ class TempDatabase(object):
         if capcom_id in self.capcom_ids:
             self.capcom_ids[capcom_id]["session"] = None
 
-
     def get_users(self, session, first_index, count):
         """Returns Capcom IDs tied to the session."""
         users = self.consoles[session.online_support_code]
