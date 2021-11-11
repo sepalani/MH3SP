@@ -2,4 +2,6 @@
 *.key
 *.pyc
 *.dol
+*.bat
+.idea
 logs
