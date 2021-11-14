@@ -50,6 +50,8 @@ class Session(object):
         self.hunter_name = ""
         self.hunter_stats = None
         self.layer = 0
+        self.binary_setting = b""
+        self.search_payload = None
 
     def get(self, connection_data):
         """Return the session associated with the connection data, if any."""
@@ -129,6 +131,11 @@ class Session(object):
         elif self.layer == 2:
             return self.get_cities()
         assert False, "Unsupported layer to get sibling"
+
+    def get_layer_users(self, server_id, gate_id, city_id, first_index, count):
+        players = list(DB.get_city(server_id, gate_id, city_id).players)
+        start = first_index - 1
+        return players[start:start+count]
 
     def leave_server(self):
         DB.leave_server(self)
