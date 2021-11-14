@@ -1154,6 +1154,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk1, = struct.unpack_from(">I", data)
         profile_info = pati.unpack_lp2_string(data, 4)
+        self.session.binary_setting = profile_info
         self.sendAnsUserBinarySet(unk1, profile_info, seq)
 
     def sendAnsUserBinarySet(self, unk1, profile_info, seq):
@@ -1245,6 +1246,91 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.capcom_id = pati.String(self.session.capcom_id)
         data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
+
+    def recvReqLayerUserListHead(self, packet_id, data, seq):
+        """ReqLayerUserListHead packet.
+
+        ID: 64640100
+        JP: レイヤユーザリスト数要求
+        TR: Layer user list count request
+        """
+        unk, = struct.unpack_from(">B", data)
+        layer = pati.unpack_lp2_string(data, 1)
+        offset = 1 + len(layer) + 2
+        first_index, count = struct.unpack_from(">II", data, offset)
+        offset += 8
+        fields = pati.unpack_bytes(data, offset)
+        self.server.debug("LayerUserListHead({}, {!r}, {}, {}, {!r}".format(
+            unk, layer, first_index, count, fields))
+        self.sendAnsLayerUserListHead(unk, layer, first_index, count, fields,
+                                      seq)
+
+    def sendAnsLayerUserListHead(self, unk, layer, first_index, count, fields,
+                                 seq):
+        """AnsLayerUserListHead packet.
+
+        ID: 64640200
+        JP: レイヤユーザリスト数返答
+        TR: Layer user list count response
+        """
+        depth, server_id, unk_id, gate_id, city_id = struct.unpack_from(
+            ">IIHHH", layer)
+        search_payload = (server_id, gate_id, city_id, first_index, count)
+        users = self.session.get_layer_users(*search_payload)
+        self.session.search_payload = search_payload
+        data = struct.pack(">II", first_index, len(users))
+        self.send_packet(PatID4.AnsLayerUserListHead, data, seq)
+
+    def recvReqLayerUserListData(self, packet_id, data, seq):
+        """ReqLayerUserListData packet.
+
+        ID: 64650100
+        JP: レイヤユーザリスト要求
+        TR: Layer user list request
+        """
+        first_index, count = struct.unpack(">II", data)
+        self.sendAnsLayerUserListData(first_index, count, seq)
+
+    def sendAnsLayerUserListData(self, first_index, count, seq):
+        """AnsLayerUserListData packet.
+
+        ID: 64650200
+        JP: レイヤユーザリスト返答
+        TR: Layer user list response
+        """
+        unk = 1
+        search_payload = self.session.search_payload[:-2] + (
+            first_index, count)
+        users = self.session.get_layer_users(*search_payload)
+        self.session.search_payload = None
+        data = struct.pack(">II", unk, len(users))
+        for user in users:
+            layer_user = pati.LayerUserInfo()
+            layer_user.capcom_id = pati.String(user.capcom_id)
+            layer_user.hunter_name = pati.String(user.hunter_name)
+            data += layer_user.pack()
+            # A strange struct is also used, try to skip it
+            data += struct.pack(">B", 0)
+        self.send_packet(PatID4.AnsLayerUserListData, data, seq)
+
+    def recvReqLayerUserListFoot(self, packet_id, data, seq):
+        """ReqLayerUserListFoot packet.
+
+        ID: 64660100
+        JP: レイヤユーザリスト終了要求
+        TR: Layer user list end of transmission request
+        """
+        self.sendAnsLayerUserListFoot(seq)
+
+    def sendAnsLayerUserListFoot(self, seq):
+        """AnsLayerUserListFoot packet.
+
+        ID: 64660200
+        JP: レイヤユーザリスト終了返答
+        TR: Layer user list end of transmission response
+        """
+        data = b""
+        self.send_packet(PatID4.AnsLayerUserListFoot, data, seq)
 
     def recvReqFriendList(self, packet_id, data, seq):
         """ReqFriendList packet.
@@ -1843,6 +1929,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         ID: 64110100
         JP: レイヤ作成要求（番号指定）
         TR: Layer creation request (number specified)
+
+        TODO: Lock it to prevent race-condition.
         """
         number, = struct.unpack(">H", data)
         self.sendAnsLayerCreateHead(number, seq)
@@ -1879,7 +1967,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer creation settings response
         """
         data = struct.pack(">H", number)
-        self.session.join_city(number)
+        self.session.layer_down(number)
         self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
 
     def recvReqLayerCreateFoot(self, packet_id, data, seq):
