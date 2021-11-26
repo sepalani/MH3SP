@@ -45,7 +45,7 @@ def lp_string(s):
 def unpack_lp_string(data, offset=0):
     """Unpack lp_string."""
     size, = struct.unpack_from(">B", data, offset)
-    return data[offset+1:offset+1+size]
+    return data[offset + 1:offset + 1 + size]
 
 
 def lp2_string(s):
@@ -57,7 +57,7 @@ def lp2_string(s):
 def unpack_lp2_string(data, offset=0):
     """Unpack lp2_string."""
     size, = struct.unpack_from(">H", data, offset)
-    return data[offset+2:offset+2+size]
+    return data[offset + 2:offset + 2 + size]
 
 
 class Item(bytes):
@@ -136,6 +136,7 @@ def unpack_extra_info(data, offset=0):
 
 class Byte(Item):
     """PAT item byte class."""
+
     def __new__(cls, b):
         return Item.__new__(cls, pack_byte(b))
 
@@ -165,6 +166,7 @@ def unpack_word(data, offset=0):
 
 class Word(Item):
     """PAT item word class."""
+
     def __new__(cls, w):
         return Item.__new__(cls, pack_word(w))
 
@@ -194,6 +196,7 @@ def unpack_long(data, offset=0):
 
 class Long(Item):
     """PAT item long class."""
+
     def __new__(cls, lg):
         return Item.__new__(cls, pack_long(lg))
 
@@ -218,6 +221,7 @@ def unpack_longlong(data, offset=0):
 
 class LongLong(Item):
     """PAT item long long class."""
+
     def __new__(cls, q):
         return Item.__new__(cls, pack_longlong(q))
 
@@ -237,11 +241,12 @@ def unpack_string(data, offset=0):
         raise AssertionError("Invalid type for string item: {}".format(
             item_type
         ))
-    return data[offset+3:offset+3+length]
+    return data[offset + 3:offset + 3 + length]
 
 
 class String(Item):
     """PAT item string class."""
+
     def __new__(cls, s):
         return Item.__new__(cls, pack_string(s))
 
@@ -262,11 +267,12 @@ def unpack_binary(data, offset=0):
         raise AssertionError("Invalid type for binary item: {}".format(
             item_type
         ))
-    return data[offset+3:offset+3+length]
+    return data[offset + 3:offset + 3 + length]
 
 
 class Binary(Item):
     """PAT item binary class."""
+
     def __new__(cls, b):
         return Item.__new__(cls, pack_binary(b))
 
@@ -290,6 +296,7 @@ def unpack_any(data, offset=0):
 
 class Custom(Item):
     """PAT custom item class."""
+
     def __new__(cls, b, item_type=b'\0'):
         return Item.__new__(cls, item_type + b)
 
@@ -313,7 +320,7 @@ class FallthroughBug(Custom):
 def unpack_bytes(data, offset=0):
     """Unpack bytes list."""
     count, = struct.unpack_from(">B", data, offset)
-    return struct.unpack_from(">" + count * "B", data, offset+1)
+    return struct.unpack_from(">" + count * "B", data, offset + 1)
 
 
 class PatData(OrderedDict):
@@ -657,6 +664,14 @@ class LayerUserInfo(PatData):
     )
 
 
+class LayerBinaryInfo(PatData):
+    FIELDS = (
+        (0x01, "unk_long_0x01"),  # time related
+        (0x02, "capcom_id"),
+        (0x03, "hunter_name")
+    )
+
+
 def get_fmp_servers(session, first_index, count):
     assert first_index > 0, "Invalid list index"
 
@@ -707,6 +722,7 @@ def get_layer_children(session, first_index, count, sibling=False):
         layer.state = Byte(child.get_state())
         # layer.unk_binary_0x17 = Binary("test")
         # layer.fallthrough_bug = FallthroughBug()
+        layer.unk_byte_0x12 = Byte(1)
         data += layer.pack()
         # A strange struct is also used, try to skip it
         data += struct.pack(">B", 0)
@@ -793,7 +809,7 @@ def getHunterStats(hr=921, profile=b"Navaldeus",
     data[0x64:0x70] = slot(4, 113)
     data[0x70:0x7c] = slot(6, 7, slots=3)
 
-    data[0x9c:0x9c+len(profile)] = profile
+    data[0x9c:0x9c + len(profile)] = profile
     data[0xf2] = title
     data[0xf3] = status
     data[0xf5] = hr_limit

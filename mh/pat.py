@@ -66,6 +66,14 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
         """Return the debug connection list."""
         return self.debug_con
 
+    def get_pat_handler(self, session):
+        """Return pat handler from session"""
+        for handler in self.debug_con:
+            if handler.session == session:
+                return handler
+
+        return None
+
 
 class PatRequestHandler(SocketServer.StreamRequestHandler):
     """Generic PAT request handler class.

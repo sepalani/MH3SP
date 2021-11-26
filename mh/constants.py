@@ -57,7 +57,7 @@ def make_binary_server_type_list(is_jap=False):
             while b'\n' in desc:
                 i = desc.index(b'\n')
                 padding = (LINE_LENGTH - i % LINE_LENGTH) % LINE_LENGTH
-                desc[i:i+1] = b' ' * padding
+                desc[i:i + 1] = b' ' * padding
         data += pad(desc, 112 if is_jap else 168)
 
     # TODO: Figure out what it is
@@ -754,8 +754,8 @@ PAT_NAMES = {
     0x64680200: 'AnsLayerUserSearchData',
     0x64690100: 'ReqLayerUserSearchFoot',
     0x64690200: 'AnsLayerUserSearchFoot',
-    0x64701000: 'Ntc0x6470',
-    0x64711000: 'Ntc0x6471',
+    0x64701000: 'NtcLayerBinary',
+    0x64711000: 'NtcLayerUserPosition',
     0x64721000: 'NtcLayerChat',
     0x64730100: 'ReqLayerTell',
     0x64730200: 'AnsLayerTell',
@@ -1067,8 +1067,8 @@ class PatID4:
     AnsLayerUserSearchData = 0x64680200
     ReqLayerUserSearchFoot = 0x64690100
     AnsLayerUserSearchFoot = 0x64690200
-    Ntc0x6470 = 0x64701000
-    Ntc0x6471 = 0x64711000
+    NtcLayerBinary = 0x64701000
+    NtcLayerUserPosition = 0x64711000
     NtcLayerChat = 0x64721000
     ReqLayerTell = 0x64730100
     AnsLayerTell = 0x64730200
