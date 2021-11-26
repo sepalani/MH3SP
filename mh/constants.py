@@ -45,7 +45,7 @@ def make_binary_server_type_list(is_jap=False):
         (b"Rookie", b"Only hunters HR 30\nor lower may enter.", 0, 30),
         (b"Expert", b"Only hunters HR 31\nor higher may enter.", 31, 999),
         (b"Recruiting", b"Hunters in search of\n"
-         b"hunting companions\ncan gather here.", 0, 999),
+                        b"hunting companions\ncan gather here.", 0, 999),
     ]
 
     # Handle server type properties
@@ -233,6 +233,58 @@ def make_binary_trading_post():
     return data
 
 
+QUEST_FLAG_UNK = 0b1000  # It really is unknown, it put a question mark icon on the monster/item box icon
+QUEST_FLAG_ARENA = 0b10000
+QUEST_FLAG_DOUBLE_MONSTER = 0b10000
+
+QUEST_LOCATION_NONE = 0
+QUEST_LOCATION_D_ISLAND = 1
+QUEST_LOCATION_SANDY_PLAINS = 2
+QUEST_LOCATION_FLOODED_FOR = 3
+QUEST_LOCATION_TUNDRA = 4
+QUEST_LOCATION_VOLCANO = 5
+QUEST_LOCATION_GRT_DESERT = 6
+QUEST_LOCATION_UW_RUIN = 7
+QUEST_LOCATION_LAND_ARENA_1 = 8
+QUEST_LOCATION_LAND_ARENA_2 = 9
+QUEST_LOCATION_WATER_ARENA_1 = 10
+QUEST_LOCATION_SACRED_LAND = 11
+QUEST_LOCATION_WATER_ARENA_2 = 12
+
+
+def make_binary_event_quest(quest_id, name, description, flags):
+    main_reward = 123
+    sub_quest_1_reward = 321
+    sub_quest_2_reward = 231
+    penalty_per_cart = 100
+    quest_fee = 110
+    location = QUEST_LOCATION_LAND_ARENA_2
+    time_limit = 45  # In minutes
+
+    monsterType1 = 1
+    monsterType2 = 2
+
+    data = b""
+    data += pad(name, 40)  # Size 0x28
+    data += struct.pack(">I", 0xffffffff)  # Unknown
+    data += struct.pack(">H", quest_id)
+    data += pad(description, 40)
+    data += pad(description, 40)
+    data += b'\0' * 0xD  # Padding
+    data += struct.pack(">B", location)  # Offset 0x8C
+    data += b'\0' * 0xAE  # Padding
+    data += struct.pack(">h", time_limit)  # Offset 0x13A
+    data += b'\0' * 0x1D0  # Padding
+    data += struct.pack(">BB", monsterType1, monsterType2)  # Offset 0x30C
+    data += b'\0\0'  # Padding
+    data += struct.pack(">I", flags)  # Offset 0x310
+    data += b'\0' * 0x34  # Padding
+    data += struct.pack(">IIIII", quest_fee, main_reward, sub_quest_1_reward, sub_quest_2_reward, penalty_per_cart)  # Offset 0x348
+    data += b'\0' * 0xA4  # Padding
+    assert len(data) == 0x400
+    return data
+
+
 TERMS_VERSION = 1
 TERMS = {
     1: b"""MH3 Server Project - Terms.""",
@@ -253,6 +305,8 @@ IS_JAP = False
 # MY_CAPCOM_ID = b"C9I7D4"
 OTHER_CAPCOM_ID = b"D9R7K4"
 OTHER_HUNTER_NAME = b"Drakea"
+
+SHIFT_OFFSET = 0
 
 # Dummy PAT_BINARY
 PAT_BINARIES = {
@@ -280,43 +334,43 @@ PAT_BINARIES = {
     },
     0x06: {
         "version": 1,
-        "content": b"dummy_06\0"
+        "content": make_binary_event_quest(60000, "MH3SP #1", "Hello", 0b1 << SHIFT_OFFSET)
     },
     0x07: {
         "version": 1,
-        "content": b"dummy_07\0"
+        "content": make_binary_event_quest(60001, "MH3SP #2", "Hello", 0x2000000)
     },
     0x08: {
         "version": 1,
-        "content": b"dummy_08\0"
+        "content": make_binary_event_quest(60002, "MH3SP #3", "Hello", 0b100 << SHIFT_OFFSET)
     },
     0x09: {
         "version": 1,
-        "content": b"dummy_09\0"
+        "content": make_binary_event_quest(60003, "MH3SP #4", "Hello", 0b1000 << SHIFT_OFFSET)
     },
     0x0a: {  # Japanese
         "version": 1,
-        "content": b"6" * 0x50  # b"foo\tbar\tfuu\nboo\tfaa\bbaa\nree\t"
+        "content": make_binary_event_quest(60004, "MH3SP #5", "Hello", 0b10000 << SHIFT_OFFSET)
     },
     0x0b: {
         "version": 1,
-        "content": b"dummy_0b\0"
+        "content": make_binary_event_quest(60005, "MH3SP #6", "Hello", 0b100000 << SHIFT_OFFSET)
     },
     0x0c: {
         "version": 1,
-        "content": b"dummy_0c\0"
+        "content": make_binary_event_quest(60006, "MH3SP #7", "Hello", 0b1000000 << SHIFT_OFFSET)
     },
     0x0d: {
         "version": 1,
-        "content": b"dummy_0d\0"
+        "content": make_binary_event_quest(60007, "MH3SP #8", "Hello", 0b10000000 << SHIFT_OFFSET)
     },
     0x0e: {
         "version": 1,
-        "content": b"dummy_0e\0"
+        "content": make_binary_event_quest(60008, "MH3SP #9", "Hello", 0b100000000 << SHIFT_OFFSET)
     },
     0x0f: {
         "version": 1,
-        "content": b"dummy_0f\0"
+        "content": make_binary_event_quest(60009, "MH3SP #10", "Hello", 0b1000000000 << SHIFT_OFFSET)
     },
     0x10: {  # French
         "version": 1,
