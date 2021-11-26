@@ -89,14 +89,17 @@ class FmpRequestHandler(PatRequestHandler):
 
         city = self.session.get_city()
         leader = next(iter(city.players))  # Assume the first player is the one that created the city
+        leader_handler = self.server.get_pat_handler(leader)
 
         data = unk_data
         data += pati.lp2_string(leader.capcom_id)
         data += pati.lp2_string(leader.hunter_name)
         self.send_packet(PatID4.AnsLayerHost, data, seq)
 
+        # Notify the leader, being the host
+        leader_handler.send_packet(PatID4.NtcLayerHost, data, seq)
+
         # Notify the city leader of the joining player
-        leader_handler = self.server.get_pat_handler(leader)
         user = pati.LayerUserInfo()
         user.capcom_id = pati.String(self.session.capcom_id)
         user.hunter_name = pati.String(self.session.hunter_name)
@@ -105,6 +108,7 @@ class FmpRequestHandler(PatRequestHandler):
         data += user.pack()
 
         leader_handler.send_packet(PatID4.NtcLayerIn, data, seq)
+
 
     def recvNtcLayerBinary(self, packet_id, data, seq):
         sender_blank = pati.LayerUserInfo.unpack(data)
