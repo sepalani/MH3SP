@@ -138,6 +138,9 @@ class FmpRequestHandler(PatRequestHandler):
                 continue
 
             player_pat_handler = self.server.get_pat_handler(player_session)
+            if player_pat_handler is None:
+                continue
+
             player_pat_handler.send_packet(PatID4.NtcLayerBinary, data, seq)
 
     def recvNtcLayerBinary2(self, packet_id, data, seq):
@@ -166,8 +169,31 @@ class FmpRequestHandler(PatRequestHandler):
         data += unk_data
 
         partner_pat_handler = self.server.get_pat_handler(partner_session)
+        if partner_pat_handler is None:
+            return
+
         partner_pat_handler.send_packet(PatID4.NtcLayerBinary2, data, seq)
 
+    def recvReqLayerUp(self, packet_id, data, seq):
+        if self.session.layer == 2:
+            city = self.session.get_city()
+            if city.leader == self.session:
+                if len(city.players) > 1:
+                    # TODO: Transfer the leadership to another player
+                    pass
+                city.leader = None
+
+            ntc_layer_out_data = pati.lp2_string(self.session.capcom_id)
+            for player_in_city in city.players:
+                if player_in_city == self.session:
+                    continue
+
+                player_in_city_handler = self.server.get_pat_handler(player_in_city)
+                if player_in_city_handler is None:
+                    continue
+
+                player_in_city_handler.send_packet(PatID4.NtcLayerOut, ntc_layer_out_data, 0)
+        self.sendAnsLayerUp(data, seq)
 
 BASE = server_base("FMP", FmpServer, FmpRequestHandler)
 
