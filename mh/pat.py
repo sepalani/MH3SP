@@ -1084,8 +1084,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.unk_string_0x0c = pati.String("StrC")
         user.city_size = pati.Long(4)
         user.city_capacity = pati.Long(3)
-        user.info_mine_0x0f = pati.Long(5)
-        user.info_mine_0x10 = pati.Long(6)
+        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID)) & 0xffffffff)
+        user.info_mine_0x10 = pati.Long(int(hash(OTHER_CAPCOM_ID[::-1])) & 0xffffffff)
 
         data = user.pack()
         data += pati.pack_extra_info([])  # TODO: Figure out the values

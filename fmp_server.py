@@ -197,6 +197,41 @@ class FmpRequestHandler(PatRequestHandler):
                 player_in_city_handler.send_packet(PatID4.NtcLayerOut, ntc_layer_out_data, 0)
         self.sendAnsLayerUp(data, seq)
 
+    def recvReqUserSearchInfoMine(self, packet_id, data, seq):
+        """ReqUserSearchInfoMine packet.
+
+        ID: 66370100
+        JP: ユーザ検索データ要求(自分)
+        TR: User search data request (mine)
+        """
+
+        search_info = pati.UserSearchInfo.unpack(data)
+        self.server.debug("SearchInfo: {!r}".format(search_info))
+        self.sendAnsUserSearchInfoMine(search_info, seq)
+
+    def sendAnsUserSearchInfoMine(self, search_info, seq):
+        """AnsUserSearchInfoMine packet.
+
+        ID: 66370200
+        JP: ユーザ検索データ返答(自分)
+        TR: User search data response (mine)
+
+        TODO: Figure out what to do with it.
+        Maybe prevent the same profile to be connected twice simultaneously.
+        """
+
+        info_mine_0x0f = int(hash(self.session.capcom_id)) & 0xffffffff
+        info_mine_0x10 = int(hash(self.session.capcom_id[::-1])) & 0xffffffff
+
+        self.server.debug("SearchInfoMine: {:08X} {:08X}".format(info_mine_0x0f, info_mine_0x10))
+
+        search_info = pati.UserSearchInfo()
+        search_info.info_mine_0x0f = pati.Long(info_mine_0x0f)  # TODO: Proper field value
+        search_info.info_mine_0x10 = pati.Long(info_mine_0x10)  # TODO: Proper field value
+        data = search_info.pack()
+
+        self.send_packet(PatID4.AnsUserSearchInfoMine, data, seq)
+
 BASE = server_base("FMP", FmpServer, FmpRequestHandler)
 
 if __name__ == "__main__":
