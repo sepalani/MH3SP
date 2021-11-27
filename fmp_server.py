@@ -20,7 +20,7 @@
 """
 
 from mh.pat import PatServer, PatRequestHandler
-from other.utils import server_base, server_main
+from other.utils import server_base, server_main, hexdump
 from mh.constants import *
 import mh.pat_item as pati
 
@@ -145,12 +145,14 @@ class FmpRequestHandler(PatRequestHandler):
 
     def recvNtcLayerBinary2(self, packet_id, data, seq):
 
-        self.server.debug("NtcLayerBinary2: From ({}, {})".format(self.session.capcom_id, self.session.hunter_name))
-
         partner = pati.unpack_lp2_string(data)
         partner_size = len(partner) + 2
         binary_info = pati.LayerBinaryInfo.unpack(data, partner_size)
         unk_data = data[partner_size + len(binary_info.pack()):]
+
+        self.server.debug("NtcLayerBinary2: From ({}, {})\n{}".format(self.session.capcom_id, self.session.hunter_name,
+                                                                      hexdump(unk_data)))
+
         self.sendNtcLayerBinary2(partner, unk_data, seq)
 
     def sendNtcLayerBinary2(self, partner, unk_data, seq):
@@ -161,7 +163,7 @@ class FmpRequestHandler(PatRequestHandler):
 
         data = pati.lp2_string(self.session.capcom_id)
 
-        self_data = pati.LayerUserInfo()
+        self_data = pati.LayerBinaryInfo()
         self_data.capcom_id = pati.String(self.session.capcom_id)
         self_data.hunter_name = pati.String(self.session.hunter_name)
 
