@@ -815,7 +815,7 @@ PAT_NAMES = {
     0x64730200: 'AnsLayerTell',
     0x64731000: 'NtcLayerTell',
     0x64741000: 'Ntc0x6474',
-    0x64751000: 'Ntc0x6475',
+    0x64751000: 'NtcLayerBinary2',  # (partner specified)
     0x64800100: 'ReqLayerMediationLock',
     0x64800200: 'AnsLayerMediationLock',
     0x64801000: 'NtcLayerMediationLock',
@@ -1128,7 +1128,7 @@ class PatID4:
     AnsLayerTell = 0x64730200
     NtcLayerTell = 0x64731000
     Ntc0x6474 = 0x64741000
-    Ntc0x6475 = 0x64751000
+    NtcLayerBinary2 = 0x64751000  # (partner specified)
     ReqLayerMediationLock = 0x64800100
     AnsLayerMediationLock = 0x64800200
     NtcLayerMediationLock = 0x64801000

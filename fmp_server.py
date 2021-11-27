@@ -133,6 +133,31 @@ class FmpRequestHandler(PatRequestHandler):
             player_pat_handler = self.server.get_pat_handler(player_session)
             player_pat_handler.send_packet(PatID4.NtcLayerBinary, data, seq)
 
+    def recvNtcLayerBinary2(self, packet_id, data, seq):
+        partner = pati.unpack_lp2_string(data)
+        partner_size = len(data) + 2
+        binary_info = pati.LayerBinaryInfo(data[partner_size:])
+        unk_data = data[partner_size + len(binary_info.pack()):]
+        self.sendNtcLayerBinary2(partner, unk_data, seq)
+
+    def sendNtcLayerBinary2(self, partner, unk_data, seq):
+        city = self.session.get_city()
+        partner_session = next(p for p in city.players if p.capcom_id == partner)
+        if partner_session is None:
+            return
+
+        data = pati.lp2_string(partner)
+
+        partner_data = pati.LayerUserInfo()
+        partner_data.capcom_id = pati.String(self.session.capcom_id)
+        partner_data.hunter_name = pati.String(self.session.hunter_name)
+
+        data += partner_data.pack()
+        data += unk_data
+
+        partner_pat_handler = self.server.get_pat_handler(partner_session)
+        partner_pat_handler.send_packet(PatID4.NtcLayerBinary2, data, seq)
+
 
 BASE = server_base("FMP", FmpServer, FmpRequestHandler)
 
