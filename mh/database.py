@@ -55,6 +55,7 @@ class City(object):
         self.capacity = 4
         self.state = LayerState.EMPTY
         self.players = set()
+        self.leader = None
 
     def get_population(self):
         return len(self.players)

@@ -1983,6 +1983,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         data = struct.pack(">H", number)
         self.session.layer_down(number)
+
+        if self.session.layer == 2:
+            city = self.session.get_city()
+            city.leader = self.session
+
         self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
 
     def recvReqLayerCreateFoot(self, packet_id, data, seq):

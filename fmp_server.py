@@ -88,9 +88,7 @@ class FmpRequestHandler(PatRequestHandler):
         """
 
         city = self.session.get_city()
-
-        # TODO: Create a field on the city class that would hold who is the leader
-        leader = next(x for x in city.players if x != self.session)
+        leader = city.leader
         assert leader != self.session
 
         leader_handler = self.server.get_pat_handler(leader)
