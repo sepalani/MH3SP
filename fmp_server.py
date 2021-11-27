@@ -89,14 +89,14 @@ class FmpRequestHandler(PatRequestHandler):
 
         city = self.session.get_city()
 
-        # Create a field on the city class that would hold who is the leader
+        # TODO: Create a field on the city class that would hold who is the leader
         leader = next(x for x in city.players if x != self.session)
         assert leader != self.session
-        
+
         leader_handler = self.server.get_pat_handler(leader)
 
         self.server.debug("ReqLayerHost: Req ({}, {})  Host ({}, {})".
-                          format(self.session.capcom_id,self.session.hunter_name, leader.capcom_id,
+                          format(self.session.capcom_id, self.session.hunter_name, leader.capcom_id,
                                  leader.hunter_name))
 
         data = unk_data
@@ -147,8 +147,8 @@ class FmpRequestHandler(PatRequestHandler):
         self.server.debug("NtcLayerBinary2: From ({}, {})".format(self.session.capcom_id, self.session.hunter_name))
 
         partner = pati.unpack_lp2_string(data)
-        partner_size = len(data) + 2
-        binary_info = pati.LayerBinaryInfo(data[partner_size:])
+        partner_size = len(partner) + 2
+        binary_info = pati.LayerBinaryInfo.unpack(data, partner_size)
         unk_data = data[partner_size + len(binary_info.pack()):]
         self.sendNtcLayerBinary2(partner, unk_data, seq)
 
