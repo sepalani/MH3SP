@@ -88,8 +88,16 @@ class FmpRequestHandler(PatRequestHandler):
         """
 
         city = self.session.get_city()
-        leader = next(iter(city.players))  # Assume the first player is the one that created the city
+
+        # Create a field on the city class that would hold who is the leader
+        leader = next(x for x in city.players if x != self.session)
+        assert leader != self.session
+        
         leader_handler = self.server.get_pat_handler(leader)
+
+        self.server.debug("ReqLayerHost: Req ({}, {})  Host ({}, {})".
+                          format(self.session.capcom_id,self.session.hunter_name, leader.capcom_id,
+                                 leader.hunter_name))
 
         data = unk_data
         data += pati.lp2_string(leader.capcom_id)
@@ -109,7 +117,6 @@ class FmpRequestHandler(PatRequestHandler):
 
         leader_handler.send_packet(PatID4.NtcLayerIn, data, seq)
 
-
     def recvNtcLayerBinary(self, packet_id, data, seq):
         sender_blank = pati.LayerUserInfo.unpack(data)
         unk_data = data[len(sender_blank.pack()):]
@@ -120,6 +127,8 @@ class FmpRequestHandler(PatRequestHandler):
         sender.unk_long_0x01 = pati.Long(0x12345678)
         sender.capcom_id = pati.String(self.session.capcom_id)
         sender.hunter_name = pati.String(self.session.hunter_name)
+
+        self.server.debug("NtcLayerBinary: From ({}, {})".format(self.session.capcom_id, self.session.hunter_name))
 
         data = pati.lp2_string(self.session.capcom_id)
         data += sender.pack()
@@ -134,6 +143,9 @@ class FmpRequestHandler(PatRequestHandler):
             player_pat_handler.send_packet(PatID4.NtcLayerBinary, data, seq)
 
     def recvNtcLayerBinary2(self, packet_id, data, seq):
+
+        self.server.debug("NtcLayerBinary2: From ({}, {})".format(self.session.capcom_id, self.session.hunter_name))
+
         partner = pati.unpack_lp2_string(data)
         partner_size = len(data) + 2
         binary_info = pati.LayerBinaryInfo(data[partner_size:])
@@ -146,13 +158,13 @@ class FmpRequestHandler(PatRequestHandler):
         if partner_session is None:
             return
 
-        data = pati.lp2_string(partner)
+        data = pati.lp2_string(self.session.capcom_id)
 
-        partner_data = pati.LayerUserInfo()
-        partner_data.capcom_id = pati.String(self.session.capcom_id)
-        partner_data.hunter_name = pati.String(self.session.hunter_name)
+        self_data = pati.LayerUserInfo()
+        self_data.capcom_id = pati.String(self.session.capcom_id)
+        self_data.hunter_name = pati.String(self.session.hunter_name)
 
-        data += partner_data.pack()
+        data += self_data.pack()
         data += unk_data
 
         partner_pat_handler = self.server.get_pat_handler(partner_session)
