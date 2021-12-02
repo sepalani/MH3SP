@@ -79,6 +79,61 @@ def unpack_byte(data, offset=0):
     return value
 
 
+def pack_extra_info(info):
+    """Pack extra info (list of field_id and int value).
+
+    Extra info are retrieved after the following function calls:
+     - getLayerData
+     - getLayerUserInfo
+     - getCircleInfo
+     - getUserSearchInfo
+
+    It follows a simple format:
+     - field_id, a byte used as an identifier
+     - has_value, a byte telling if it has a value
+     - value: an integer with the field's value (only set if has_value is true)
+
+    TODO: Rename "extra_info" to something meaningful.
+    """
+    data = struct.pack(">B", len(info))
+    for field_id, value in info:
+        has_value = value is not None
+        data += struct.pack(">BB", field_id, int(has_value))
+        if has_value:
+            data += struct.pack(">I", value)
+    return data
+
+
+def unpack_extra_info(data, offset=0):
+    """Unpack extra info (list of field_id and int value).
+
+    Extra info are stored after the following function calls:
+     - putLayerSet
+     - putCircleInfo
+    and is also used in PatInterface::sendReqUserSearchSet.
+
+    TODO: Rename "extra_info" to something meaningful.
+    It seems related to the city info. If correct:
+     - field_id 0x01: ???
+     - field_id 0x02: City's HR limit (if not applicable, 0xffffffff is set)
+     - field_id 0x03: City's goal (if not applicable, 0xffffffff is set)
+     - field_id 0x04: City's seeking
+    """
+    info = []
+    count, = struct.unpack_from(">B", data, offset)
+    offset += 1
+    for _ in range(count):
+        field_id, has_value = struct.unpack_from(">BB", data, offset)
+        offset += 2
+        if has_value:
+            value, = struct.unpack_from(">I", data, offset)
+            offset += 4
+        else:
+            value = None
+        info.append((field_id, value))
+    return info
+
+
 class Byte(Item):
     """PAT item byte class."""
     def __new__(cls, b):

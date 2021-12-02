@@ -1080,11 +1080,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.info_mine_0x10 = pati.Long(6)
 
         data = user.pack()
-
-        # A strange struct is also used, try to skip it
-        count = 0
-        data += struct.pack(">B", count) + b"\0" * 2
-
+        data += pati.pack_extra_info([])  # TODO: Figure out the values
         self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
 
     def recvReqLayerStart(self, packet_id, data, seq):
@@ -1178,20 +1174,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ユーザ検索設定要求
         TR: User search settings request
         """
-        count, = struct.unpack_from(">B", data)
-        sets = []
-        offset = 1
-        for _ in range(count):
-            set_data = struct.unpack_from(">BB", data, offset)
-            offset += 2
-            if set_data[1] == 1:
-                set_data += struct.unpack_from(">I", data, offset)
-                offset += 4
-            sets.append(set_data)
-        self.server.debug("UserSearchSet: {!r}".format(sets))
-        self.sendAnsUserSearchSet(sets, seq)
+        extra = pati.unpack_extra_info(data)
+        self.server.debug("UserSearchSet: {!r}".format(extra))
+        self.sendAnsUserSearchSet(extra, seq)
 
-    def sendAnsUserSearchSet(self, sets, seq):
+    def sendAnsUserSearchSet(self, extra, seq):
         """AnsUserSearchSet packet.
 
         ID: 66300200
@@ -1308,9 +1295,27 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             layer_user = pati.LayerUserInfo()
             layer_user.capcom_id = pati.String(user.capcom_id)
             layer_user.hunter_name = pati.String(user.hunter_name)
+            layer_user.layer_host = pati.Binary(
+                b'\x00\x00\x00\x03'  # Depth?
+                b'\x00\x00\x00\x01'  # Unknown
+                b'\x00\x01'          # Server ID?
+                b'\x00\x01'          # Gate ID?
+                b'\x00\x01'          # City ID?
+            )
             data += layer_user.pack()
-            # A strange struct is also used, try to skip it
-            data += struct.pack(">B", 0)
+            # User summary?
+            # Index 1/4 - Weapon (u8) + 16-bit padding + Location (u8)
+            # Index 2/4 - HR (u16) + 16-bit padding
+            # Index 3/4 - ??? (u8[4])
+            # Index 4/4 - ??? (u32)
+            count = 4
+            data += pati.pack_extra_info([
+                (i, 0x03030303)
+                for i in range(3, 5)
+            ] + [
+                (1, 0x03000001),
+                (2, 0x00ff0000)
+            ])
         self.send_packet(PatID4.AnsLayerUserListData, data, seq)
 
     def recvReqLayerUserListFoot(self, packet_id, data, seq):
@@ -1953,13 +1958,15 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer creation settings request (number specified)
         """
         number, = struct.unpack_from(">H", data)
-        layer_set = pati.LayerSet.unpack(data, 2)
-        unk = data[2+len(layer_set.pack()):]
+        offset = 2
+        layer_set = pati.LayerSet.unpack(data, offset)
+        offset += len(layer_set.pack())
+        extra = pati.unpack_extra_info(data, offset)
         self.server.debug("LayerCreateSet: {}, {!r}, {!r}".format(
-            number, layer_set, unk))
-        self.sendAnsLayerCreateSet(number, layer_set, unk, seq)
+            number, layer_set, extra))
+        self.sendAnsLayerCreateSet(number, layer_set, extra, seq)
 
-    def sendAnsLayerCreateSet(self, number, layer_set, unk, seq):
+    def sendAnsLayerCreateSet(self, number, layer_set, extra, seq):
         """AnsLayerCreateSet packet.
 
         ID: 64120200
@@ -2162,9 +2169,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">II", unk, count)
         for circle in circles:
             data += circle.pack()
-            # A strange struct is also used, try to skip it
-            data += struct.pack(">B", 0) + b"\0" * 2
-
+            data += pati.pack_extra_info([])  # TODO: Figure out the values
         self.send_packet(PatID4.AnsCircleListLayer, data, seq)
 
     def recvReqCircleCreate(self, packet_id, data, seq):
@@ -2175,11 +2180,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle creation request
         """
         circle = pati.CircleInfo.unpack(data)
-        unk = data[len(circle.pack()):]
-        self.server.debug("CircleCreate: {!r}, {!r}".format(circle, unk))
-        self.sendAnsCircleCreate(circle, unk, seq)
+        extra = pati.unpack_extra_info(data, len(circle.pack()))
+        # Extra fields
+        #  - field_id 0x01: Party capacity
+        #  - field_id 0x02: Quest ID
+        self.server.debug("CircleCreate: {!r}, {!r}".format(circle, extra))
+        self.sendAnsCircleCreate(circle, extra, seq)
 
-    def sendAnsCircleCreate(self, circle, unk, seq):
+    def sendAnsCircleCreate(self, circle, extra, seq):
         """AnsCircleCreate packet.
 
         ID: 65010200
@@ -2271,9 +2279,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         circle.unk_long_0x0b = pati.Long(1)
         self.server.debug("AnsCircleInfo: {!r}".format(circle))
         data += circle.pack()  # TODO: Fill this struct
-
-        # A strange struct is also used, try to skip it
-        data += struct.pack(">B", 0) + b"\0" * 2
+        data += pati.pack_extra_info([])  # TODO: Figure out the values
 
         self.send_packet(PatID4.AnsCircleInfo, data, seq)
         global g_circle_info_set
@@ -2307,21 +2313,23 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: サークルデータ設定要求
         TR: Circle data settings request
         """
-        unk1, = struct.unpack_from(">I", data)
-        unk2 = data[4:4+0xd]
-        unk3 = data[4+0xd:]
+        unk, = struct.unpack_from(">I", data)
+        offset = 4
+        circle = pati.CircleInfo.unpack(data, offset)
+        offset += len(circle.pack())
+        extra = pati.unpack_extra_info(data, offset)
         self.server.debug("ReqCircleInfoSet: {}, {!r}, {!r}".format(
-            unk1, unk2, unk3))
-        self.sendAnsCircleInfoSet(unk1, unk2, unk3, seq)
+            unk, circle, extra))
+        self.sendAnsCircleInfoSet(unk, circle, extra, seq)
 
-    def sendAnsCircleInfoSet(self, unk1, unk2, unk3, seq):
+    def sendAnsCircleInfoSet(self, unk, circle, extra, seq):
         """AnsCircleInfoSet packet.
 
         ID: 65040200
         JP: サークルデータ設定返答
         TR: Circle data settings response
         """
-        data = struct.pack(">I", 0)  # unk1)
+        data = struct.pack(">I", 0)  # unk)
         # self.send_packet(PatID4.NtcCircleInfoSet, g_circle_info_set, seq)
         self.send_packet(PatID4.AnsCircleInfoSet, data, seq)
 
