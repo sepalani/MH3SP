@@ -66,6 +66,22 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
         """Return the debug connection list."""
         return self.debug_con
 
+    def get_pat_handler(self, session):
+        """Return pat handler from session"""
+        for handler in self.debug_con:
+            if handler.session == session:
+                return handler
+
+        return None
+
+    def layer_broadcast(self, session, packet_id, data, seq, exclude_self=True):
+        for player in session.get_layer_players():
+            if exclude_self and player == session:
+                continue
+
+            pat_handler = self.get_pat_handler(player)
+            pat_handler.send_packet(packet_id, data, seq)
+
 
 class PatRequestHandler(SocketServer.StreamRequestHandler):
     """Generic PAT request handler class.
@@ -1017,30 +1033,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         self.send_packet(PatID4.AnsBinaryFoot, b"", seq)
 
-    def recvReqUserSearchInfoMine(self, packet_id, data, seq):
-        """ReqUserSearchInfoMine packet.
-
-        ID: 66370100
-        JP: ユーザ検索データ要求(自分)
-        TR: User search data request (mine)
-        """
-        search_info = pati.UserSearchInfo.unpack(data)
-        self.server.debug("SearchInfo: {!r}".format(search_info))
-        self.sendAnsUserSearchInfoMine(search_info, seq)
-
-    def sendAnsUserSearchInfoMine(self, search_info, seq):
-        """AnsUserSearchInfoMine packet.
-
-        ID: 66370200
-        JP: ユーザ検索データ返答(自分)
-        TR: User search data response (mine)
-
-        TODO: Figure out what to do with it.
-        Maybe prevent the same profile to be connected twice simultaneously.
-        """
-        data = pati.UserSearchInfo().pack()
-        self.send_packet(PatID4.AnsUserSearchInfoMine, data, seq)
-
     def recvReqUserSearchInfo(self, packet_id, data, seq):
         """ReqUserSearchInfo packet.
 
@@ -1076,8 +1068,12 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.unk_string_0x0c = pati.String("StrC")
         user.city_size = pati.Long(4)
         user.city_capacity = pati.Long(3)
-        user.info_mine_0x0f = pati.Long(5)
-        user.info_mine_0x10 = pati.Long(6)
+
+        # This fields are used to identify a user. Specifically when a client is deserializing data from the packets
+        # `NtcLayerBinary` and `NtcLayerBinary2`
+        # TODO: Proper field value and name
+        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID)) & 0xffffffff)
+        user.info_mine_0x10 = pati.Long(int(hash(OTHER_CAPCOM_ID[::-1])) & 0xffffffff)
 
         data = user.pack()
         # TODO: Figure out the optional fields
@@ -1209,31 +1205,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         version = 1  # The game might send binary requests for this version
         data = struct.pack(">BI", unused, version)
         self.send_packet(PatID4.AnsBinaryVersion, data, seq)
-
-    def recvReqLayerUserList(self, packet_id, data, seq):
-        """ReqLayerUserList packet.
-
-        ID: 64630100
-        JP: レイヤ同期ユーザリスト要求
-        TR: Layer sync user list request
-        """
-        count, = struct.unpack_from(">B", data)
-        unk = struct.unpack_from(">" + count * "B", data, 1)
-        self.sendAnsLayerUserList(unk, seq)
-
-    def sendAnsLayerUserList(self, unk, seq):
-        """AnsLayerUserList packet.
-
-        ID: 64630200
-        JP: レイヤ同期ユーザリスト返答
-        TR: Layer sync user list response
-        """
-        count = 1
-        data = struct.pack(">I", count)
-        user = pati.LayerUserInfo()
-        user.capcom_id = pati.String(self.session.capcom_id)
-        data += user.pack()
-        self.send_packet(PatID4.AnsLayerUserList, data, seq)
 
     def recvReqLayerUserListHead(self, packet_id, data, seq):
         """ReqLayerUserListHead packet.
@@ -1976,6 +1947,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         data = struct.pack(">H", number)
         self.session.layer_down(number)
+
+        if self.session.layer == 2:
+            city = self.session.get_city()
+            city.leader = self.session
+
         self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
 
     def recvReqLayerCreateFoot(self, packet_id, data, seq):

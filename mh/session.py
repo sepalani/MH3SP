@@ -90,6 +90,18 @@ class Session(object):
     def get_servers(self):
         return DB.get_servers()
 
+    def get_server(self):
+        assert self.local_info['server_id'] is not None
+        return DB.get_server(self.local_info['server_id'])
+
+    def get_gate(self):
+        assert self.local_info['gate_id'] is not None
+        return DB.get_gate(self.local_info['server_id'], self.local_info['gate_id'])
+
+    def get_city(self):
+        assert self.local_info['city_id'] is not None
+        return DB.get_city(self.local_info['server_id'], self.local_info['gate_id'], self.local_info['city_id'])
+
     def layer_start(self):
         self.layer = 0
         return pati.getDummyLayerData()
@@ -161,3 +173,16 @@ class Session(object):
 
     def leave_city(self):
         DB.leave_city(self)
+
+    def get_layer_players(self):
+        if self.session.layer == 0:
+            server = self.get_server()
+            return server.players
+        elif self.session.layer == 1:
+            gate = self.get_gate()
+            return gate.players
+        elif self.session.layer == 2:
+            city = self.get_city()
+            return city.players
+        else:
+            assert False, "Can't find layer"
