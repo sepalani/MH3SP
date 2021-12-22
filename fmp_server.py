@@ -103,7 +103,7 @@ class FmpRequestHandler(PatRequestHandler):
         self.send_packet(PatID4.AnsLayerHost, data, seq)
 
         # Notify the leader, being the host
-        leader_handler.send_packet(PatID4.NtcLayerHost, data, seq)
+        # leader_handler.send_packet(PatID4.NtcLayerHost, data, seq)
 
         # Notify the city leader of the joining player
         user = pati.LayerUserInfo()
