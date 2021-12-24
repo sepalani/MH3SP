@@ -41,7 +41,8 @@ class Session(object):
             "gate_id": None,
             "gate_name": None,
             "city_id": None,
-            "city_name": None
+            "city_name": None,
+            "circle_id": None,
         }
         self.connection = None
         self.online_support_code = None
@@ -101,6 +102,10 @@ class Session(object):
     def get_city(self):
         assert self.local_info['city_id'] is not None
         return DB.get_city(self.local_info['server_id'], self.local_info['gate_id'], self.local_info['city_id'])
+
+    def get_circle(self):
+        assert self.local_info['circle_id'] is not None
+        return self.get_city().circles[self.local_info['circle_id']]
 
     def layer_start(self):
         self.layer = 0
@@ -173,3 +178,9 @@ class Session(object):
 
     def leave_city(self):
         DB.leave_city(self)
+
+    def join_circle(self, circle_id):
+        self.local_info['circle_id'] = circle_id
+
+    def leave_circle(self):
+        self.local_info['circle_id'] = None

@@ -627,21 +627,21 @@ class CircleInfo(PatData):
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
         (0x0c, "unk_long_0x0c"),
-        (0x0d, "unk_string_0x0d"),
+        (0x0d, "leader_capcom_id"),
         (0x0e, "unk_byte_0x0e"),
         (0x0f, "unk_byte_0x0f"),
         (0x0f, "unk_byte_0x10"),
     )
 
 
-class MatchOptionSet(PatData):
+class CircleUserData(PatData):
     FIELDS = (
         (0x01, "unk_binary_0x01"),
         (0x02, "unk_word_0x02"),
-        (0x03, "unk_byte_0x03"),
+        (0x03, "is_standby"),
         (0x04, "unk_bytedec_0x04"),
-        (0x05, "unk_string_0x05"),
-        (0x06, "unk_string_0x06"),
+        (0x05, "capcom_id"),
+        (0x06, "hunter_name"),
     )
 
 

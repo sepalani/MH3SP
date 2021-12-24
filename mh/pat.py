@@ -2219,7 +2219,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: マッチングオプション設定要求
         TR: Match option settings request
         """
-        options = pati.MatchOptionSet.unpack(data)
+        options = pati.CircleUserData.unpack(data)
         self.server.debug("MatchOptionSet: {!r}".format(options))
         self.sendAnsCircleMatchOptionSet(options, seq)
 

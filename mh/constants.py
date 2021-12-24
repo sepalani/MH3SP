@@ -878,9 +878,9 @@ PAT_NAMES = {
     0x65411000: 'NtcCircleHost',
     0x65600100: 'ReqCircleUserList',
     0x65600200: 'AnsCircleUserList',
-    0x65701000: 'Ntc0x6570',
-    0x65711000: 'Ntc0x6571',
-    0x65721000: 'Ntc0x6572',
+    0x65701000: 'NtcCircleBinary',
+    0x65711000: 'NtcCircleBinary2',
+    0x65721000: 'NtcCircleChat',
     0x65730100: 'ReqCircleTell',
     0x65730200: 'AnsCircleTell',
     0x65731000: 'NtcCircleTell',
@@ -1191,9 +1191,9 @@ class PatID4:
     NtcCircleHost = 0x65411000
     ReqCircleUserList = 0x65600100
     AnsCircleUserList = 0x65600200
-    Ntc0x6570 = 0x65701000
-    Ntc0x6571 = 0x65711000
-    Ntc0x6572 = 0x65721000
+    NtcCircleBinary = 0x65701000
+    NtcCircleBinary2 = 0x65711000
+    NtcCircleChat = 0x65721000
     ReqCircleTell = 0x65730100
     AnsCircleTell = 0x65730200
     NtcCircleTell = 0x65731000

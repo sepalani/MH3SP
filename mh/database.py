@@ -48,6 +48,30 @@ class LayerState(object):
     FULL = 2
 
 
+class Circle(object):
+    def __init__(self, parent):
+        self.parent = parent
+        self.leader = None
+        self.players = set()
+        self.questId = 0
+        self.embarked = False
+        self.capacity = 4
+        self.password = None
+        self.remarks = None
+
+    def get_population(self):
+        return len(self.players)
+
+    def get_capacity(self):
+        return self.capacity
+
+    def is_empty(self):
+        return self.leader is None
+
+    def has_password(self):
+        return self.password is not None
+
+
 class City(object):
     def __init__(self, name, parent):
         self.name = name
@@ -56,6 +80,10 @@ class City(object):
         self.state = LayerState.EMPTY
         self.players = set()
         self.leader = None
+        self.circles = [
+            Circle(self)
+            for _ in range(0, self.capacity)  # One circle per player
+        ]
 
     def get_population(self):
         return len(self.players)
@@ -71,6 +99,24 @@ class City(object):
             return LayerState.JOINABLE
         else:
             return LayerState.FULL
+
+    def get_first_empty_circle(self):
+        index = 0
+        for circle in self.circles:
+            if circle.is_empty():
+                return circle, index
+            index += 1
+
+        return None, None
+
+    def get_circle_for(self, leader_session):
+        index = 0
+        for circle in self.circles:
+            if circle.leader == leader_session:
+                return circle, index
+            index += 1
+
+        return None, None
 
 
 class Gate(object):
