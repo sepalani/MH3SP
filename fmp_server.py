@@ -271,7 +271,7 @@ class FmpRequestHandler(PatRequestHandler):
             extra_info.append((2, circle.questId))
             # TODO: Other extra values
 
-            circles.append([circle, extra_info])
+            circles.append([info, extra_info])
 
         count = len(circles)
         data = struct.pack(">II", unk, count)
