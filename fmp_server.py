@@ -300,7 +300,7 @@ class FmpRequestHandler(PatRequestHandler):
         assert circle is not None  # TODO: Transmit error when no slot available
 
         circle.leader = self.session
-        circle.players.add(self.session)
+        circle.players.append(self.session)
 
         self.session.join_circle(circle_index)
 
@@ -464,7 +464,7 @@ class FmpRequestHandler(PatRequestHandler):
             self.sendAnsCircleJoin(0, 0, seq)
             return
 
-        circle.players.add(self.session)
+        circle.players.append(self.session)
         self.session.join_circle(circle_index - 1)
 
         # TODO: Figure out what exactly is this value suppose to do

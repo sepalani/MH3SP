@@ -52,7 +52,7 @@ class Circle(object):
     def __init__(self, parent):
         self.parent = parent
         self.leader = None
-        self.players = set()
+        self.players = []
         self.questId = 0
         self.embarked = False
         self.capacity = 4
