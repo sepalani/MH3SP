@@ -115,6 +115,24 @@ class FmpRequestHandler(PatRequestHandler):
 
         leader_handler.send_packet(PatID4.NtcLayerIn, data, seq)
 
+    def recvNtcLayerUserPosition(self, packet_id, data, seq):
+        self.sendNtcLayerUserPosition(data, seq)
+
+    def sendNtcLayerUserPosition(self, fo, seq):
+
+        assert self.session.layer == 2  # Make sure to be in a city
+        city = self.session.get_city()
+
+        data = pati.lp2_string(self.session.capcom_id)
+        data += fo
+
+        for player_in_city in city.players:
+            if player_in_city == self.session:
+                continue
+
+            player_pat_handler = self.server.get_pat_handler(player_in_city)
+            player_pat_handler.send_packet(PatID4.NtcLayerUserPosition, data, seq)
+
     def recvNtcLayerBinary(self, packet_id, data, seq):
         sender_blank = pati.LayerUserInfo.unpack(data)
         unk_data = data[len(sender_blank.pack()):]

@@ -559,7 +559,7 @@ class LayerData(PatData):
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
-        (0x11, "unk_long_0x11"),
+        (0x11, "unk_long_0x11"),  # player position synchronization timer
         (0x12, "unk_byte_0x12"),
         (0x15, "unk_bytedec_0x15"),
         (0x16, "unk_string_0x16"),
@@ -720,6 +720,7 @@ def get_layer_children(session, first_index, count, sibling=False):
         layer.size = Long(child.get_population())
         layer.capacity = Long(child.get_capacity())
         layer.state = Byte(child.get_state())
+        layer.unk_long_0x11 = Long(120)
         # layer.unk_binary_0x17 = Binary("test")
         # layer.fallthrough_bug = FallthroughBug()
         layer.unk_byte_0x12 = Byte(1)
@@ -756,7 +757,7 @@ def getDummyLayerData():
     # layer.unk_long_0x0c = Long(1)
     # layer.unk_word_0x0d = Word(1)
     layer.state = Byte(1)
-    # layer.unk_long_0x11 = Long(1)
+    layer.unk_long_0x11 = Long(120)
     # layer.unk_long_0x11 = Long(1)
 
     # Might be needed to be >=1 to keep NetworkConnectionStable alive
