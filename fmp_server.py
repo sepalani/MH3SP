@@ -369,11 +369,12 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Match option settings response
         """
 
+        circle = self.session.get_circle()
         options.capcom_id = pati.String(self.session.capcom_id)
         options.hunter_name = pati.String(self.session.hunter_name)
+        options.player_index = pati.Byte(circle.players.index(self.session) + 1)
         ntc_data = options.pack()
 
-        circle = self.session.get_circle()
         for circle_player in circle.players:
             if circle_player == self.session:
                 continue
@@ -522,15 +523,13 @@ class FmpRequestHandler(PatRequestHandler):
         circle = self.session.get_circle()
 
         data = struct.pack(">I", circle.get_population())
-        i = 0
-        for circle_player in circle.players:
+        for i, circle_player in enumerate(circle.players):
             circle_user_data = pati.CircleUserData()
             circle_user_data.is_standby = pati.Byte(0)
-            circle_user_data.unk_bytedec_0x04 = pati.Byte(i + 1)  # TODO: RE properly
+            circle_user_data.player_index = pati.Byte(i + 1)
             circle_user_data.capcom_id = pati.String(circle_player.capcom_id)
             circle_user_data.hunter_name = pati.String(circle_player.hunter_name)
             data += circle_user_data.pack()
-            i += 1
 
         self.send_packet(PatID4.AnsCircleUserList, data, seq)
 

@@ -639,7 +639,7 @@ class CircleUserData(PatData):
         (0x01, "unk_binary_0x01"),
         (0x02, "unk_word_0x02"),
         (0x03, "is_standby"),
-        (0x04, "unk_bytedec_0x04"),
+        (0x04, "player_index"),
         (0x05, "capcom_id"),
         (0x06, "hunter_name"),
     )
