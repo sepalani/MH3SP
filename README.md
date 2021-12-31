@@ -88,6 +88,8 @@ Without them, the project would never have been possible:
  - [Dolphin Emulator Team](https://dolphin-emu.org/)
  - [InusualZ](https://github.com/InusualZ)
    * For helping me to reverse the game
+ - [barronwaffles](https://github.com/barronwaffles)
+   * For helping with GameSpy related service 
  - Some people from the video game preservation scene
    * They will recognise themselves ;v)
  - The ones who helped me to improve my reverse and programming skills
