@@ -39,6 +39,77 @@ class FmpRequestHandler(PatRequestHandler):
         self.server.debug("Connection: {!r}".format(connection_data))
         self.sendNtcLogin(3, connection_data, seq)
 
+    def sendAnsLayerDown(self, layer_id, layer_set, seq):
+        """AnsLayerDown packet.
+
+       ID: 64140200
+       JP: レイヤダウン返答
+       TR: Layer down response
+       """
+
+        self.session.layer_down(layer_id)
+        if self.session.layer == 1:  # Gate
+            user = pati.LayerUserInfo()
+            user.capcom_id = pati.String(self.session.capcom_id)
+            user.hunter_name = pati.String(self.session.hunter_name)
+
+            data = pati.lp2_string(self.session.capcom_id)
+            data += user.pack()
+
+            gate = self.session.get_gate()
+            for player in gate.players:
+                if self.session == player:
+                    continue
+
+                pat_handler = self.server.get_pat_handler(player)
+                # pat_handler.send_packet(PatID4.NtcLayerIn, data, seq)
+
+        data = struct.pack(">H", layer_id)
+        self.send_packet(PatID4.AnsLayerDown, data, seq)
+
+    def recvReqUserBinarySet(self, packet_id, data, seq):
+        offset, = struct.unpack_from(">I", data)
+        binary = pati.unpack_lp2_string(data, 4)
+
+        # unk1 ??
+        self.session.binaries = binary
+        self.sendAnsUserBinarySet(offset, binary, seq)
+
+    def recvReqUserBinaryNotice(self, packet_id, data, seq):
+        unk1, = struct.unpack_from(">B", data)
+        capcom_id = pati.unpack_lp2_string(data, 1)
+        offset, length = struct.unpack_from(">II", data, 3 + len(capcom_id))
+
+        self.sendAnsUserBinaryNotice(unk1, capcom_id, offset, length, seq)
+
+    def sendAnsUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
+        if self.session.binaries is not None:
+            if self.session.layer == 0:
+                server = self.session.get_server()
+                players = server.players
+            elif self.session.layer == 1:
+                gate = self.session.get_gate()
+                players = gate.players
+            elif self.session.layer == 2:
+                city = self.session.get_city()
+                players = city.players
+            else:
+                assert False, "Can't find layer"
+
+            data = struct.pack(">B", unk1)
+            data += pati.lp2_string(self.session.capcom_id)
+            data += struct.pack(">I", length)
+            data += pati.lp2_string(self.session.binaries)
+
+            for player in players:
+                if player == self.session:
+                    continue
+
+                pat_handler = self.server.get_pat_handler(player)
+                # pat_handler.send_packet(PatID4.NtcUserBinaryNotice, data, seq)
+
+        self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
+
     def sendAnsLayerUserList(self, unk, seq):
         """AnsLayerUserList packet.
         ID: 64630200
@@ -65,6 +136,7 @@ class FmpRequestHandler(PatRequestHandler):
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(player.capcom_id)
             user.hunter_name = pati.String(player.hunter_name)
+            # user.stats = pati.getHunterStats()
             # TODO: Other fields?
             data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
@@ -150,8 +222,19 @@ class FmpRequestHandler(PatRequestHandler):
         data += sender.pack()
         data += unk_data
 
-        city = self.session.get_city()
-        for player_session in city.players:
+        if self.session.layer == 0:
+            server = self.session.get_server()
+            players = server.players
+        elif self.session.layer == 1:
+            gate = self.session.get_gate()
+            players = gate.players
+        elif self.session.layer == 2:
+            city = self.session.get_city()
+            players = city.players
+        else:
+            assert False, "Can't find layer"
+
+        for player_session in players:
             if player_session == self.session:
                 continue
 

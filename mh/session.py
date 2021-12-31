@@ -53,6 +53,7 @@ class Session(object):
         self.layer = 0
         self.binary_setting = b""
         self.search_payload = None
+        self.binaries = None
 
     def get(self, connection_data):
         """Return the session associated with the connection data, if any."""
