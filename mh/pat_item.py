@@ -556,7 +556,7 @@ class LayerData(PatData):
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
-        (0x11, "unk_long_0x11"),
+        (0x11, "positionSynchronizationInterval"),  # player position synchronization timer
         (0x12, "unk_byte_0x12"),
         (0x15, "unk_bytedec_0x15"),
         (0x16, "unk_string_0x16"),
@@ -624,21 +624,21 @@ class CircleInfo(PatData):
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
         (0x0c, "unk_long_0x0c"),
-        (0x0d, "unk_string_0x0d"),
+        (0x0d, "leader_capcom_id"),
         (0x0e, "unk_byte_0x0e"),
         (0x0f, "unk_byte_0x0f"),
         (0x0f, "unk_byte_0x10"),
     )
 
 
-class MatchOptionSet(PatData):
+class CircleUserData(PatData):
     FIELDS = (
         (0x01, "unk_binary_0x01"),
         (0x02, "unk_word_0x02"),
-        (0x03, "unk_byte_0x03"),
-        (0x04, "unk_bytedec_0x04"),
-        (0x05, "unk_string_0x05"),
-        (0x06, "unk_string_0x06"),
+        (0x03, "is_standby"),
+        (0x04, "player_index"),
+        (0x05, "capcom_id"),
+        (0x06, "hunter_name"),
     )
 
 
@@ -717,6 +717,7 @@ def get_layer_children(session, first_index, count, sibling=False):
         layer.size = Long(child.get_population())
         layer.capacity = Long(child.get_capacity())
         layer.state = Byte(child.get_state())
+        layer.positionSynchronizationInterval = Long(120)
         # layer.unk_binary_0x17 = Binary("test")
         # layer.fallthrough_bug = FallthroughBug()
         layer.unk_byte_0x12 = Byte(1)
@@ -753,7 +754,7 @@ def getDummyLayerData():
     # layer.unk_long_0x0c = Long(1)
     # layer.unk_word_0x0d = Word(1)
     layer.state = Byte(1)
-    # layer.unk_long_0x11 = Long(1)
+    layer.positionSynchronizationInterval = Long(120)
     # layer.unk_long_0x11 = Long(1)
 
     # Might be needed to be >=1 to keep NetworkConnectionStable alive
