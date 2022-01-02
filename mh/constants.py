@@ -232,6 +232,7 @@ def make_binary_trading_post():
 
     return data
 
+LAYER_CHAT_COLORS = (0xbb3385ff, 0xffffffff, 0xffffffff)
 
 QUEST_FLAG_UNK = 0b1000  # It really is unknown, it put a question mark icon on the monster/item box icon
 QUEST_FLAG_ARENA = 0b10000

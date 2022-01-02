@@ -4,3 +4,4 @@
 *.dol
 logs
 .idea
+RUN.bat
