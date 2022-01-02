@@ -770,7 +770,7 @@ def getDummyLayerData():
 
 def getHunterStats(hr=921, profile=b"Navaldeus",
                    title=117, status=1, hr_limit=2, goal=35, seeking=23,
-                   server_type=3, weapon_id=11):
+                   server_type=3, weapon_type=10, weapon_id=11):
     """
     Offsets:
      - 0x00: Hunter Rank
@@ -798,7 +798,7 @@ def getHunterStats(hr=921, profile=b"Navaldeus",
     data[:2] = struct.pack(">H", hr)
 
     # Weapon / Gun slots (Lance: Nega-Babylon)
-    data[0x10:0x1c] = slot(10, weapon_id)
+    data[0x10:0x1c] = slot(weapon_type, weapon_id)
     data[0x1c:0x28] = b"\xff" * 0xc
     data[0x28:0x34] = b"\xff" * 0xc
 
@@ -818,4 +818,4 @@ def getHunterStats(hr=921, profile=b"Navaldeus",
     data[0xf7] = seeking
     data[0xf8] = server_type
 
-    return Binary(data)
+    return data

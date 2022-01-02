@@ -1072,7 +1072,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user = pati.UserSearchInfo()
         user.capcom_id = pati.String(OTHER_CAPCOM_ID)
         user.name = pati.String(OTHER_HUNTER_NAME)
-        user.unk_binary_0x03 = pati.getHunterStats(seeking=21)
+        user.unk_binary_0x03 = pati.Binary(pati.getHunterStats(seeking=21))
         # Warp location ?
         user.unk_binary_0x04 = pati.Binary(
             # Long: ? + server_type? / Word: server? + gate? + city?
