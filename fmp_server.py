@@ -85,23 +85,12 @@ class FmpRequestHandler(PatRequestHandler):
 
     def sendAnsUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
         if self.session.binaries is not None:
-            if self.session.layer == 0:
-                server = self.session.get_server()
-                players = server.players
-            elif self.session.layer == 1:
-                gate = self.session.get_gate()
-                players = gate.players
-            elif self.session.layer == 2:
-                city = self.session.get_city()
-                players = city.players
-            else:
-                assert False, "Can't find layer"
-
             data = struct.pack(">B", unk1)
             data += pati.lp2_string(self.session.capcom_id)
             data += struct.pack(">I", length)
             data += pati.getHunterStats(weapon_id=10)[1:]
 
+            players = self.session.get_layer_players()
             for player in players:
                 if player == self.session:
                     continue
@@ -118,20 +107,8 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Layer sync user list response
         """
 
-        if self.session.layer == 0:
-            server = self.session.get_server()
-            players = server.players
-        elif self.session.layer == 1:
-            gate = self.session.get_gate()
-            players = gate.players
-        elif self.session.layer == 2:
-            city = self.session.get_city()
-            players = city.players
-        else:
-            assert False, "Can't find layer"
-
-        count = len(players)
-        data = struct.pack(">I", count)
+        players = self.session.get_layer_players()
+        data = struct.pack(">I", len(players))
 
         for player in players:
             user = pati.LayerUserInfo()
@@ -224,18 +201,7 @@ class FmpRequestHandler(PatRequestHandler):
         data += sender.pack()
         data += unk_data
 
-        if self.session.layer == 0:
-            server = self.session.get_server()
-            players = server.players
-        elif self.session.layer == 1:
-            gate = self.session.get_gate()
-            players = gate.players
-        elif self.session.layer == 2:
-            city = self.session.get_city()
-            players = city.players
-        else:
-            assert False, "Can't find layer"
-
+        players = self.session.get_layer_players()
         for player_session in players:
             if player_session == self.session:
                 continue

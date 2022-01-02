@@ -185,3 +185,17 @@ class Session(object):
 
     def leave_circle(self):
         self.local_info['circle_id'] = None
+
+    def get_layer_players(self):
+        if self.layer == 0:
+            server = self.get_server()
+            return server.players
+        elif self.layer == 1:
+            gate = self.get_gate()
+            return gate.players
+        elif self.layer == 2:
+            city = self.get_city()
+            return city.players
+        else:
+            assert False, "Can't find layer"
+

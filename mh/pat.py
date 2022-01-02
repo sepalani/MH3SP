@@ -1484,20 +1484,13 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data += info.pack()
         data += pati.lp2_string(message)
 
-        if self.session.layer == 1:  # Gate
-            gate = self.session.get_gate()
-            for player in gate.players:
-                if self.session == player:
-                    continue
-                pat_handler = self.server.get_pat_handler(player)
-                pat_handler.send_packet(PatID4.NtcLayerChat, data, seq)
-        elif self.session.layer == 2:  # City
-            city = self.session.get_city()
-            for player in city.players:
-                if self.session == player:
-                    continue
-                pat_handler = self.server.get_pat_handler(player)
-                pat_handler.send_packet(PatID4.NtcLayerChat, data, seq)
+        players = self.session.get_layer_players()
+        for player in players:
+            if self.session == player:
+                continue
+
+            pat_handler = self.server.get_pat_handler(player)
+            pat_handler.send_packet(PatID4.NtcLayerChat, data, seq)
 
     def recvReqTell(self, packet_id, data, seq):
         """ReqTell packet.
