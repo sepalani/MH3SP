@@ -1064,7 +1064,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user = pati.UserSearchInfo()
         user.capcom_id = pati.String(OTHER_CAPCOM_ID)
         user.name = pati.String(OTHER_HUNTER_NAME)
-        user.unk_binary_0x03 = pati.getHunterStats(seeking=21)
+        user.unk_binary_0x03 = pati.Binary(pati.getHunterStats(seeking=21))
         # Warp location ?
         user.unk_binary_0x04 = pati.Binary(
             # Long: ? + server_type? / Word: server? + gate? + city?
@@ -1141,39 +1141,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Handle cheat check data.
         """
         pass
-
-    def recvReqUserBinarySet(self, packet_id, data, seq):
-        """ReqUserBinarySet packet.
-
-        ID: 66310100
-        JP: ユーザ表示用バイナリ設定要求
-        TR: User display binary settings request
-
-        The game sends the updated user display binary settings to the server.
-
-        Examples:
-         - Online > Settings > Profile
-         - Online > Settings > Status Indicator
-        """
-        unk1, = struct.unpack_from(">I", data)
-        profile_info = pati.unpack_lp2_string(data, 4)
-        self.session.binary_setting = profile_info
-        self.sendAnsUserBinarySet(unk1, profile_info, seq)
-
-    def sendAnsUserBinarySet(self, unk1, profile_info, seq):
-        """AnsUserBinarySet packet.
-
-        ID: 66310200
-        JP: ユーザ表示用バイナリ設定返答
-        TR: User display binary settings response
-
-        TODO: Properly handle binary settings.
-        """
-        profile_title_id = profile_info[
-            -2]  # Example: - Fabled Harpooner -
-        profile_status = profile_info[-1]  # Example: Ready for Quests!
-        profile_message = profile_info[:-2]
-        self.send_packet(PatID4.AnsUserBinarySet, b"", seq)
 
     def recvReqUserSearchSet(self, packet_id, data, seq):
         """ReqUserSearchSet packet.
