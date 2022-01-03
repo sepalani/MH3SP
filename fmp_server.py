@@ -64,21 +64,60 @@ class FmpRequestHandler(PatRequestHandler):
         self.send_packet(PatID4.AnsLayerDown, data, seq)
 
     def recvReqUserBinarySet(self, packet_id, data, seq):
-        offset,length = struct.unpack_from(">IH", data)
+        """ReqUserBinarySet packet.
+
+        ID: 66310100
+        JP: ユーザ表示用バイナリ設定要求
+        TR: Binary setting request for user display
+
+        The game sends the updated user display binary settings to the server.
+
+        Examples:
+         - Online > Settings > Profile
+         - Online > Settings > Status Indicator
+        """
+
+        offset, length = struct.unpack_from(">IH", data)
         binary = pati.unpack_lp2_string(data, 4)
         self.session.hunter_info.unpack(data[6:], length, offset)
 
-        # unk1 ??
         self.sendAnsUserBinarySet(offset, binary, seq)
 
+    def sendAnsUserBinarySet(self, unk1, profile_info, seq):
+        """AnsUserBinarySet packet.
+
+        ID: 66310200
+        JP: ユーザ表示用バイナリ設定返答
+        TR: Binary setting reply for user display
+
+        TODO: Properly handle binary settings.
+        """
+
+        self.send_packet(PatID4.AnsUserBinarySet, b"", seq)
+
     def recvReqUserBinaryNotice(self, packet_id, data, seq):
+        """AnsUserBinarySet packet.
+
+        ID: 66320100
+        JP: ユーザ表示用バイナリ通知要求
+        TR: Binary notification request for user display
+
+        """
+
         unk1, = struct.unpack_from(">B", data)
         capcom_id = pati.unpack_lp2_string(data, 1)
-        offset, length = struct.unpack_from(">II", data, 3 + len(capcom_id))
+        offset, length = struct.unpack_from(">II", data, 3+len(capcom_id))
 
         self.sendAnsUserBinaryNotice(unk1, capcom_id, offset, length, seq)
 
     def sendAnsUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
+        """AnsUserBinaryNotice packet.
+
+       ID: 66320200
+       JP: ユーザ表示用バイナリ通知返答
+       TR: Binary notification reply for user display
+       """
+
         data = struct.pack(">B", unk1)
         data += pati.lp2_string(self.session.capcom_id)
         data += struct.pack(">I", 0)
@@ -117,6 +156,7 @@ class FmpRequestHandler(PatRequestHandler):
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(player.capcom_id)
             user.hunter_name = pati.String(player.hunter_name)
+            user.stats = pati.Binary(player.hunter_info.pack())
             # TODO: Other fields?
             data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
@@ -163,6 +203,7 @@ class FmpRequestHandler(PatRequestHandler):
         user = pati.LayerUserInfo()
         user.capcom_id = pati.String(self.session.capcom_id)
         user.hunter_name = pati.String(self.session.hunter_name)
+        user.stats = pati.Binary(self.session.hunter_info.pack())
 
         data = pati.lp2_string(self.session.capcom_id)
         data += user.pack()
@@ -271,8 +312,7 @@ class FmpRequestHandler(PatRequestHandler):
         data += self_data.pack()
         data += unk_data
 
-        partner_pat_handler = self.server.get_pat_handler(
-            partner_session)
+        partner_pat_handler = self.server.get_pat_handler(partner_session)
         if partner_pat_handler is None:
             return
 
@@ -337,9 +377,9 @@ class FmpRequestHandler(PatRequestHandler):
 
         search_info = pati.UserSearchInfo()
 
-        # This fields are used to identify a user. Specifically when a client is deserializing data from the packets
-        # `NtcLayerBinary` and `NtcLayerBinary2`
-        # TODO: Proper field value and name
+        # This fields are used to identify a user. Specifically when a
+        # client is deserializing data from the packets `NtcLayerBinary` and
+        # `NtcLayerBinary2` TODO: Proper field value and name
         search_info.info_mine_0x0f = pati.Long(info_mine_0x0f)
         search_info.info_mine_0x10 = pati.Long(info_mine_0x10)
         data = search_info.pack()
