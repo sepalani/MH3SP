@@ -52,7 +52,7 @@ class FmpRequestHandler(PatRequestHandler):
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(self.session.capcom_id)
             user.hunter_name = pati.String(self.session.hunter_name)
-            user.stats = pati.Binary(pati.getHunterStats())
+            user.stats = pati.Binary(self.session.hunter_info.pack())
 
             data = pati.lp2_string(self.session.capcom_id)
             data += user.pack()
@@ -69,11 +69,11 @@ class FmpRequestHandler(PatRequestHandler):
         self.send_packet(PatID4.AnsLayerDown, data, seq)
 
     def recvReqUserBinarySet(self, packet_id, data, seq):
-        offset, = struct.unpack_from(">I", data)
+        offset,length = struct.unpack_from(">IH", data)
         binary = pati.unpack_lp2_string(data, 4)
+        self.session.hunter_info.unpack(data[6:], length, offset)
 
         # unk1 ??
-        self.session.binaries = binary
         self.sendAnsUserBinarySet(offset, binary, seq)
 
     def recvReqUserBinaryNotice(self, packet_id, data, seq):
@@ -87,7 +87,8 @@ class FmpRequestHandler(PatRequestHandler):
         data = struct.pack(">B", unk1)
         data += pati.lp2_string(self.session.capcom_id)
         data += struct.pack(">I", 0)
-        data += pati.lp2_string(pati.getHunterStats(weapon_type=8, weapon_id=2))
+
+        data += pati.lp2_string(self.session.hunter_info.pack())
 
         players = self.session.get_layer_players()
         for player in players:
@@ -113,7 +114,7 @@ class FmpRequestHandler(PatRequestHandler):
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(player.capcom_id)
             user.hunter_name = pati.String(player.hunter_name)
-            user.stats = pati.Binary(pati.getHunterStats())
+            user.stats = pati.Binary(player.hunter_info.pack())
             # TODO: Other fields?
             data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
@@ -158,7 +159,7 @@ class FmpRequestHandler(PatRequestHandler):
         user = pati.LayerUserInfo()
         user.capcom_id = pati.String(self.session.capcom_id)
         user.hunter_name = pati.String(self.session.hunter_name)
-        user.stats = pati.Binary(pati.getHunterStats())
+        user.stats = pati.Binary(self.session.hunter_info.pack())
 
         data = pati.lp2_string(self.session.capcom_id)
         data += user.pack()

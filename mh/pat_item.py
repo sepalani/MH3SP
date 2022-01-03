@@ -672,6 +672,19 @@ class LayerBinaryInfo(PatData):
     )
 
 
+class HunterSettings(object):
+    SIZE = 0x100
+    
+    def __init__(self):
+        self.data = bytearray(self.SIZE)
+    
+    def unpack(self, data, length, offset=0):
+        self.data[offset:offset+length] = data
+        return self
+
+    def pack(self):
+        return self.data
+
 def get_fmp_servers(session, first_index, count):
     assert first_index > 0, "Invalid list index"
 
