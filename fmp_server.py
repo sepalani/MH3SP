@@ -117,6 +117,7 @@ class FmpRequestHandler(PatRequestHandler):
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(player.capcom_id)
             user.hunter_name = pati.String(player.hunter_name)
+            user.stats = pati.Binary(player.hunter_info.pack())
             # TODO: Other fields?
             data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
@@ -163,6 +164,7 @@ class FmpRequestHandler(PatRequestHandler):
         user = pati.LayerUserInfo()
         user.capcom_id = pati.String(self.session.capcom_id)
         user.hunter_name = pati.String(self.session.hunter_name)
+        user.stats = pati.Binary(self.session.hunter_info.pack())
 
         data = pati.lp2_string(self.session.capcom_id)
         data += user.pack()
@@ -271,8 +273,7 @@ class FmpRequestHandler(PatRequestHandler):
         data += self_data.pack()
         data += unk_data
 
-        partner_pat_handler = self.server.get_pat_handler(
-            partner_session)
+        partner_pat_handler = self.server.get_pat_handler(partner_session)
         if partner_pat_handler is None:
             return
 
@@ -337,9 +338,9 @@ class FmpRequestHandler(PatRequestHandler):
 
         search_info = pati.UserSearchInfo()
 
-        # This fields are used to identify a user. Specifically when a client is deserializing data from the packets
-        # `NtcLayerBinary` and `NtcLayerBinary2`
-        # TODO: Proper field value and name
+        # This fields are used to identify a user. Specifically when a
+        # client is deserializing data from the packets `NtcLayerBinary` and
+        # `NtcLayerBinary2` TODO: Proper field value and name
         search_info.info_mine_0x0f = pati.Long(info_mine_0x0f)
         search_info.info_mine_0x10 = pati.Long(info_mine_0x10)
         data = search_info.pack()
