@@ -37,7 +37,7 @@ class FmpRequestHandler(PatRequestHandler):
         """AnsConnection packet."""
         connection_data = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(connection_data))
-        self.sendNtcLogin(3, seq)
+        self.sendNtcLogin(3, connection_data, seq)
 
 
 BASE = server_base("FMP", FmpServer, FmpRequestHandler)

@@ -22,7 +22,7 @@
 import struct
 
 from collections import OrderedDict
-from other.utils import to_bytearray
+from other.utils import to_bytearray, get_config, get_ip
 
 
 class ItemType:
@@ -77,6 +77,58 @@ def unpack_byte(data, offset=0):
             item_type
         ))
     return value
+
+
+def pack_optional_fields(info):
+    """Pack optional fields (list of field_id and int value).
+
+    Optional fields are retrieved after the following function calls:
+     - getLayerData
+     - getLayerUserInfo
+     - getCircleInfo
+     - getUserSearchInfo
+
+    It follows a simple format:
+     - field_id, a byte used as an identifier
+     - has_value, a byte telling if it has a value
+     - value: an integer with the field's value (only set if has_value is true)
+    """
+    data = struct.pack(">B", len(info))
+    for field_id, value in info:
+        has_value = value is not None
+        data += struct.pack(">BB", field_id, int(has_value))
+        if has_value:
+            data += struct.pack(">I", value)
+    return data
+
+
+def unpack_optional_fields(data, offset=0):
+    """Unpack optional fields (list of field_id and int value).
+
+    Optional fields are stored after the following function calls:
+     - putLayerSet
+     - putCircleInfo
+    and is also used in PatInterface::sendReqUserSearchSet.
+
+    It seems related to the city info. If correct:
+     - field_id 0x01: ???
+     - field_id 0x02: City's HR limit (if not applicable, 0xffffffff is set)
+     - field_id 0x03: City's goal (if not applicable, 0xffffffff is set)
+     - field_id 0x04: City's seeking
+    """
+    info = []
+    count, = struct.unpack_from(">B", data, offset)
+    offset += 1
+    for _ in range(count):
+        field_id, has_value = struct.unpack_from(">BB", data, offset)
+        offset += 2
+        if has_value:
+            value, = struct.unpack_from(">I", data, offset)
+            offset += 4
+        else:
+            value = None
+        info.append((field_id, value))
+    return info
 
 
 class Byte(Item):
@@ -242,6 +294,19 @@ class Custom(Item):
         return "Custom({!r})".format(repr(self[1:]))
 
 
+class FallthroughBug(Custom):
+    """Wordaround a fallthrough bug.
+
+    After reading LayerData's field_0x17 it falls through a getItemAny call.
+    It clobbers the next field by reading the field_id. Then, the game tries
+    to read the next field which was clobbered.
+
+    The workaround uses a dummy field_0xff which will be clobbered on purpose.
+    """
+    def __new__(cls):
+        return Custom.__new__(cls, b"\xff", b"\xff")
+
+
 def unpack_bytes(data, offset=0):
     """Unpack bytes list."""
     count, = struct.unpack_from(">B", data, offset)
@@ -325,6 +390,18 @@ class PatData(OrderedDict):
             for index, value in items
         )
 
+    def pack_fields(self, fields):
+        """Pack PAT items specified fields."""
+        items = [
+            (index, value)
+            for index, value in self.items()
+            if value is not None and index in fields
+        ]
+        return struct.pack(">B", len(items)) + b"".join(
+            (struct.pack(">B", index) + value)
+            for index, value in items
+        )
+
     @classmethod
     def unpack(cls, data, offset=0):
         obj = cls()
@@ -356,6 +433,12 @@ class PatData(OrderedDict):
             else:
                 raise ValueError("Unknown type: {}".format(item_type))
         return obj
+
+    def assert_fields(self, fields):
+        items = set(self.keys())
+        fields = set(fields)
+        message = "Fields mismatch: {}\n -> Expected: {}".format(items, fields)
+        assert items == fields, message
 
 
 class DummyData(PatData):
@@ -425,7 +508,7 @@ class FmpData(PatData):
         (0x01, "index"),
         (0x02, "server_address"),
         (0x03, "server_port"),
-        (0x07, "unk_longlong_0x07"),
+        (0x07, "server_type"),
         (0x08, "player_count"),
         (0x09, "player_capacity"),
         (0x0a, "server_name"),
@@ -456,7 +539,7 @@ class LayerData(PatData):
         (0x01, "unk_long_0x01"),
         (0x02, "unk_custom_0x02"),
         (0x03, "name"),
-        (0x05, "unk_worddec_0x05"),
+        (0x05, "index"),
         (0x06, "size"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
@@ -471,6 +554,7 @@ class LayerData(PatData):
         (0x15, "unk_bytedec_0x15"),
         (0x16, "unk_string_0x16"),
         (0x17, "unk_binary_0x17"),
+        (0xff, "fallthrough_bug")  # Fill this if field 0x17 is set !!!
     )
 
 
@@ -570,9 +654,69 @@ class LayerUserInfo(PatData):
     )
 
 
+def get_fmp_servers(session, first_index, count):
+    assert first_index > 0, "Invalid list index"
+
+    config = get_config("FMP")
+    fmp_addr = get_ip(config["IP"])
+    fmp_port = config["Port"]
+
+    data = b""
+    start = first_index - 1
+    end = start + count
+    servers = session.get_servers()[start:end]
+    for i, server in enumerate(servers, first_index):
+        fmp_data = FmpData()
+        fmp_data.index = Long(i)  # The server might be full, if zero
+        server.addr = server.addr or fmp_addr
+        server.port = server.port or fmp_port
+        fmp_data.server_address = String(server.addr)
+        fmp_data.server_port = Word(server.port)
+        # Might produce invalid reads if too high
+        # fmp_data.server_type = LongLong(i+0x10000000)
+        # fmp_data.server_type = LongLong(i + (1<<32)) # OK
+        fmp_data.server_type = LongLong(server.server_type)
+        fmp_data.player_count = Long(server.get_population())
+        fmp_data.player_capacity = Long(server.get_capacity())
+        fmp_data.server_name = String(server.name)
+        fmp_data.unk_string_0x0b = String("X")
+        fmp_data.unk_long_0x0c = Long(0x12345678)
+        data += fmp_data.pack()
+    return data
+
+
+def get_layer_children(session, first_index, count, sibling=False):
+    assert first_index > 0, "Invalid list index"
+
+    data = b""
+    start = first_index - 1
+    end = start + count
+    if not sibling:
+        children = session.get_layer_children()[start:end]
+    else:
+        children = session.get_layer_sibling()[start:end]
+    for i, child in enumerate(children, first_index):
+        layer = LayerData()
+        layer.index = Word(i)
+        layer.name = String(child.name)
+        layer.size = Long(child.get_population())
+        layer.capacity = Long(child.get_capacity())
+        layer.state = Byte(child.get_state())
+        # layer.unk_binary_0x17 = Binary("test")
+        # layer.fallthrough_bug = FallthroughBug()
+        data += layer.pack()
+        # A strange struct is also used, try to skip it
+        data += struct.pack(">B", 0)
+    return data
+
+
+def get_layer_sibling(session, first_index, count):
+    return get_layer_children(session, first_index, count, True)
+
+
 def getDummyLayerData():
     layer = LayerData()
-    layer.unk_long_0x01 = Long(1)  # Index
+    layer.index = Word(1)  # Index
     # layer.unk_custom_0x02 = Custom(b"")
     layer.name = String("LayerStart")
     # layer.unk_worddec_0x05 = Word(2)  # City no longer exists message
