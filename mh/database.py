@@ -52,6 +52,7 @@ class Players(list):
     """
     TODO: Probably use a better container or another approach.
     """
+
     def add(self, item):
         if item not in self:
             self.append(item)
@@ -90,7 +91,7 @@ class City(object):
         self.players = Players()
         self.leader = None
         self.circles = [
-            Circle(self) for _ in range(self.capacity)  # One circle per player
+            Circle(self) for _ in range(self.capacity) # One circle per player
         ]
 
     def get_population(self):
@@ -124,7 +125,8 @@ class City(object):
 
 
 class Gate(object):
-    def __init__(self, name, parent, city_count=40, player_capacity=100):
+    def __init__(self, name, parent, city_count=40,
+                 player_capacity=100):
         self.name = name
         self.parent = parent
         self.state = LayerState.EMPTY
@@ -136,7 +138,7 @@ class Gate(object):
         self.players = Players()
 
     def get_population(self):
-        return len(self.players) + sum((
+        return len(self.players)+sum((
             city.get_population()
             for city in self.cities
         ))
@@ -169,7 +171,7 @@ class Server(object):
         self.players = Players()
 
     def get_population(self):
-        return len(self.players) + sum((
+        return len(self.players)+sum((
             gate.get_population() for gate in self.gates
         ))
 
@@ -320,7 +322,7 @@ class TempDatabase(object):
 
     def get_server(self, index):
         assert 0 < index <= len(self.servers), "Invalid server index"
-        return self.servers[index - 1]
+        return self.servers[index-1]
 
     def get_gates(self, server_id):
         return self.get_server(server_id).gates
@@ -328,7 +330,7 @@ class TempDatabase(object):
     def get_gate(self, server_id, index):
         gates = self.get_gates(server_id)
         assert 0 < index <= len(gates), "Invalid gate index"
-        return gates[index - 1]
+        return gates[index-1]
 
     def join_gate(self, session, server_id, index):
         gate = self.get_gate(server_id, index)
@@ -352,7 +354,7 @@ class TempDatabase(object):
     def get_city(self, server_id, gate_id, index):
         cities = self.get_cities(server_id, gate_id)
         assert 0 < index <= len(cities), "Invalid city index"
-        return cities[index - 1]
+        return cities[index-1]
 
     def join_city(self, session, server_id, gate_id, index):
         city = self.get_city(server_id, gate_id, index)

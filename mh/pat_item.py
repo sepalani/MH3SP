@@ -39,25 +39,25 @@ class ItemType:
 def lp_string(s):
     """1-byte length-prefixed string."""
     s = to_bytearray(s)
-    return struct.pack(">B", len(s)) + s
+    return struct.pack(">B", len(s))+s
 
 
 def unpack_lp_string(data, offset=0):
     """Unpack lp_string."""
     size, = struct.unpack_from(">B", data, offset)
-    return data[offset + 1:offset + 1 + size]
+    return data[offset+1:offset+1+size]
 
 
 def lp2_string(s):
     """2-bytes length-prefixed string."""
     s = to_bytearray(s)
-    return struct.pack(">H", len(s)) + s
+    return struct.pack(">H", len(s))+s
 
 
 def unpack_lp2_string(data, offset=0):
     """Unpack lp2_string."""
     size, = struct.unpack_from(">H", data, offset)
-    return data[offset + 2:offset + 2 + size]
+    return data[offset+2:offset+2+size]
 
 
 class Item(bytes):
@@ -210,9 +210,10 @@ def unpack_longlong(data, offset=0):
     """Unpack PAT item long long."""
     item_type, value = struct.unpack_from(">BQ", data, offset)
     if item_type != ItemType.LongLong:
-        raise AssertionError("Invalid type for long long item: {}".format(
-            item_type
-        ))
+        raise AssertionError(
+            "Invalid type for long long item: {}".format(
+                item_type
+            ))
     return value
 
 
@@ -228,7 +229,7 @@ class LongLong(Item):
 
 def pack_string(s):
     """Pack PAT item string."""
-    return struct.pack(">B", ItemType.String) + lp2_string(s)
+    return struct.pack(">B", ItemType.String)+lp2_string(s)
 
 
 def unpack_string(data, offset=0):
@@ -238,7 +239,7 @@ def unpack_string(data, offset=0):
         raise AssertionError("Invalid type for string item: {}".format(
             item_type
         ))
-    return data[offset + 3:offset + 3 + length]
+    return data[offset+3:offset+3+length]
 
 
 class String(Item):
@@ -254,7 +255,7 @@ class String(Item):
 def pack_binary(s):
     """Pack PAT item binary."""
     s = to_bytearray(s)
-    return struct.pack(">BH", ItemType.Binary, len(s)) + s
+    return struct.pack(">BH", ItemType.Binary, len(s))+s
 
 
 def unpack_binary(data, offset=0):
@@ -264,7 +265,7 @@ def unpack_binary(data, offset=0):
         raise AssertionError("Invalid type for binary item: {}".format(
             item_type
         ))
-    return data[offset + 3:offset + 3 + length]
+    return data[offset+3:offset+3+length]
 
 
 class Binary(Item):
@@ -295,7 +296,7 @@ class Custom(Item):
     """PAT custom item class."""
 
     def __new__(cls, b, item_type=b'\0'):
-        return Item.__new__(cls, item_type + b)
+        return Item.__new__(cls, item_type+b)
 
     def __repr__(self):
         return "Custom({!r})".format(repr(self[1:]))
@@ -310,6 +311,7 @@ class FallthroughBug(Custom):
 
     The workaround uses a dummy field_0xff which will be clobbered on purpose.
     """
+
     def __new__(cls):
         return Custom.__new__(cls, b"\xff", b"\xff")
 
@@ -317,7 +319,7 @@ class FallthroughBug(Custom):
 def unpack_bytes(data, offset=0):
     """Unpack bytes list."""
     count, = struct.unpack_from(">B", data, offset)
-    return struct.unpack_from(">" + count * "B", data, offset + 1)
+    return struct.unpack_from(">"+count * "B", data, offset+1)
 
 
 class PatData(OrderedDict):
@@ -358,12 +360,14 @@ class PatData(OrderedDict):
         for field_id, field_name in self.FIELDS:
             if name == field_name:
                 if not isinstance(value, Item):
-                    raise ValueError("{!r} not a valid PAT item".format(value))
+                    raise ValueError(
+                        "{!r} not a valid PAT item".format(value))
                 self[field_id] = value
                 return
         if name.startswith("_"):
             return OrderedDict.__setattr__(self, name, value)
-        raise AttributeError("Cannot set unknown field: {}".format(name))
+        raise AttributeError(
+            "Cannot set unknown field: {}".format(name))
 
     def __delattr__(self, name):
         for field_id, field_name in self.FIELDS:
@@ -392,8 +396,8 @@ class PatData(OrderedDict):
             for index, value in self.items()
             if value is not None
         ]
-        return struct.pack(">B", len(items)) + b"".join(
-            (struct.pack(">B", index) + value)
+        return struct.pack(">B", len(items))+b"".join(
+            (struct.pack(">B", index)+value)
             for index, value in items
         )
 
@@ -404,8 +408,8 @@ class PatData(OrderedDict):
             for index, value in self.items()
             if value is not None and index in fields
         ]
-        return struct.pack(">B", len(items)) + b"".join(
-            (struct.pack(">B", index) + value)
+        return struct.pack(">B", len(items))+b"".join(
+            (struct.pack(">B", index)+value)
             for index, value in items
         )
 
@@ -433,10 +437,10 @@ class PatData(OrderedDict):
                 offset += 8
             elif item_type == ItemType.String:
                 obj[field_id] = String(value)
-                offset += 2 + len(value)
+                offset += 2+len(value)
             elif item_type == ItemType.Binary:
                 obj[field_id] = Binary(value)
-                offset += 2 + len(value)
+                offset += 2+len(value)
             else:
                 raise ValueError("Unknown type: {}".format(item_type))
         return obj
@@ -444,7 +448,8 @@ class PatData(OrderedDict):
     def assert_fields(self, fields):
         items = set(self.keys())
         fields = set(fields)
-        message = "Fields mismatch: {}\n -> Expected: {}".format(items, fields)
+        message = "Fields mismatch: {}\n -> Expected: {}".format(items,
+                                                                 fields)
         assert items == fields, message
 
 
@@ -556,7 +561,8 @@ class LayerData(PatData):
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
-        (0x11, "positionSynchronizationInterval"),  # player position synchronization timer
+        (0x11, "positionSynchronizationInterval"),
+        # player position synchronization timer
         (0x12, "unk_byte_0x12"),
         (0x15, "unk_bytedec_0x15"),
         (0x16, "unk_string_0x16"),
@@ -677,8 +683,8 @@ def get_fmp_servers(session, first_index, count):
     fmp_port = config["Port"]
 
     data = b""
-    start = first_index - 1
-    end = start + count
+    start = first_index-1
+    end = start+count
     servers = session.get_servers()[start:end]
     for i, server in enumerate(servers, first_index):
         fmp_data = FmpData()
@@ -704,8 +710,8 @@ def get_layer_children(session, first_index, count, sibling=False):
     assert first_index > 0, "Invalid list index"
 
     data = b""
-    start = first_index - 1
-    end = start + count
+    start = first_index-1
+    end = start+count
     if not sibling:
         children = session.get_layer_children()[start:end]
     else:
@@ -807,7 +813,7 @@ def getHunterStats(hr=921, profile=b"Navaldeus",
     data[0x64:0x70] = slot(4, 113)
     data[0x70:0x7c] = slot(6, 7, slots=3)
 
-    data[0x9c:0x9c + len(profile)] = profile
+    data[0x9c:0x9c+len(profile)] = profile
     data[0xf2] = title
     data[0xf3] = status
     data[0xf5] = hr_limit
