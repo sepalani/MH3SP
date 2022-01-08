@@ -98,11 +98,14 @@ class Session(object):
 
     def get_gate(self):
         assert self.local_info['gate_id'] is not None
-        return DB.get_gate(self.local_info['server_id'], self.local_info['gate_id'])
+        return DB.get_gate(self.local_info['server_id'],
+                           self.local_info['gate_id'])
 
     def get_city(self):
         assert self.local_info['city_id'] is not None
-        return DB.get_city(self.local_info['server_id'], self.local_info['gate_id'], self.local_info['city_id'])
+        return DB.get_city(self.local_info['server_id'],
+                           self.local_info['gate_id'],
+                           self.local_info['city_id'])
 
     def get_circle(self):
         assert self.local_info['circle_id'] is not None
@@ -198,4 +201,3 @@ class Session(object):
             return city.players
         else:
             assert False, "Can't find layer"
-

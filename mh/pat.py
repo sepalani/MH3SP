@@ -1084,8 +1084,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.unk_string_0x0c = pati.String("StrC")
         user.city_size = pati.Long(4)
         user.city_capacity = pati.Long(3)
-        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID)) & 0xffffffff)
-        user.info_mine_0x10 = pati.Long(int(hash(OTHER_CAPCOM_ID[::-1])) & 0xffffffff)
+        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID)) &
+                                        0xffffffff)
+        user.info_mine_0x10 = pati.Long(int(hash(
+                                        OTHER_CAPCOM_ID[::-1])) & 0xffffffff)
 
         data = user.pack()
         data += pati.pack_extra_info([])  # TODO: Figure out the values
@@ -1479,7 +1481,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         info.text_color = pati.Long(LAYER_CHAT_COLORS[self.session.layer])
         info.sender_id = pati.String(self.session.capcom_id.encode("utf-8"))
-        info.sender_name = pati.String(self.session.hunter_name.encode("utf-8"))
+        info.sender_name =\
+            pati.String(self.session.hunter_name.encode("utf-8"))
 
         data += info.pack()
         data += pati.lp2_string(message)
