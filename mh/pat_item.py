@@ -79,10 +79,10 @@ def unpack_byte(data, offset=0):
     return value
 
 
-def pack_extra_info(info):
-    """Pack extra info (list of field_id and int value).
+def pack_optional_fields(info):
+    """Pack optional fields (list of field_id and int value).
 
-    Extra info are retrieved after the following function calls:
+    Optional fields are retrieved after the following function calls:
      - getLayerData
      - getLayerUserInfo
      - getCircleInfo
@@ -92,8 +92,6 @@ def pack_extra_info(info):
      - field_id, a byte used as an identifier
      - has_value, a byte telling if it has a value
      - value: an integer with the field's value (only set if has_value is true)
-
-    TODO: Rename "extra_info" to something meaningful.
     """
     data = struct.pack(">B", len(info))
     for field_id, value in info:
@@ -104,15 +102,14 @@ def pack_extra_info(info):
     return data
 
 
-def unpack_extra_info(data, offset=0):
-    """Unpack extra info (list of field_id and int value).
+def unpack_optional_fields(data, offset=0):
+    """Unpack optional fields (list of field_id and int value).
 
-    Extra info are stored after the following function calls:
+    Optional fields are stored after the following function calls:
      - putLayerSet
      - putCircleInfo
     and is also used in PatInterface::sendReqUserSearchSet.
 
-    TODO: Rename "extra_info" to something meaningful.
     It seems related to the city info. If correct:
      - field_id 0x01: ???
      - field_id 0x02: City's HR limit (if not applicable, 0xffffffff is set)
