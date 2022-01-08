@@ -48,13 +48,22 @@ class LayerState(object):
     FULL = 2
 
 
+class Players(list):
+    """
+    TODO: Probably use a better container or another approach.
+    """
+    def add(self, item):
+        if item not in self:
+            self.append(item)
+
+
 class City(object):
     def __init__(self, name, parent):
         self.name = name
         self.parent = parent
         self.capacity = 4
         self.state = LayerState.EMPTY
-        self.players = set()
+        self.players = Players()
 
     def get_population(self):
         return len(self.players)
@@ -82,7 +91,7 @@ class Gate(object):
             City("City{}".format(i), self)
             for i in range(1, city_count+1)
         ]
-        self.players = set()
+        self.players = Players()
 
     def get_population(self):
         return len(self.players) + sum((
@@ -115,7 +124,7 @@ class Server(object):
             Gate("City Gate{}".format(i), self)
             for i in range(1, gate_count+1)
         ]
-        self.players = set()
+        self.players = Players()
 
     def get_population(self):
         return len(self.players) + sum((
