@@ -33,6 +33,7 @@ class Session(object):
     TODO:
      - Finish the implementation
     """
+
     def __init__(self):
         """Create a session object."""
         self.local_info = {
@@ -97,11 +98,14 @@ class Session(object):
 
     def get_gate(self):
         assert self.local_info['gate_id'] is not None
-        return DB.get_gate(self.local_info['server_id'], self.local_info['gate_id'])
+        return DB.get_gate(self.local_info['server_id'],
+                           self.local_info['gate_id'])
 
     def get_city(self):
         assert self.local_info['city_id'] is not None
-        return DB.get_city(self.local_info['server_id'], self.local_info['gate_id'], self.local_info['city_id'])
+        return DB.get_city(self.local_info['server_id'],
+                           self.local_info['gate_id'],
+                           self.local_info['city_id'])
 
     def get_circle(self):
         assert self.local_info['circle_id'] is not None
@@ -151,7 +155,7 @@ class Session(object):
 
     def get_layer_users(self, server_id, gate_id, city_id, first_index, count):
         players = list(DB.get_city(server_id, gate_id, city_id).players)
-        start = first_index - 1
+        start = first_index-1
         return players[start:start+count]
 
     def leave_server(self):
