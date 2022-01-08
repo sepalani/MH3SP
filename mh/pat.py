@@ -1080,7 +1080,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.info_mine_0x10 = pati.Long(6)
 
         data = user.pack()
-        data += pati.pack_extra_info([])  # TODO: Figure out the values
+        # TODO: Figure out the optional fields
+        data += pati.pack_optional_fields([])
         self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
 
     def recvReqLayerStart(self, packet_id, data, seq):
@@ -1174,7 +1175,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ユーザ検索設定要求
         TR: User search settings request
         """
-        extra = pati.unpack_extra_info(data)
+        extra = pati.unpack_optional_fields(data)
         self.server.debug("UserSearchSet: {!r}".format(extra))
         self.sendAnsUserSearchSet(extra, seq)
 
@@ -1309,7 +1310,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             # Index 3/4 - ??? (u8[4])
             # Index 4/4 - ??? (u32)
             count = 4
-            data += pati.pack_extra_info([
+            data += pati.pack_optional_fields([
                 (i, 0x03030303)
                 for i in range(3, 5)
             ] + [
@@ -1961,7 +1962,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         offset = 2
         layer_set = pati.LayerSet.unpack(data, offset)
         offset += len(layer_set.pack())
-        extra = pati.unpack_extra_info(data, offset)
+        extra = pati.unpack_optional_fields(data, offset)
         self.server.debug("LayerCreateSet: {}, {!r}, {!r}".format(
             number, layer_set, extra))
         self.sendAnsLayerCreateSet(number, layer_set, extra, seq)
@@ -2169,7 +2170,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">II", unk, count)
         for circle in circles:
             data += circle.pack()
-            data += pati.pack_extra_info([])  # TODO: Figure out the values
+            # TODO: Figure out the optional fields
+            data += pati.pack_optional_fields([])
         self.send_packet(PatID4.AnsCircleListLayer, data, seq)
 
     def recvReqCircleCreate(self, packet_id, data, seq):
@@ -2180,7 +2182,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle creation request
         """
         circle = pati.CircleInfo.unpack(data)
-        extra = pati.unpack_extra_info(data, len(circle.pack()))
+        extra = pati.unpack_optional_fields(data, len(circle.pack()))
         # Extra fields
         #  - field_id 0x01: Party capacity
         #  - field_id 0x02: Quest ID
@@ -2279,7 +2281,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         circle.unk_long_0x0b = pati.Long(1)
         self.server.debug("AnsCircleInfo: {!r}".format(circle))
         data += circle.pack()  # TODO: Fill this struct
-        data += pati.pack_extra_info([])  # TODO: Figure out the values
+        # TODO: Figure out the optional fields
+        data += pati.pack_optional_fields([])
 
         self.send_packet(PatID4.AnsCircleInfo, data, seq)
         global g_circle_info_set
@@ -2317,7 +2320,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         offset = 4
         circle = pati.CircleInfo.unpack(data, offset)
         offset += len(circle.pack())
-        extra = pati.unpack_extra_info(data, offset)
+        extra = pati.unpack_optional_fields(data, offset)
         self.server.debug("ReqCircleInfoSet: {}, {!r}, {!r}".format(
             unk, circle, extra))
         self.sendAnsCircleInfoSet(unk, circle, extra, seq)
