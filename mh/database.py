@@ -88,6 +88,7 @@ class City(object):
         self.capacity = 4
         self.state = LayerState.EMPTY
         self.players = Players()
+        self.optional_fields = []
         self.leader = None
         self.circles = [
             Circle(self) for _ in range(self.capacity)  # One circle per player
@@ -132,6 +133,7 @@ class Gate(object):
             for i in range(1, city_count+1)
         ]
         self.players = Players()
+        self.optional_fields = []
 
     def get_population(self):
         return len(self.players) + sum((
@@ -351,6 +353,12 @@ class TempDatabase(object):
         cities = self.get_cities(server_id, gate_id)
         assert 0 < index <= len(cities), "Invalid city index"
         return cities[index - 1]
+
+    def create_city(self, session, server_id, gate_id, index,
+                    settings, optional_fields):
+        city = self.get_city(server_id, gate_id, index)
+        city.optional_fields = optional_fields
+        return city
 
     def join_city(self, session, server_id, gate_id, index):
         city = self.get_city(server_id, gate_id, index)

@@ -730,8 +730,7 @@ def get_layer_children(session, first_index, count, sibling=False):
         # layer.fallthrough_bug = FallthroughBug()
         layer.unk_byte_0x12 = Byte(1)
         data += layer.pack()
-        # A strange struct is also used, try to skip it
-        data += struct.pack(">B", 0)
+        data += pack_optional_fields(child.optional_fields)
     return data
 
 
