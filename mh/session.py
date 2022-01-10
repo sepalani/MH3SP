@@ -33,7 +33,6 @@ class Session(object):
     TODO:
      - Finish the implementation
     """
-
     def __init__(self):
         """Create a session object."""
         self.local_info = {
@@ -156,7 +155,7 @@ class Session(object):
 
     def get_layer_users(self, server_id, gate_id, city_id, first_index, count):
         players = list(DB.get_city(server_id, gate_id, city_id).players)
-        start = first_index-1
+        start = first_index - 1
         return players[start:start+count]
 
     def leave_server(self):
