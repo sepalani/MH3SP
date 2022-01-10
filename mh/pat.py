@@ -1422,12 +1422,16 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         The server sends a chat message.
         """
         data = struct.pack(">B", unk1)
-        info.text_color = pati.Long(0xbb3385ff)
-        info.sender_id = pati.String(b"C1I2D3")
-        info.sender_name = pati.String(b"Cid")
+
+        info.text_color = pati.Long(LAYER_CHAT_COLORS[self.session.layer])
+        info.sender_id = pati.String(self.session.capcom_id)
+        info.sender_name = pati.String(self.session.hunter_name)
+
         data += info.pack()
         data += pati.lp2_string(message)
-        self.send_packet(PatID4.NtcLayerChat, data, seq)
+
+        self.server.layer_broadcast(self.session, PatID4.NtcLayerChat, data,
+                                    seq)
 
     def recvReqTell(self, packet_id, data, seq):
         """ReqTell packet.
