@@ -19,13 +19,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import mh.pat_item as pati
-import mh.time_utils as time_utils
 import select
 import struct
 import time
 import traceback
 from datetime import datetime, timedelta
+
+import mh.pat_item as pati
+import mh.time_utils as time_utils
 from mh.constants import *
 from mh.session import Session
 from other.utils import Logger, get_config, get_ip, hexdump
@@ -235,8 +236,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         The game requests the terms version and its total size.
         """
-        self.sendAnsTermsVersion(TERMS_VERSION,
-                                 len(TERMS[TERMS_VERSION]), seq)
+        self.sendAnsTermsVersion(TERMS_VERSION, len(TERMS[TERMS_VERSION]), seq)
 
     def sendAnsTermsVersion(self, terms_version, terms_size, seq):
         """AnsTermsVersion packet.
@@ -492,8 +492,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: I don't think it's related to LMP protocol.
         """
         config = get_config("LMP")
-        self.sendAnsLmpConnect(get_ip(config["IP"]), config["Port"],
-                               seq)
+        self.sendAnsLmpConnect(get_ip(config["IP"]), config["Port"], seq)
 
     def sendAnsLmpConnect(self, address, port, seq):
         """AnsLmpConnect packet.
@@ -554,8 +553,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             int(timedelta(days=1).total_seconds())
         )
         info.unk_binary_0x05 = pati.Binary("Cid")
-        info.online_support_code = pati.String(
-            self.session.get_support_code())
+        info.online_support_code = pati.String(self.session.get_support_code())
         data = info.pack()
         self.send_packet(PatID4.AnsChargeInfo, data, seq)
 
@@ -614,7 +612,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: PAT ticket response
         """
         pat_ticket = self.session.new_pat_ticket()
-        data = struct.pack(">H", len(pat_ticket))+pat_ticket
+        data = struct.pack(">H", len(pat_ticket)) + pat_ticket
         self.send_packet(PatID4.AnsTicket, data, seq)
 
     def recvReqUserListHead(self, packet_id, data, seq):
@@ -731,8 +729,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user_obj.capcom_id = pati.String(self.session.capcom_id)
         self.sendAnsUserObject(is_slot_empty, slot_index, user_obj, seq)
 
-    def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj,
-                          seq):
+    def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj, seq):
         """AnsUserObject packet.
 
         ID: 61200200
@@ -991,8 +988,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
          - Spanish: 0x41, 0x3d, 0x41, 0x3e, 0x3f, 0x40
         """
         binary = PAT_BINARIES[binary_type]
-        data = struct.pack(">II", binary["version"],
-                           len(binary["content"]))
+        data = struct.pack(">II", binary["version"], len(binary["content"]))
         self.send_packet(PatID4.AnsBinaryHead, data, seq)
 
     def recvReqBinaryData(self, packet_id, data, seq):
@@ -1004,11 +1000,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         TODO: Handle multiple versions of a binary
         """
-        binary_type, version, offset, size = struct.unpack(">BIII",
-                                                           data)
+        binary_type, version, offset, size = struct.unpack(">BIII", data)
         binary = PAT_BINARIES[binary_type]
-        self.sendAnsBinaryData(version, offset, size, binary["content"],
-                               seq)
+        self.sendAnsBinaryData(version, offset, size, binary["content"], seq)
 
     def sendAnsBinaryData(self, version, offset, size, binary, seq):
         """AnsBinaryData packet.
@@ -1048,10 +1042,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: User search data request
         """
         name = pati.unpack_lp2_string(data)
-        offset = 2+len(name)
+        offset = 2 + len(name)
         search_info = pati.UserSearchInfo.unpack(data, offset)
-        self.server.debug(
-            "SearchInfo: {}, {!r}".format(name, search_info))
+        self.server.debug("SearchInfo: {}, {!r}".format(name, search_info))
         self.sendAnsUserSearchInfo(name, search_info, seq)
 
     def sendAnsUserSearchInfo(self, name, search_info, seq):
@@ -1068,7 +1061,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         # Warp location ?
         user.unk_binary_0x04 = pati.Binary(
             # Long: ? + server_type? / Word: server? + gate? + city?
-            b"\0\0\0\01"+b"\0\0\0\01"+b"\0\01"+b"\0\01"+b"\0\01"
+            b"\0\0\0\01" + b"\0\0\0\01" + b"\0\01" + b"\0\01" + b"\0\01"
         )
         user.unk_byte_0x07 = pati.Byte(1)
         user.server_name = pati.String("Server\tGate\tCity")
@@ -1077,13 +1070,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         user.city_size = pati.Long(4)
         user.city_capacity = pati.Long(3)
 
-        # This fields are used to identify a user. Specifically when a client is deserializing data from the packets
+        # This fields are used to identify a user.
+        # Specifically when a client is deserializing data from the packets
         # `NtcLayerBinary` and `NtcLayerBinary2`
         # TODO: Proper field value and name
-        user.info_mine_0x0f = pati.Long(
-            int(hash(OTHER_CAPCOM_ID)) & 0xffffffff)
-        user.info_mine_0x10 = pati.Long(
-            int(hash(OTHER_CAPCOM_ID[::-1])) & 0xffffffff)
+        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID))
+                                        & 0xffffffff)
+        user.info_mine_0x10 = pati.Long(int(hash(OTHER_CAPCOM_ID[::-1]))
+                                        & 0xffffffff)
 
         data = user.pack()
         # TODO: Figure out the optional fields
@@ -1098,7 +1092,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer start request
         """
         unk1 = pati.unpack_bytes(data)
-        unk2 = pati.unpack_bytes(data, len(unk1)+1)
+        unk2 = pati.unpack_bytes(data, len(unk1) + 1)
         self.sendAnsLayerStart(unk1, unk2, seq)
 
     def sendAnsLayerStart(self, unk1, unk2, seq):
@@ -1119,7 +1113,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle notification subscription request
         """
         unk1 = pati.unpack_bytes(data)
-        unk2 = pati.unpack_bytes(data, len(unk1)+1)
+        unk2 = pati.unpack_bytes(data, len(unk1) + 1)
         self.sendAnsCircleInfoNoticeSet(unk1, unk2, seq)
 
     def sendAnsCircleInfoNoticeSet(self, unk1, unk2, seq):
@@ -1193,15 +1187,13 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk, = struct.unpack_from(">B", data)
         layer = pati.unpack_lp2_string(data, 1)
-        offset = 1+len(layer)+2
+        offset = 1 + len(layer) + 2
         first_index, count = struct.unpack_from(">II", data, offset)
         offset += 8
         fields = pati.unpack_bytes(data, offset)
-        self.server.debug(
-            "LayerUserListHead({}, {!r}, {}, {}, {!r}".format(
-                unk, layer, first_index, count, fields))
-        self.sendAnsLayerUserListHead(unk, layer, first_index, count,
-                                      fields,
+        self.server.debug("LayerUserListHead({}, {!r}, {}, {}, {!r}".format(
+                          unk, layer, first_index, count, fields))
+        self.sendAnsLayerUserListHead(unk, layer, first_index, count, fields,
                                       seq)
 
     def sendAnsLayerUserListHead(self, unk, layer, first_index, count,
@@ -1215,8 +1207,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         depth, server_id, unk_id, gate_id, city_id = struct.unpack_from(
             ">IIHHH", layer)
-        search_payload = (
-            server_id, gate_id, city_id, first_index, count)
+        search_payload = (server_id, gate_id, city_id, first_index, count)
         users = self.session.get_layer_users(*search_payload)
         self.session.search_payload = search_payload
         data = struct.pack(">II", first_index, len(users))
@@ -1240,7 +1231,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer user list response
         """
         unk = 1
-        search_payload = self.session.search_payload[:-2]+(
+        search_payload = self.session.search_payload[:-2] + (
             first_index, count)
         users = self.session.get_layer_users(*search_payload)
         self.session.search_payload = None
@@ -1252,9 +1243,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             layer_user.layer_host = pati.Binary(
                 b'\x00\x00\x00\x03'  # Depth?
                 b'\x00\x00\x00\x01'  # Unknown
-                b'\x00\x01'  # Server ID?
-                b'\x00\x01'  # Gate ID?
-                b'\x00\x01'  # City ID?
+                b'\x00\x01'          # Server ID?
+                b'\x00\x01'          # Gate ID?
+                b'\x00\x01'          # City ID?
             )
             data += layer_user.pack()
             # User summary?
@@ -1264,12 +1255,12 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             # Index 4/4 - ??? (u32)
             count = 4
             data += pati.pack_optional_fields([
-                                                  (i, 0x03030303)
-                                                  for i in range(3, 5)
-                                              ]+[
-                                                  (1, 0x03000001),
-                                                  (2, 0x00ff0000)
-                                              ])
+                (i, 0x03030303)
+                for i in range(3, 5)
+            ] + [
+                (1, 0x03000001),
+                (2, 0x00ff0000)
+            ])
         self.send_packet(PatID4.AnsLayerUserListData, data, seq)
 
     def recvReqLayerUserListFoot(self, packet_id, data, seq):
@@ -1331,7 +1322,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Black data registration request
         """
         capcom_id = pati.unpack_lp2_string(data)
-        offset = len(capcom_id)+2
+        offset = len(capcom_id) + 2
         black_data = pati.BlackListUserData.unpack(data, offset)
         self.sendAnsBlackAdd(capcom_id, black_data, seq)
 
@@ -1405,7 +1396,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk1, = struct.unpack_from(">B", data)
         info = pati.MessageInfo.unpack(data, 1)
-        offset = 1+len(info.pack())
+        offset = 1 + len(info.pack())
         message = pati.unpack_lp2_string(data, offset)
         self.server.debug("NtcLayerChat: {}, {!r}, {}".format(
             unk1, info, message))
@@ -1441,7 +1432,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Send partner message
         """
         recipient_id = pati.unpack_lp2_string(data)
-        offset = 2+len(recipient_id)
+        offset = 2 + len(recipient_id)
         info = pati.MessageInfo.unpack(data, offset)
         offset += len(info.pack())
         message = pati.unpack_lp2_string(data, offset)
@@ -1483,7 +1474,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Merge this with ReqTell?
         """
         recipient_id = pati.unpack_lp2_string(data)
-        offset = 2+len(recipient_id)
+        offset = 2 + len(recipient_id)
         info = pati.MessageInfo.unpack(data, offset)
         offset += len(info.pack())
         message = pati.unpack_lp2_string(data, offset)
@@ -1619,8 +1610,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk = first_index
         data = struct.pack(">II", unk, count)
-        data += pati.get_layer_children(self.session, first_index,
-                                        count)
+        data += pati.get_layer_children(self.session, first_index, count)
         self.send_packet(PatID4.AnsLayerChildListData, data, seq)
 
     def recvReqLayerChildListFoot(self, packet_id, data, seq):
@@ -1723,8 +1713,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Child layer information request
         """
         unk1, = struct.unpack_from(">H", data)
-        layer_data = data[
-                     2:]  # layer_data with some unknown ones appended
+        layer_data = data[2:]  # layer_data with some unknown ones appended
         self.sendAnsLayerChildInfo(unk1, layer_data, seq)
 
     def sendAnsLayerChildInfo(self, unk1, layer_data, seq):
@@ -2081,8 +2070,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         name = "recv{}".format(PAT_NAMES[packet_id])
 
         if not hasattr(self, name):
-            self.server.error("Unsupported packet: %08x | %s",
-                              packet_id, name)
+            self.server.error("Unsupported packet: %08x | %s", packet_id, name)
             return
 
         handler = getattr(self, name)
@@ -2090,10 +2078,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
     def handle_client(self):
         """Select handler."""
-        timeout = time.time()+30
+        timeout = time.time() + 30
         while True:
-            r, w, e = select.select([self.rfile], [self.wfile], [],
-                                    0.2123)
+            r, w, e = select.select([self.rfile], [self.wfile], [], 0.2123)
             if r:
                 header = self.rfile.read(8)
                 if not len(header):
@@ -2109,7 +2096,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
                 current_time = time.time()
                 if current_time > timeout:
                     self.sendReqLineCheck()
-                    timeout = current_time+30
+                    timeout = current_time + 30
             if e:
                 self.server.error("Select error: %s", e)
 
