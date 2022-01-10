@@ -46,8 +46,8 @@ class FmpRequestHandler(PatRequestHandler):
        JP: レイヤダウン返答
        TR: Layer down response
        """
-
         self.session.layer_down(layer_id)
+
         if self.session.layer == 1:  # Gate
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(self.session.capcom_id)
@@ -56,7 +56,6 @@ class FmpRequestHandler(PatRequestHandler):
 
             data = pati.lp2_string(self.session.capcom_id)
             data += user.pack()
-
             self.server.layer_broadcast(self.session, PatID4.NtcLayerIn,
                                         data, seq)
 
@@ -76,7 +75,6 @@ class FmpRequestHandler(PatRequestHandler):
          - Online > Settings > Profile
          - Online > Settings > Status Indicator
         """
-
         offset, length = struct.unpack_from(">IH", data)
         binary = pati.unpack_lp2_string(data, 4)
         self.session.hunter_info.unpack(data[6:], length, offset)
@@ -92,7 +90,6 @@ class FmpRequestHandler(PatRequestHandler):
 
         TODO: Properly handle binary settings.
         """
-
         self.send_packet(PatID4.AnsUserBinarySet, b"", seq)
 
     def recvReqUserBinaryNotice(self, packet_id, data, seq):
@@ -101,32 +98,25 @@ class FmpRequestHandler(PatRequestHandler):
         ID: 66320100
         JP: ユーザ表示用バイナリ通知要求
         TR: Binary notification request for user display
-
         """
-
         unk1, = struct.unpack_from(">B", data)
         capcom_id = pati.unpack_lp2_string(data, 1)
         offset, length = struct.unpack_from(">II", data, 3+len(capcom_id))
-
         self.sendAnsUserBinaryNotice(unk1, capcom_id, offset, length, seq)
 
     def sendAnsUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
         """AnsUserBinaryNotice packet.
 
-       ID: 66320200
-       JP: ユーザ表示用バイナリ通知返答
-       TR: Binary notification reply for user display
-       """
-
+        ID: 66320200
+        JP: ユーザ表示用バイナリ通知返答
+        TR: Binary notification reply for user display
+        """
         data = struct.pack(">B", unk1)
         data += pati.lp2_string(self.session.capcom_id)
         data += struct.pack(">I", 0)
-
         data += pati.lp2_string(self.session.hunter_info.pack())
-
-        self.server.layer_broadcast(self.session,
-                                    PatID4.NtcUserBinaryNotice, data, seq)
-
+        self.server.layer_broadcast(self.session, PatID4.NtcUserBinaryNotice,
+                                    data, seq)
         self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
 
     def recvReqLayerUserList(self, packet_id, data, seq):
@@ -147,7 +137,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤ同期ユーザリスト返答
         TR: Layer sync user list response
         """
-
         players = self.session.get_layer_players()
         count = len(players)
         data = struct.pack(">I", count)
@@ -168,7 +157,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤのホスト者要求
         TR: Layer host request
         """
-
         self.sendAnsLayerHost(data, seq)
 
     def sendAnsLayerHost(self, unk_data, seq):
@@ -178,18 +166,15 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤのホスト者返答
         TR: Layer host response
         """
-
         city = self.session.get_city()
         leader = city.leader
         assert leader != self.session
 
         leader_handler = self.server.get_pat_handler(leader)
 
-        self.server.debug("ReqLayerHost: Req ({}, {})  Host ({}, {})".
-                          format(self.session.capcom_id,
-                                 self.session.hunter_name,
-                                 leader.capcom_id,
-                                 leader.hunter_name))
+        self.server.debug("ReqLayerHost: Req ({}, {})  Host ({}, {})".format(
+            self.session.capcom_id, self.session.hunter_name,
+            leader.capcom_id, leader.hunter_name))
 
         data = unk_data
         data += pati.lp2_string(leader.capcom_id)
@@ -217,23 +202,19 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤゲームポジション受信通知
         TR: Layer game position reception notification
         """
-
         self.sendNtcLayerUserPosition(data, seq)
 
     def sendNtcLayerUserPosition(self, fo, seq):
         """NtcLayerBinary packet.
 
-       ID: 64711000
-       JP: レイヤゲームポジション通知
-       TR: Layer game position notification
-       """
-
+        ID: 64711000
+        JP: レイヤゲームポジション通知
+        TR: Layer game position notification
+        """
         data = pati.lp2_string(self.session.capcom_id)
         data += fo
-
-        self.server.layer_broadcast(self.session,
-                                    PatID4.NtcLayerUserPosition, data,
-                                    seq)
+        self.server.layer_broadcast(self.session, PatID4.NtcLayerUserPosition,
+                                    data, seq)
 
     def recvNtcLayerBinary(self, packet_id, data, seq):
         """NtcLayerBinary packet.
@@ -242,7 +223,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤユーザ用バイナリ通知
         TR: Binary notifications for layer users
         """
-
         sender_blank = pati.LayerUserInfo.unpack(data)
         unk_data = data[len(sender_blank.pack()):]
         self.sendNtcLayerBinary(unk_data, seq)
@@ -254,7 +234,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤユーザ用バイナリ送信
         TR: Binary transmission for layer users
         """
-
         sender = pati.LayerBinaryInfo()
         sender.unk_long_0x01 = pati.Long(0x12345678)
         sender.capcom_id = pati.String(self.session.capcom_id)
@@ -277,16 +256,14 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤユーザ用バイナリ通知 (相手指定)
         TR: Binary notification for layer users (specify the other party)
         """
-
         partner = pati.unpack_lp2_string(data)
-        partner_size = len(partner)+2
+        partner_size = len(partner) + 2
         binary_info = pati.LayerBinaryInfo.unpack(data, partner_size)
         unk_data = data[partner_size+len(binary_info.pack()):]
 
         self.server.debug("NtcLayerBinary2: From ({}, {})\n{}".format(
             self.session.capcom_id, self.session.hunter_name,
             hexdump(unk_data)))
-
         self.sendNtcLayerBinary2(partner, unk_data, seq)
 
     def sendNtcLayerBinary2(self, partner, unk_data, seq):
@@ -296,10 +273,9 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤユーザ用バイナリ通知 (相手指定)
         TR: Binary transmission for layer users (specify the other party)
         """
-
         city = self.session.get_city()
-        partner_session = next(
-            p for p in city.players if p.capcom_id == partner)
+        partner_session = next(p for p in city.players
+                               if p.capcom_id == partner)
         if partner_session is None:
             return
 
@@ -316,8 +292,7 @@ class FmpRequestHandler(PatRequestHandler):
         if partner_pat_handler is None:
             return
 
-        partner_pat_handler.send_packet(PatID4.NtcLayerBinary2, data,
-                                        seq)
+        partner_pat_handler.send_packet(PatID4.NtcLayerBinary2, data, seq)
 
     def recvReqLayerUp(self, packet_id, data, seq):
         """ReqLayerUp packet.
@@ -329,7 +304,6 @@ class FmpRequestHandler(PatRequestHandler):
         Sent by the game when leaving the gate via the entrance:
          - Relocate > Select Server
         """
-
         if self.session.layer == 2:
             city = self.session.get_city()
             if city.leader == self.session:
@@ -339,9 +313,8 @@ class FmpRequestHandler(PatRequestHandler):
                 city.leader = None
 
             ntc_data = pati.lp2_string(self.session.capcom_id)
-            self.server.layer_broadcast(self.session,
-                                        PatID4.NtcLayerOut, ntc_data,
-                                        seq)
+            self.server.layer_broadcast(self.session, PatID4.NtcLayerOut,
+                                        ntc_data, seq)
         self.sendAnsLayerUp(data, seq)
 
     def recvReqUserSearchInfoMine(self, packet_id, data, seq):
@@ -351,7 +324,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: ユーザ検索データ要求(自分)
         TR: User search data request (self)
         """
-
         search_info = pati.UserSearchInfo.unpack(data)
         self.server.debug("SearchInfo: {!r}".format(search_info))
         self.sendAnsUserSearchInfoMine(search_info, seq)
@@ -366,20 +338,18 @@ class FmpRequestHandler(PatRequestHandler):
         TODO: Figure out what to do with it.
         Maybe prevent the same profile to be connected twice simultaneously.
         """
-
         info_mine_0x0f = int(hash(self.session.capcom_id)) & 0xffffffff
-        info_mine_0x10 = int(
-            hash(self.session.capcom_id[::-1])) & 0xffffffff
+        info_mine_0x10 = int(hash(self.session.capcom_id[::-1])) & 0xffffffff
 
-        self.server.debug(
-            "SearchInfoMine: {:08X} {:08X}".format(info_mine_0x0f,
-                                                   info_mine_0x10))
+        self.server.debug("SearchInfoMine: {:08X} {:08X}".format(
+            info_mine_0x0f, info_mine_0x10))
 
         search_info = pati.UserSearchInfo()
 
-        # This fields are used to identify a user. Specifically when a
-        # client is deserializing data from the packets `NtcLayerBinary` and
-        # `NtcLayerBinary2` TODO: Proper field value and name
+        # This fields are used to identify a user.
+        # Specifically when a client is deserializing data from the packets
+        # `NtcLayerBinary` and `NtcLayerBinary2`
+        # TODO: Proper field value and name
         search_info.info_mine_0x0f = pati.Long(info_mine_0x0f)
         search_info.info_mine_0x10 = pati.Long(info_mine_0x10)
         data = search_info.pack()
@@ -414,8 +384,7 @@ class FmpRequestHandler(PatRequestHandler):
             info = pati.CircleInfo()
             info.index = pati.Long(i+1)
             info.leader_capcom_id = pati.String(circle.leader.capcom_id)
-            info.has_password = pati.Byte(
-                1 if circle.has_password() else 0)
+            info.has_password = pati.Byte(int(circle.has_password()))
             info.team_size = pati.Long(circle.capacity)
 
             if circle.remarks is not None:
@@ -444,18 +413,19 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Circle creation request
         """
         circle_info = pati.CircleInfo.unpack(data)
-        circle_optional_fields = pati.unpack_optional_fields(data,
-                                                             len(circle_info.pack()))
+        circle_optional_fields = pati.unpack_optional_fields(
+            data, len(circle_info.pack()))
         # Extra fields
         #  - field_id 0x01: Party capacity
         #  - field_id 0x02: Quest ID
-        self.server.debug("CircleCreate: {!r}, {!r}".format(circle_info,
-                                                            circle_optional_fields))
+        self.server.debug("CircleCreate: {!r}, {!r}".format(
+                          circle_info, circle_optional_fields))
 
         city = self.session.get_city()
         (circle, circle_index) = city.get_first_empty_circle()
 
-        assert circle is not None  # TODO: Transmit error when no slot available
+        # TODO: Transmit error when no slot available
+        assert circle is not None
 
         circle.leader = self.session
         circle.players.append(self.session)
@@ -482,29 +452,24 @@ class FmpRequestHandler(PatRequestHandler):
         circle_info.team_size = pati.Long(circle.get_capacity())
         circle_info.unk_long_0x0a = pati.Long(5)
         circle_info.unk_long_0x0b = pati.Long(6)
-        circle_info.unk_long_0x0c = \
-            pati.Long(
-                circle_index+1)  # TODO: RE what exactly is this field
-        circle_info.leader_capcom_id = pati.String(
-            self.session.capcom_id)
+        # TODO: RE what exactly is this field
+        circle_info.unk_long_0x0c = pati.Long(circle_index+1)
+        circle_info.leader_capcom_id = pati.String(self.session.capcom_id)
         circle_info.unk_byte_0x0f = pati.Byte(0)  # Is Full? VERIFY this
 
         # Notify every city's player
-        ntc_circle_list_layer_create_data = struct.pack(">I",
-                                                        circle_index+1)
+        ntc_circle_list_layer_create_data = struct.pack(">I", circle_index+1)
         ntc_circle_list_layer_create_data += circle_info.pack()
         ntc_circle_list_layer_create_data += pati.pack_optional_fields(
             circle_optional_fields)
 
         for city_player in city.players:
-            city_player_handler = self.server.get_pat_handler(
-                city_player)
+            city_player_handler = self.server.get_pat_handler(city_player)
             city_player_handler.send_packet(
                 PatID4.NtcCircleListLayerCreate,
                 ntc_circle_list_layer_create_data, seq)
 
-        self.sendAnsCircleCreate(circle_index+1, circle_optional_fields,
-                                 seq)
+        self.sendAnsCircleCreate(circle_index+1, circle_optional_fields, seq)
 
     def sendAnsCircleCreate(self, circle, extra, seq):
         """AnsCircleCreate packet.
@@ -514,7 +479,6 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Circle creation response
         """
         data = struct.pack(">I", circle)
-
         self.send_packet(PatID4.AnsCircleCreate, data, seq)
 
     def recvReqCircleMatchOptionSet(self, packet_id, data, seq):
@@ -535,12 +499,10 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチングオプション設定返答
         TR: Match option settings response
         """
-
         circle = self.session.get_circle()
         options.capcom_id = pati.String(self.session.capcom_id)
         options.hunter_name = pati.String(self.session.hunter_name)
-        options.player_index = pati.Byte(
-            circle.players.index(self.session)+1)
+        options.player_index = pati.Byte(circle.players.index(self.session)+1)
         ntc_data = options.pack()
 
         for circle_player in circle.players:
@@ -548,8 +510,8 @@ class FmpRequestHandler(PatRequestHandler):
                 continue
 
             pat_handler = self.server.get_pat_handler(circle_player)
-            pat_handler.send_packet(PatID4.NtcCircleMatchOptionSet,
-                                    ntc_data, seq)
+            pat_handler.send_packet(PatID4.NtcCircleMatchOptionSet, ntc_data,
+                                    seq)
 
         self.send_packet(PatID4.AnsCircleMatchOptionSet, b"", seq)
 
@@ -574,7 +536,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルデータ取得返答
         TR: Circle data acquisition reply
         """
-
         data = struct.pack(">I", circle_index)
 
         city = self.session.get_city()
@@ -611,8 +572,8 @@ class FmpRequestHandler(PatRequestHandler):
             (2, circle.questId)
         ]
 
-        self.server.debug("AnsCircleInfo: {!r} {!r}".format(circle_info,
-                                                            optional_fields))
+        self.server.debug("AnsCircleInfo: {!r} {!r}".format(
+                          circle_info, optional_fields))
 
         data += circle_info.pack()
         data += pati.pack_optional_fields(optional_fields)
@@ -626,10 +587,10 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルイン要求
         TR: Circle-in request
         """
-
         circle_index, = struct.unpack_from(">I", data)
 
-        # In this circle info, the only possible field filled are the: unk_long_0x0b, has_password, password
+        # In this circle info, the only possible field filled are:
+        # unk_long_0x0b, has_password, password
         circle_info = pati.CircleInfo.unpack(data, 4)
 
         city = self.session.get_city()
@@ -655,10 +616,9 @@ class FmpRequestHandler(PatRequestHandler):
         """AnsCircleJoin packet.
 
         ID: 65030200
-        JP:  	サークルイン返答
+        JP: サークルイン返答
         TR: Circle-in reply
         """
-
         data = struct.pack(">IB", circle_index, unk)
         self.send_packet(PatID4.AnsCircleJoin, data, seq)
 
@@ -694,7 +654,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークル同期ユーザリスト要求
         TR: Circle sync user list request
         """
-
         # Ignore packet data
         self.sendAnsCircleUserList(seq)
 
@@ -705,7 +664,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークル同期ユーザリスト返答
         TR: Circle sync user list reply
         """
-
         circle = self.session.get_circle()
 
         data = struct.pack(">I", circle.get_population())
@@ -739,15 +697,16 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルのホスト者返答
         TR: Circle host response
         """
-
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
 
-        leader_index = 0  # next(i for i in range(0, circle.get_population()) if circle.players[i] == circle.leader)
+        leader_index = 0
+        # leader_index = next(i for i in range(0, circle.get_population())
+        #                     if circle.players[i] == circle.leader)
         assert leader_index is not None
 
         # TODO: Verify this field
-        unk1 = leader_index+1
+        unk1 = leader_index + 1
 
         data = struct.pack(">IB", circle_index, unk1)
         data += pati.lp2_string(circle.leader.capcom_id)
@@ -759,8 +718,8 @@ class FmpRequestHandler(PatRequestHandler):
 
             circle_player_pat_handler = \
                 self.server.get_pat_handler(circle_player)
-            circle_player_pat_handler.send_packet(PatID4.NtcCircleHost,
-                                                  data, seq)
+            circle_player_pat_handler.send_packet(PatID4.NtcCircleHost, data,
+                                                  seq)
 
         self.send_packet(PatID4.AnsCircleHost, data, seq)
 
@@ -771,7 +730,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルバイナリ通知
         TR: Circle binary notification
         """
-
         circle_index, = struct.unpack_from(">I", data)
         sender_blank = pati.LayerUserInfo.unpack(data, 4)
         unk_data = data[len(sender_blank.pack())+4:]
@@ -784,7 +742,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルバイナリ送信
         TR: Circle binary transmission
         """
-
         sender = pati.LayerBinaryInfo()
         sender.unk_long_0x01 = pati.Long(0x12345678)
         sender.capcom_id = pati.String(self.session.capcom_id)
@@ -819,7 +776,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルバイナリ通知 (相手指定)
         TR: Circle binary notification (specified by the other party)
         """
-
         circle_index, = struct.unpack_from(">I", data)
         partner = pati.unpack_lp2_string(data, 4)
         partner_size = len(partner)+2+4
@@ -832,19 +788,17 @@ class FmpRequestHandler(PatRequestHandler):
 
         self.sendNtcCircleBinary2(circle_index, partner, unk_data, seq)
 
-    def sendNtcCircleBinary2(self, circle_index, partner, unk_data,
-                             seq):
+    def sendNtcCircleBinary2(self, circle_index, partner, unk_data, seq):
         """NtcCircleBinary2 packet.
 
         ID: 65711000
         JP: サークルバイナリ送信 (相手指定)
         TR: Circle binary transmission (specified by the other party)
         """
-
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
-        partner_session = next(
-            p for p in circle.players if p.capcom_id == partner)
+        partner_session = next(p for p in circle.players
+                               if p.capcom_id == partner)
         if partner_session is None:
             return
 
@@ -858,13 +812,11 @@ class FmpRequestHandler(PatRequestHandler):
         data += self_data.pack()
         data += unk_data
 
-        partner_pat_handler = self.server.get_pat_handler(
-            partner_session)
+        partner_pat_handler = self.server.get_pat_handler(partner_session)
         if partner_pat_handler is None:
             return
 
-        partner_pat_handler.send_packet(PatID4.NtcCircleBinary2, data,
-                                        seq)
+        partner_pat_handler.send_packet(PatID4.NtcCircleBinary2, data, seq)
 
     def recvReqCircleLeave(self, packet_id, data, seq):
         """ReqCircleLeave packet.
@@ -883,7 +835,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルアウト返答
         TR: Circle out reply
         """
-
         data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleLeave, data, seq)
 
@@ -894,27 +845,22 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルデータ設定要求
         TR: Circle data setting request
         """
-
         circle_index, = struct.unpack_from(">I", data)
         offset = 4
         circle = pati.CircleInfo.unpack(data, offset)
         offset += len(circle.pack())
         optional_fields = pati.unpack_optional_fields(data, offset)
-        self.server.debug(
-            "ReqCircleInfoSet: Circle({}) {!r}, {!r}".format(
-                circle_index, circle, optional_fields))
-        self.sendAnsCircleInfoSet(circle_index, circle, optional_fields,
-                                  seq)
+        self.server.debug("ReqCircleInfoSet: Circle({}) {!r}, {!r}".format(
+                          circle_index, circle, optional_fields))
+        self.sendAnsCircleInfoSet(circle_index, circle, optional_fields, seq)
 
-    def sendAnsCircleInfoSet(self, circle_index, circle,
-                             optional_fields, seq):
+    def sendAnsCircleInfoSet(self, circle_index, circle, optional_fields, seq):
         """AnsCircleInfoSet packet.
 
         ID: 65200200
         JP: サークルデータ設定返答
         TR: Circle data setting reply
         """
-
         ntc_data = struct.pack(">I", circle_index)
         ntc_data += circle.pack()
         ntc_data += pati.pack_optional_fields(optional_fields)
@@ -951,7 +897,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング開始返答
         TR: Matching start reply
         """
-
         self.sendNtcCircleMatchStart(seq)
         self.send_packet(PatID4.AnsCircleMatchStart, b"", seq)
 
@@ -962,7 +907,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング開始通知
         TR: Matching start notification
         """
-
         circle = self.session.get_circle()
 
         count = circle.get_population()
@@ -979,8 +923,7 @@ class FmpRequestHandler(PatRequestHandler):
 
         for circle_player in circle.players:
             pat_handler = self.server.get_pat_handler(circle_player)
-            pat_handler.send_packet(PatID4.NtcCircleMatchStart, data,
-                                    seq)
+            pat_handler.send_packet(PatID4.NtcCircleMatchStart, data, seq)
 
     def recvReqCircleMatchEnd(self, packet_id, data, seq):
         """ReqCircleMatchEnd packet.
@@ -1002,6 +945,7 @@ class FmpRequestHandler(PatRequestHandler):
 
 
 BASE = server_base("FMP", FmpServer, FmpRequestHandler)
+
 
 if __name__ == "__main__":
     server_main(*BASE)
