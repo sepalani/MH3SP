@@ -82,6 +82,15 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
             pat_handler = self.get_pat_handler(player)
             pat_handler.send_packet(packet_id, data, seq)
 
+    def circle_broadcast(self, circle, packet_id, data, seq,
+                         session=None):
+        for player in circle.players:
+            if session and player == session:
+                continue
+
+            pat_handler = self.get_pat_handler(player)
+            pat_handler.send_packet(packet_id, data, seq)
+
 
 class PatRequestHandler(SocketServer.StreamRequestHandler):
     """Generic PAT request handler class.
