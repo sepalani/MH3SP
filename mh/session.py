@@ -127,6 +127,14 @@ class Session(object):
             assert False, "Can't go down a layer"
         self.layer += 1
 
+    def layer_create(self, layer_id, settings, optional_fields):
+        if self.layer == 1:
+            city = self.create_city(layer_id, settings, optional_fields)
+            city.leader = self
+        else:
+            assert False, "Can't create a layer from L{}".format(self.layer)
+        self.layer_down(layer_id)
+
     def layer_up(self):
         if self.layer == 1:
             self.leave_gate()
@@ -173,6 +181,12 @@ class Session(object):
     def get_cities(self):
         return DB.get_cities(self.local_info["server_id"],
                              self.local_info["gate_id"])
+
+    def create_city(self, city_id, settings, optional_fields):
+        return DB.create_city(self,
+                              self.local_info["server_id"],
+                              self.local_info["gate_id"],
+                              city_id, settings, optional_fields)
 
     def join_city(self, city_id):
         DB.join_city(self,
