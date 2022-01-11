@@ -376,8 +376,7 @@ class FmpRequestHandler(PatRequestHandler):
         circles = []
 
         city = self.session.get_city()
-        for i in range(0, len(city.circles)):
-            circle = city.circles[i]
+        for i, circle in enumerate(city.circles):
             if circle.is_empty():
                 continue
 
@@ -422,7 +421,7 @@ class FmpRequestHandler(PatRequestHandler):
                           circle_info, circle_optional_fields))
 
         city = self.session.get_city()
-        (circle, circle_index) = city.get_first_empty_circle()
+        circle, circle_index = city.get_first_empty_circle()
 
         # TODO: Transmit error when no slot available
         assert circle is not None
@@ -504,15 +503,8 @@ class FmpRequestHandler(PatRequestHandler):
         options.hunter_name = pati.String(self.session.hunter_name)
         options.player_index = pati.Byte(circle.players.index(self.session)+1)
         ntc_data = options.pack()
-
-        for circle_player in circle.players:
-            if circle_player == self.session:
-                continue
-
-            pat_handler = self.server.get_pat_handler(circle_player)
-            pat_handler.send_packet(PatID4.NtcCircleMatchOptionSet, ntc_data,
-                                    seq)
-
+        self.server.circle_broadcast(circle, PatID4.NtcCircleMatchOptionSet,
+                                     ntc_data, seq, self.session)
         self.send_packet(PatID4.AnsCircleMatchOptionSet, b"", seq)
 
     def recvReqCircleInfo(self, packet_id, data, seq):
@@ -625,27 +617,18 @@ class FmpRequestHandler(PatRequestHandler):
         if circle_index > 0:
             city = self.session.get_city()
             circle = city.circles[circle_index-1]
-            ntc_circle_join_data = struct.pack(">I", circle_index)
-            ntc_circle_join_data += pati.lp2_string(
+            ntc_data = struct.pack(">I", circle_index)
+            ntc_data += pati.lp2_string(
                 self.session.capcom_id)
-            ntc_circle_join_data += pati.lp2_string(
+            ntc_data += pati.lp2_string(
                 self.session.hunter_name)
             # TODO NEED RE
             unk1 = circle.get_population()  # NOTE: act as player index
             unk2 = 0
 
-            ntc_circle_join_data += struct.pack(">BB", unk1, unk2)
-
-            for circle_player in circle.players:
-                if circle_player == self.session:
-                    continue
-
-                circle_player_pat_handler = \
-                    self.server.get_pat_handler(circle_player)
-                circle_player_pat_handler.send_packet(
-                    PatID4.NtcCircleJoin,
-                    ntc_circle_join_data,
-                    seq)
+            ntc_data += struct.pack(">BB", unk1, unk2)
+            self.server.circle_broadcast(circle, PatID4.NtcCircleJoin,
+                                         ntc_data, seq, self.session)
 
     def recvReqCircleUserList(self, packet_id, data, seq):
         """ReqCircleUserList packet.
@@ -667,14 +650,12 @@ class FmpRequestHandler(PatRequestHandler):
         circle = self.session.get_circle()
 
         data = struct.pack(">I", circle.get_population())
-        for i, circle_player in enumerate(circle.players):
+        for i, player in enumerate(circle.players):
             circle_user_data = pati.CircleUserData()
             circle_user_data.is_standby = pati.Byte(0)
             circle_user_data.player_index = pati.Byte(i+1)
-            circle_user_data.capcom_id = pati.String(
-                circle_player.capcom_id)
-            circle_user_data.hunter_name = pati.String(
-                circle_player.hunter_name)
+            circle_user_data.capcom_id = pati.String(player.capcom_id)
+            circle_user_data.hunter_name = pati.String(player.hunter_name)
             data += circle_user_data.pack()
 
         self.send_packet(PatID4.AnsCircleUserList, data, seq)
@@ -712,15 +693,8 @@ class FmpRequestHandler(PatRequestHandler):
         data += pati.lp2_string(circle.leader.capcom_id)
         data += pati.lp2_string(circle.leader.hunter_name)
 
-        for circle_player in circle.players:
-            if circle_player == self.session:
-                continue
-
-            circle_player_pat_handler = \
-                self.server.get_pat_handler(circle_player)
-            circle_player_pat_handler.send_packet(PatID4.NtcCircleHost, data,
-                                                  seq)
-
+        self.server.circle_broadcast(circle, PatID4.NtcCircleHost, data,
+                                     seq, self.session)
         self.send_packet(PatID4.AnsCircleHost, data, seq)
 
     def recvNtcCircleBinary(self, packet_id, data, seq):
@@ -757,17 +731,8 @@ class FmpRequestHandler(PatRequestHandler):
 
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
-        for circle_player in circle.players:
-            if circle_player == self.session:
-                continue
-
-            player_pat_handler = self.server.get_pat_handler(
-                circle_player)
-            if player_pat_handler is None:
-                continue
-
-            player_pat_handler.send_packet(PatID4.NtcCircleBinary, data,
-                                           seq)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleBinary, data,
+                                     seq, self.session)
 
     def recvNtcCircleBinary2(self, packet_id, data, seq):
         """NtcCircleBinary2 packet.
@@ -867,16 +832,8 @@ class FmpRequestHandler(PatRequestHandler):
 
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
-
-        for circle_player in circle.players:
-            if circle_player == self.session:
-                continue
-
-            circle_player_pat_handler = \
-                self.server.get_pat_handler(circle_player)
-            circle_player_pat_handler.send_packet(
-                PatID4.NtcCircleInfoSet,
-                ntc_data, seq)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleInfoSet, ntc_data,
+                                     seq, self.session)
 
         data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleInfoSet, data, seq)
@@ -921,9 +878,8 @@ class FmpRequestHandler(PatRequestHandler):
         data = struct.pack(">H", len(data))+data
         data += struct.pack(">I", 1)  # Field??
 
-        for circle_player in circle.players:
-            pat_handler = self.server.get_pat_handler(circle_player)
-            pat_handler.send_packet(PatID4.NtcCircleMatchStart, data, seq)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleMatchStart, data,
+                                     seq)
 
     def recvReqCircleMatchEnd(self, packet_id, data, seq):
         """ReqCircleMatchEnd packet.
