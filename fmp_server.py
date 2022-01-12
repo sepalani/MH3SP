@@ -42,10 +42,10 @@ class FmpRequestHandler(PatRequestHandler):
     def sendAnsLayerDown(self, layer_id, layer_set, seq):
         """AnsLayerDown packet.
 
-       ID: 64140200
-       JP: レイヤダウン返答
-       TR: Layer down response
-       """
+        ID: 64140200
+        JP: レイヤダウン返答
+        TR: Layer down response
+        """
         self.session.layer_down(layer_id)
 
         if self.session.layer == 1:  # Gate
@@ -93,7 +93,7 @@ class FmpRequestHandler(PatRequestHandler):
         self.send_packet(PatID4.AnsUserBinarySet, b"", seq)
 
     def recvReqUserBinaryNotice(self, packet_id, data, seq):
-        """AnsUserBinarySet packet.
+        """ReqUserBinaryNotice packet.
 
         ID: 66320100
         JP: ユーザ表示用バイナリ通知要求
@@ -196,7 +196,7 @@ class FmpRequestHandler(PatRequestHandler):
         leader_handler.send_packet(PatID4.NtcLayerIn, data, seq)
 
     def recvNtcLayerUserPosition(self, packet_id, data, seq):
-        """NtcLayerBinary packet.
+        """NtcLayerUserPosition packet.
 
         ID: 64711000
         JP: レイヤゲームポジション受信通知
@@ -205,7 +205,7 @@ class FmpRequestHandler(PatRequestHandler):
         self.sendNtcLayerUserPosition(data, seq)
 
     def sendNtcLayerUserPosition(self, fo, seq):
-        """NtcLayerBinary packet.
+        """NtcLayerUserPosition packet.
 
         ID: 64711000
         JP: レイヤゲームポジション通知
@@ -667,7 +667,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルのホスト者要求
         TR: Circle host request
         """
-
         circle_index, = struct.unpack_from(">I", data)
         self.sendAnsCircleHost(circle_index, seq)
 
