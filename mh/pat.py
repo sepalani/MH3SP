@@ -130,6 +130,50 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             packet_id, seq, hexdump(data)
         )
 
+    def send_error(self, message, seq=0):
+        """Send an error message."""
+        try:
+            MAX_SIZE = 0x200
+            MAX_WIDTH = 55
+            MAX_HEIGHT = 15
+            LINE_PER_PAGE = min(MAX_HEIGHT, MAX_SIZE // MAX_WIDTH)
+
+            lines = [
+                "<LF=2><BODY><CENTER>A communication error occurred",
+                "<BR><BODY>Check the server log files for more details",
+                "<BR><LEFT>",
+            ] + message.replace("\\", "/").split("\n")
+
+            def range_slice(obj, chunk_size):
+                """Range helper."""
+                length = len(obj)
+                return range(length // chunk_size + (length % chunk_size > 0))
+
+            def helper(line):
+                """Split lines helper."""
+                if len(line) <= MAX_WIDTH:
+                    return [line]
+                return [
+                    line[i*MAX_WIDTH:(i+1)*MAX_WIDTH]
+                    for i in range_slice(line, MAX_WIDTH)
+                ]
+            # Flatten the results
+            lines = sum([helper(line) for line in lines], [])
+
+            for i in range_slice(lines, LINE_PER_PAGE):
+                seq += 1
+                message = "<BR><BODY>".join(lines[i*LINE_PER_PAGE:
+                                                  (i+1)*LINE_PER_PAGE])
+                # It seems we can't send multiple messages
+                # self.sendNtcShut("<LF=2><BODY>"+message+"<END>", seq)
+                self.sendNtcShut(message + "<END>", 0)
+                # The game will close the connection and the next messages
+                # won't be received. The except block will be reached if the
+                # message is too long.
+        except Exception as e:
+            # Probably unreachable and was disconnected
+            self.server.warning("Failed to send a complete error message")
+
     def recvNtcCollectionLog(self, packet_id, data, seq):
         """NtcCollectionLog packet.
 
@@ -536,6 +580,18 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         data = struct.pack(">B", login_type)
         self.send_packet(PatID4.AnsShut, data, seq)
+
+    def sendNtcShut(self, message, seq):
+        """NtcShut packet.
+
+        ID: 60101000
+        JP: 切断返答
+        TR: Disconnection notification
+        """
+        has_message = bool(message)
+        data = struct.pack(">B", int(has_message))
+        data += pati.lp2_string(message[:0x200])
+        self.send_packet(PatID4.NtcShut, data, seq)
 
     def recvReqChargeInfo(self, packet_id, data, seq):
         """ReqChargeInfo packet.
@@ -2118,7 +2174,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             self.handle_client()
             self.session.disconnect()
         except Exception as e:
-            traceback.print_exc()
+            self.server.error(traceback.format_exc())
+            self.send_error("{}: {}".format(type(e).__name__, str(e)))
             self.session.delete()
 
         self.server.del_from_debug(self)
