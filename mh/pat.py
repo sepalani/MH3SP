@@ -2108,7 +2108,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """Default PAT handler."""
         self.server.info("Handle client")
         self.server.add_to_debug(self)
-        self.session = Session()
+        self.session = Session(self)
 
         # There are connect errors if too fast
         # TODO: investigate if it's Dolphin's fault
@@ -2116,9 +2116,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         self.sendReqConnection()
         try:
             self.handle_client()
+            self.session.disconnect()
         except Exception as e:
             traceback.print_exc()
+            self.session.delete()
 
-        self.session.delete()
         self.server.del_from_debug(self)
         self.server.info("Client finished!")
