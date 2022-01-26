@@ -65,7 +65,7 @@ class Session(object):
             self.online_support_code = to_str(
                 pati.unpack_string(connection_data.online_support_code)
             )
-        session = DB.get_session(self)
+        session = DB.get_session(self.pat_ticket) or self
         if session != self:
             assert session.connection is None, "Session is already in use"
             session.connection = self.connection
