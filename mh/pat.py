@@ -79,8 +79,9 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
             if exclude_self and player == session:
                 continue
 
-            pat_handler = self.get_pat_handler(player)
-            pat_handler.send_packet(packet_id, data, seq)
+            handler = self.get_pat_handler(player)
+            if handler:
+                handler.try_send_packet(packet_id, data, seq)
 
     def circle_broadcast(self, circle, packet_id, data, seq,
                          session=None):
@@ -88,8 +89,9 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
             if session and player == session:
                 continue
 
-            pat_handler = self.get_pat_handler(player)
-            pat_handler.send_packet(packet_id, data, seq)
+            handler = self.get_pat_handler(player)
+            if handler:
+                handler.try_send_packet(packet_id, data, seq)
 
 
 class PatRequestHandler(SocketServer.StreamRequestHandler, object):
@@ -133,6 +135,17 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
             PAT_NAMES.get(packet_id, "Packet"),
             packet_id, seq, hexdump(data)
         )
+
+    def try_send_packet(self, packet_id=0, data=b'', seq=0):
+        """Send PAT packet and catch exceptions."""
+        try:
+            self.send_packet(packet_id, data, seq)
+        except Exception as e:
+            self.server.warning(
+                "Failed to send %s[ID=%08x; Seq=%04x]\n%s\n%s",
+                PAT_NAMES.get(packet_id, "Packet"),
+                packet_id, seq, traceback.format_exc(), hexdump(data)
+            )
 
     def sendAnsNg(self, packet_id, message, seq):
         unk1 = 1  # If value is 0, the message is not rendered

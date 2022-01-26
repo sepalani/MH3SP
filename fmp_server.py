@@ -284,11 +284,9 @@ class FmpRequestHandler(PatRequestHandler):
         data += self_data.pack()
         data += unk_data
 
-        partner_pat_handler = self.server.get_pat_handler(partner_session)
-        if partner_pat_handler is None:
-            return
-
-        partner_pat_handler.send_packet(PatID4.NtcLayerBinary2, data, seq)
+        handler = self.server.get_pat_handler(partner_session)
+        if handler:
+            handler.try_send_packet(PatID4.NtcLayerBinary2, data, seq)
 
     def recvReqLayerUp(self, packet_id, data, seq):
         """ReqLayerUp packet.
@@ -722,11 +720,9 @@ class FmpRequestHandler(PatRequestHandler):
         data += self_data.pack()
         data += unk_data
 
-        partner_pat_handler = self.server.get_pat_handler(partner_session)
-        if partner_pat_handler is None:
-            return
-
-        partner_pat_handler.send_packet(PatID4.NtcCircleBinary2, data, seq)
+        handler = self.server.get_pat_handler(partner_session)
+        if handler:
+            handler.try_send_packet(PatID4.NtcCircleBinary2, data, seq)
 
     def recvReqCircleLeave(self, packet_id, data, seq):
         """ReqCircleLeave packet.
@@ -877,8 +873,8 @@ class FmpRequestHandler(PatRequestHandler):
             else:
                 # Client ignore field
                 ntc_circle_kick = struct.pack(">B", 0) + pati.lp2_string('')
-                pat_handler = self.server.get_pat_handler(player)
-                pat_handler.send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
+                handler = self.server.get_pat_handler(player)
+                handler.try_send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
                                         seq)
                 circle.players.remove(i)
                 changed = True
