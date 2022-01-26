@@ -273,10 +273,10 @@ class TempDatabase(object):
         session.capcom_id = capcom_id
         session.hunter_name = name
 
-    def get_session(self, session):
-        """Returns existing PAT session or the current one."""
-        session = self.sessions.get(session.pat_ticket, session)
-        if session.capcom_id:
+    def get_session(self, pat_ticket):
+        """Returns existing PAT session or None."""
+        session = self.sessions.get(pat_ticket)
+        if session and session.capcom_id:
             self.use_capcom_id(session, session.capcom_id, session.hunter_name)
         return session
 
