@@ -33,7 +33,7 @@ class Session(object):
     TODO:
      - Finish the implementation
     """
-    def __init__(self):
+    def __init__(self, connection_handler):
         """Create a session object."""
         self.local_info = {
             "server_id": None,
@@ -44,7 +44,7 @@ class Session(object):
             "city_name": None,
             "circle_id": None,
         }
-        self.connection = None
+        self.connection = connection_handler
         self.online_support_code = None
         self.pat_ticket = None
         self.capcom_id = ""
@@ -65,15 +65,33 @@ class Session(object):
             self.online_support_code = to_str(
                 pati.unpack_string(connection_data.online_support_code)
             )
-        return DB.get_session(self)
+        session = DB.get_session(self.pat_ticket) or self
+        if session != self:
+            assert session.connection is None, "Session is already in use"
+            session.connection = self.connection
+            self.connection = None
+        return session
 
     def get_support_code(self):
         """Return the online support code."""
         return DB.get_support_code(self)
 
+    def disconnect(self):
+        """Disconnect the current session.
+
+        It doesn't purge the session state nor its PAT ticket.
+        """
+        self.connection = None
+        DB.disconnect_session(self)
+
     def delete(self):
-        """Delete the current session from the database."""
-        DB.del_session(self)
+        """Delete the current session.
+
+        TODO:
+         - Find a good place to purge old tickets.
+         - We should probably create a SessionManager thread per server.
+        """
+        DB.delete_session(self)
 
     def is_jap(self):
         """TODO: Heuristic using the connection data to detect region."""
