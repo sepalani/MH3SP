@@ -247,8 +247,18 @@ class TempDatabase(object):
         self.sessions[session.pat_ticket] = session
         return session.pat_ticket
 
+    def use_capcom_id(self, session, capcom_id, name=None):
+        """Attach the session to the Capcom ID."""
+        assert capcom_id in self.capcom_ids, "Capcom ID doesn't exist"
+
+        not_in_use = self.capcom_ids[capcom_id]["session"] is None
+        assert not_in_use, "Capcom ID is already in use"
+
+        name = name or self.capcom_ids[capcom_id]["name"]
+        self.capcom_ids[capcom_id] = {"name": name, "session": session}
+
     def use_user(self, session, index, name):
-        """Use Capcom ID from the slot or create one if empty"""
+        """Use User from the slot or create one if empty"""
         assert 1 <= index <= 6, "Invalid Capcom ID slot"
         index -= 1
         users = self.consoles[session.online_support_code]
@@ -259,28 +269,30 @@ class TempDatabase(object):
                 break
         else:
             capcom_id = users[index]
-            not_in_use = self.capcom_ids[capcom_id]["session"] is None
-            assert not_in_use, "Capcom ID is already in use"
-        name = name or self.capcom_ids[capcom_id]["name"]
-        self.capcom_ids[capcom_id] = {"name": name, "session": session}
+        self.use_capcom_id(session, capcom_id, name)
         session.capcom_id = capcom_id
         session.hunter_name = name
 
-    def get_session(self, session):
-        """Returns existing PAT session or the current one."""
-        return self.sessions.get(session.pat_ticket, session)
+    def get_session(self, pat_ticket):
+        """Returns existing PAT session or None."""
+        session = self.sessions.get(pat_ticket)
+        if session and session.capcom_id:
+            self.use_capcom_id(session, session.capcom_id, session.hunter_name)
+        return session
 
-    def del_session(self, session):
+    def disconnect_session(self, session):
+        """Detach the session from its Capcom ID."""
+        if not session.capcom_id:
+            # Capcom ID isn't chosen yet with OPN/LMP servers
+            return
+        self.capcom_ids[session.capcom_id]["session"] = None
+
+    def delete_session(self, session):
         """Delete the session from the database."""
-        # TODO: Find a good place to purge old tickets
-        """
+        self.disconnect_session(session)
         pat_ticket = session.pat_ticket
         if pat_ticket in self.sessions:
             del self.sessions[pat_ticket]
-        """
-        capcom_id = session.capcom_id
-        if capcom_id in self.capcom_ids:
-            self.capcom_ids[capcom_id]["session"] = None
 
     def get_users(self, session, first_index, count):
         """Returns Capcom IDs tied to the session."""
