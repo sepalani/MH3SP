@@ -366,6 +366,23 @@ class TempDatabase(object):
         assert 0 < index <= len(cities), "Invalid city index"
         return cities[index - 1]
 
+    def get_all_users(self, server_id, gate_id, city_id):
+        """Search for users in layers and its children.
+
+        Let's assume wildcard search isn't possible for servers and gates.
+        A wildcard search happens when the id is zero.
+        """
+        assert 0 < server_id, "Invalid server index"
+        assert 0 < gate_id, "Invalid gate index"
+        gate = self.get_gate(server_id, gate_id)
+        users = list(gate.players)
+        cities = [
+            self.get_city(server_id, gate_id, city_id)
+        ] if city_id else self.get_cities(server_id, gate_id)
+        for city in cities:
+            users.extend(list(city.players))
+        return users
+
     def create_city(self, session, server_id, gate_id, index,
                     settings, optional_fields):
         city = self.get_city(server_id, gate_id, index)
