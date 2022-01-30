@@ -22,7 +22,7 @@
 import struct
 
 from collections import OrderedDict
-from other.utils import to_bytearray, get_config, get_ip
+from other.utils import to_bytearray, get_config, get_ip, GenericUnpacker
 
 
 class ItemType:
@@ -352,6 +352,11 @@ class FallthroughBug(Custom):
     """
     def __new__(cls):
         return Custom.__new__(cls, b"\xff", b"\xff")
+
+
+def pack_bytes(*args):
+    """Pack bytes list."""
+    return struct.pack(">B", len(args)) + bytearray(args)
 
 
 def unpack_bytes(data, offset=0):
@@ -708,6 +713,30 @@ class LayerBinaryInfo(PatData):
         (0x02, "capcom_id"),
         (0x03, "hunter_name")
     )
+
+
+class Unpacker(GenericUnpacker):
+    """Simple PAT item unpacker.
+
+    TODO:
+     - Handle PatData unpacking
+    """
+    MAPPING = {
+        "struct": (struct.unpack_from, struct.pack),
+        "lp_string": (unpack_lp_string, lp_string),
+        "lp2_string": (unpack_lp2_string, lp2_string),
+        "byte": (unpack_byte, pack_byte),
+        "word": (unpack_word, pack_word),
+        "long": (unpack_long, pack_long),
+        "longlong": (unpack_longlong, pack_longlong),
+        "string": (unpack_string, pack_string),
+        "binary": (unpack_binary, pack_binary),
+        "bytes": (unpack_bytes, pack_bytes),
+        "optional_fields": (unpack_optional_fields,
+                            pack_optional_fields),
+        "detailed_optional_fields": (unpack_detailed_optional_fields,
+                                     pack_detailed_optional_fields)
+    }
 
 
 class HunterSettings(object):
