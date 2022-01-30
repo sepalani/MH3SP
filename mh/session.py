@@ -194,6 +194,11 @@ class Session(object):
         start = first_index - 1
         return players[start:start+count]
 
+    def find_users(self, capcom_id, hunter_name, first_index, count):
+        users = DB.find_users(capcom_id, hunter_name)
+        start = first_index - 1
+        return users[start:start+count]
+
     def leave_server(self):
         DB.leave_server(self)
 
