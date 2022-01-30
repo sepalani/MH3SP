@@ -383,6 +383,21 @@ class TempDatabase(object):
             users.extend(list(city.players))
         return users
 
+    def find_users(self, capcom_id="", hunter_name=""):
+        assert capcom_id or hunter_name, "Search can't be empty"
+        users = []
+        for user_id, user_info in self.capcom_ids.items():
+            session = user_info["session"]
+            if not session:
+                continue
+            if capcom_id and capcom_id not in user_id:
+                continue
+            if hunter_name and \
+                    hunter_name.lower() not in user_info["name"].lower():
+                continue
+            users.append(session)
+        return users
+
     def create_city(self, session, server_id, gate_id, index,
                     settings, optional_fields):
         city = self.get_city(server_id, gate_id, index)
