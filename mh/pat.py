@@ -1305,27 +1305,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             layer_user = pati.LayerUserInfo()
             layer_user.capcom_id = pati.String(user.capcom_id)
             layer_user.hunter_name = pati.String(user.hunter_name)
-            layer_user.layer_host = pati.Binary(
-                b'\x00\x00\x00\x03'  # Depth?
-                b'\x00\x00\x00\x01'  # Unknown
-                b'\x00\x01'          # Server ID?
-                b'\x00\x01'          # Gate ID?
-                b'\x00\x01'          # City ID?
-            )
+            layer_user.layer_host = pati.Binary(user.get_layer_host_data())
             data += layer_user.pack()
-            # User summary?
-            # Index 1/4 - Weapon (u8) + 16-bit padding + Location (u8)
-            # Index 2/4 - HR (u16) + 16-bit padding
-            # Index 3/4 - ??? (u8[4])
-            # Index 4/4 - ??? (u32)
-            count = 4
-            data += pati.pack_optional_fields([
-                (i, 0x03030303)
-                for i in range(3, 5)
-            ] + [
-                (1, 0x03000001),
-                (2, 0x00ff0000)
-            ])
+            data += pati.pack_optional_fields(user.get_optional_fields())
         self.send_packet(PatID4.AnsLayerUserListData, data, seq)
 
     def recvReqLayerUserListFoot(self, packet_id, data, seq):

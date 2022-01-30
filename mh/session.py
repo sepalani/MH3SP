@@ -19,6 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import struct
+
 import mh.database as db
 import mh.pat_item as pati
 
@@ -233,3 +235,23 @@ class Session(object):
             return city.players
         else:
             assert False, "Can't find layer"
+
+    def get_layer_host_data(self):
+        """LayerUserInfo's layer_host."""
+        return struct.pack("IIHHH",
+                           3,  # layer depth?
+                           self.local_info["server_id"] or 0,
+                           1,  # ???
+                           self.local_info["gate_id"] or 0,
+                           self.local_info["city_id"] or 0)
+
+    def get_optional_fields(self):
+        """LayerUserInfo's optional fields."""
+        location = 1  # TODO: Don't hardcode location (city, quest, ...)
+        hunter_rank, = struct.unpack_from(">H", self.hunter_info.data, 0)
+        weapon_icon, = struct.unpack_from(">B", self.hunter_info.data, 0x10)
+        weapon_icon -= 7  # Skip armor pieces and start at index zero
+        return [
+                (1, (weapon_icon << 24) | location),
+                (2, hunter_rank << 16)
+        ]
