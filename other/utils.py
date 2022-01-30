@@ -24,6 +24,7 @@ import logging
 import socket
 
 from collections import namedtuple
+from functools import partial
 from logging.handlers import TimedRotatingFileHandler
 
 try:
@@ -74,6 +75,46 @@ class Logger(object):
         if not hasattr(self, "logger"):
             return
         return self.logger.critical(msg, *args, **kwargs)
+
+
+class GenericUnpacker(object):
+    """Generic unpacker that maps unpack and pack functions.
+
+    This class streamlines the unpacking process by keeping track of the
+    data and its current offset on top of checking the (un)packing functions
+    accuracy.
+    """
+    MAPPING = dict()
+
+    def __init__(self, data, offset=0):
+        self.data = data
+        self.offset = offset
+        for name, (unpack_function, pack_function) in self.MAPPING.items():
+            self.bind(name, unpack_function, pack_function)
+
+    def bind(self, name, unpack_function, pack_function):
+        def handler(self, name, unpack_function, pack_function,
+                    *args, **kwargs):
+            unpack_args = args + (self.data, self.offset)
+            unpack_result = unpack_function(*unpack_args, **kwargs)
+
+            if isinstance(unpack_result, tuple):
+                pack_args = args + unpack_result
+            else:
+                pack_args = args + (unpack_result,)
+            pack_result = pack_function(*pack_args, **kwargs)
+
+            length = len(pack_result)
+            matching_results = self.data[self.offset:
+                                         self.offset+length] == pack_result
+            assert matching_results, "Unpacker mismatch in {}:\n{}\n{}".format(
+                name, self.data[self.offset:self.offset+length], pack_result
+            )
+            self.offset += len(pack_result)
+            return unpack_result
+
+        setattr(self, name,
+                partial(handler, self, name, unpack_function, pack_function))
 
 
 def to_bytearray(data):
