@@ -181,8 +181,16 @@ class Session(object):
             return self.get_cities()
         assert False, "Unsupported layer to get sibling"
 
-    def get_layer_users(self, server_id, gate_id, city_id, first_index, count):
-        players = list(DB.get_city(server_id, gate_id, city_id).players)
+    def find_users_by_layer(self, server_id, gate_id, city_id,
+                            first_index, count, recursive=False):
+        if recursive:
+            players = DB.get_all_users(server_id, gate_id, city_id)
+        else:
+            layer = \
+                DB.get_city(server_id, gate_id, city_id) if city_id else \
+                DB.get_gate(server_id, gate_id) if gate_id else \
+                DB.get_server(server_id)
+            players = list(layer.players)
         start = first_index - 1
         return players[start:start+count]
 
