@@ -1099,6 +1099,99 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         self.send_packet(PatID4.AnsBinaryFoot, b"", seq)
 
+    def recvReqUserSearchHead(self, packet_id, data, seq):
+        """ReqUserSearchHead packet.
+
+        ID: 66330100
+        JP: ユーザ検索数要求
+        TR: User search count request
+
+        Sent by the game when searching for players:
+         - Online > Player Search > By Name
+         - Online > Player Search > By Id
+        """
+        unpacker = pati.Unpacker(data)
+        self.search_info = {
+            "capcom_id": unpacker.lp2_string(),
+            "hunter_name": unpacker.lp2_string(),
+            "search": unpacker.detailed_optional_fields(),
+            "offset": unpacker.struct(">I")[0],
+            "limit": unpacker.struct(">I")[0],
+            "fields": unpacker.bytes()
+        }
+        self.server.debug((
+            "ReqUserSearchHead("
+            "hunter_name={hunter_name!r}, capcom_id={capcom_id!r}, "
+            "search={search!r}, offset={offset}, limit={limit}, "
+            "fields={fields!r})"
+        ).format(**self.search_info))
+        self.sendAnsUserSearchHead(seq)
+
+    def sendAnsUserSearchHead(self, seq):
+        """AnsUserSearchHead packet.
+
+        ID: 66330200
+        JP: ユーザ検索数返答
+        TR: User search count response
+        """
+        unk = 0
+        self.search_data = self.session.find_users(
+            self.search_info["capcom_id"], self.search_info["hunter_name"],
+            self.search_info["offset"], self.search_info["limit"]
+        )
+        data = struct.pack(">II", unk, len(self.search_data))
+        self.send_packet(PatID4.AnsUserSearchHead, data, seq)
+
+    def recvReqUserSearchData(self, packet_id, data, seq):
+        """ReqUserSearchData packet.
+
+        ID: 66340100
+        JP: ユーザ検索要求
+        TR: User search request
+        """
+        offset, size = struct.unpack(">II", data)
+        self.sendAnsUserSearchData(offset, size, seq)
+
+    def sendAnsUserSearchData(self, offset, size, seq):
+        """AnsUserSearchData packet.
+
+        ID: 66340200
+        JP: ユーザ検索返答
+        TR: User search response
+        """
+        unk = 0
+        users = self.search_data
+        count = len(users)
+        data = struct.pack(">II", unk, count)
+        for user in users:
+            user_info = pati.UserSearchInfo()
+            user_info.capcom_id = pati.String(user.capcom_id)
+            user_info.hunter_name = pati.String(user.hunter_name)
+            user_info.stats = pati.Binary(user.hunter_info.pack())
+            user_info.layer_host = pati.Binary(user.get_layer_host_data())
+            user_info.assert_fields(self.search_info["fields"])
+            data += user_info.pack()
+            data += pati.pack_optional_fields(user.get_optional_fields())
+        self.send_packet(PatID4.AnsUserSearchData, data, seq)
+
+    def recvReqUserSearchFoot(self, packet_id, data, seq):
+        """ReqUserSearchFoot packet.
+
+        ID: 66350100
+        JP: ユーザ検索終了要求
+        TR: User search end of transmission request
+        """
+        self.sendAnsUserSearchFoot(seq)
+
+    def sendAnsUserSearchFoot(self, seq):
+        """AnsUserSearchFoot packet.
+
+        ID: 66350200
+        JP: ユーザ検索終了返答
+        TR: User search end of transmission response
+        """
+        self.send_packet(PatID4.AnsUserSearchFoot, b"", seq)
+
     def recvReqUserSearchInfo(self, packet_id, data, seq):
         """ReqUserSearchInfo packet.
 
@@ -1121,7 +1214,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         user = pati.UserSearchInfo()
         user.capcom_id = pati.String(OTHER_CAPCOM_ID)
-        user.name = pati.String(OTHER_HUNTER_NAME)
+        user.hunter_name = pati.String(OTHER_HUNTER_NAME)
         user.unk_binary_0x03 = pati.Binary(pati.getHunterStats(seeking=21))
         # Warp location ?
         user.unk_binary_0x04 = pati.Binary(
@@ -1339,8 +1432,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         self.search_info = {
             "unk": unpacker.struct(">B")[0],
             "layer": unpacker.lp2_string(),
-            "s1": unpacker.lp2_string(),
-            "s2": unpacker.lp2_string(),
+            "capcom_id": unpacker.lp2_string(),
+            "hunter_name": unpacker.lp2_string(),
             "search": unpacker.detailed_optional_fields(),
             "offset": unpacker.struct(">I")[0],
             "limit": unpacker.struct(">I")[0],
@@ -1348,7 +1441,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         }
         self.server.debug((
             "ReqLayerUserSearchHead("
-            "unk={unk}, layer={layer!r}, s1={s1!r}, s2={s2!r}, "
+            "unk={unk}, layer={layer!r}, "
+            "capcom_id={capcom_id!r}, hunter_name={hunter_name!r}, "
             "search={search!r}, offset={offset}, limit={limit}, "
             "fields={fields!r})"
         ).format(**self.search_info))

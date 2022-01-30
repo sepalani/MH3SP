@@ -572,9 +572,9 @@ class FmpData(PatData):
 class UserSearchInfo(PatData):
     FIELDS = (
         (0x01, "capcom_id"),
-        (0x02, "name"),
-        (0x03, "unk_binary_0x03"),  # Hunter stat/HR related
-        (0x04, "unk_binary_0x04"),  # Warp related
+        (0x02, "hunter_name"),
+        (0x03, "stats"),
+        (0x04, "layer_host"),
         (0x07, "unk_byte_0x07"),
         (0x08, "server_name"),
         (0x0b, "unk_byte_0x0b"),
