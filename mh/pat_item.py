@@ -131,6 +131,53 @@ def unpack_optional_fields(data, offset=0):
     return info
 
 
+def pack_detailed_optional_fields(info):
+    """Similar to optional fields but with more fields."""
+    data = struct.pack(">II", info["circle"], len(info["data"]))
+    for field_id, field_type, value in info["data"]:
+        has_value = value is not None
+        data += struct.pack(">BBB", field_id, int(has_value), field_type)
+        if has_value:
+            data += struct.pack(">I", value)
+    return data
+
+
+def unpack_detailed_optional_fields(data, offset=0):
+    """Similar to optional fields but with more fields.
+
+    These fields are used by the following packets:
+     - ReqLayerUserSearchHead
+     - ReqLayerDetailSearchHead
+     - ReqCircleSearchHead
+     - ReqUserSearchHead
+
+    Structure format:
+     - unk_circle, set to 0 unless from sendReqCircleSearchHead
+     - field_count, number of fields
+     - array of fields
+
+    Field structure:
+     - field_id, a byte used as an identifier
+     - has_value, a byte telling if it has a value
+     - field_type?, an unknown byte which often holds the value 0x05
+     - value, an integer with the field's value (only set if has_value is true)
+    """
+    info = []
+    unk_circle, count = struct.unpack_from(">II", data, offset)
+    offset += 1
+    for _ in range(count):
+        field_id, has_value, field_type = struct.unpack_from(">BBB",
+                                                             data, offset)
+        offset += 3
+        if has_value:
+            value, = struct.unpack_from(">I", data, offset)
+            offset += 4
+        else:
+            value = None
+        info.append((field_id, field_type, value))
+    return {"circle": unk_circle, "data": info}
+
+
 class Byte(Item):
     """PAT item byte class."""
     def __new__(cls, b):
