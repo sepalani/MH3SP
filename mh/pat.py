@@ -1272,10 +1272,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         depth, server_id, unk_id, gate_id, city_id = struct.unpack_from(
             ">IIHHH", layer)
-        search_payload = (server_id, gate_id, city_id, first_index, count)
-        users = self.session.get_layer_users(*search_payload)
-        self.session.search_payload = search_payload
-        data = struct.pack(">II", first_index, len(users))
+        self.search_data = self.session.find_users_by_layer(
+            server_id, gate_id, city_id, first_index, count)
+        data = struct.pack(">II", first_index, len(self.search_data))
         self.send_packet(PatID4.AnsLayerUserListHead, data, seq)
 
     def recvReqLayerUserListData(self, packet_id, data, seq):
@@ -1296,10 +1295,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer user list response
         """
         unk = 1
-        search_payload = self.session.search_payload[:-2] + (
-            first_index, count)
-        users = self.session.get_layer_users(*search_payload)
-        self.session.search_payload = None
+        users = self.search_data
         data = struct.pack(">II", unk, len(users))
         for user in users:
             layer_user = pati.LayerUserInfo()
