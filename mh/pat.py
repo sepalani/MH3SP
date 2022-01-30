@@ -1325,6 +1325,103 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = b""
         self.send_packet(PatID4.AnsLayerUserListFoot, data, seq)
 
+    def recvReqLayerUserSearchHead(self, packet_id, data, seq):
+        """ReqLayerUserSearchHead packet.
+
+        ID: 64670100
+        JP: レイヤユーザ検索リスト数要求
+        TR: Layer user search list count request
+
+        Sent by the game when searching for players at the gate:
+         - Online > Player Search > Gate Search
+        """
+        unpacker = pati.Unpacker(data)
+        self.search_info = {
+            "unk": unpacker.struct(">B")[0],
+            "layer": unpacker.lp2_string(),
+            "s1": unpacker.lp2_string(),
+            "s2": unpacker.lp2_string(),
+            "search": unpacker.detailed_optional_fields(),
+            "offset": unpacker.struct(">I")[0],
+            "limit": unpacker.struct(">I")[0],
+            "fields": unpacker.bytes()
+        }
+        self.server.debug((
+            "ReqLayerUserSearchHead("
+            "unk={unk}, layer={layer!r}, s1={s1!r}, s2={s2!r}, "
+            "search={search!r}, offset={offset}, limit={limit}, "
+            "fields={fields!r})"
+        ).format(**self.search_info))
+        self.sendAnsLayerUserSearchHead(seq)
+
+    def sendAnsLayerUserSearchHead(self, seq):
+        """AnsLayerUserSearchHead packet.
+
+        ID: 64670200
+        JP: レイヤユーザ検索リスト数返答
+        TR: Layer user search list count response
+        """
+        depth, server_id, unk_id, gate_id, city_id = struct.unpack_from(
+            ">IIHHH", self.search_info["layer"]
+        )
+        self.search_data = self.session.find_users_by_layer(
+            server_id, gate_id, city_id,
+            self.search_info["offset"], self.search_info["limit"],
+            recursive=True
+        )
+        unk = 0
+        data = struct.pack(">II", unk, len(self.search_data))
+        self.send_packet(PatID4.AnsLayerUserSearchHead, data, seq)
+
+    def recvReqLayerUserSearchData(self, packet_id, data, seq):
+        """ReqLayerUserSearchData packet.
+
+        ID: 64680100
+        JP: レイヤユーザ検索リスト要求
+        TR: Layer user search list request
+        """
+        offset, size = struct.unpack(">II", data)
+        self.sendAnsLayerUserSearchData(offset, size, seq)
+
+    def sendAnsLayerUserSearchData(self, offset, size, seq):
+        """AnsLayerUserSearchData packet.
+
+        ID: 64680200
+        JP: レイヤユーザ検索リスト返答
+        TR: Layer user search list response
+        """
+        unk = 0
+        layer_users = self.search_data
+        count = len(layer_users)
+        data = struct.pack(">II", unk, count)
+        for user in layer_users:
+            layer_user = pati.LayerUserInfo()
+            layer_user.capcom_id = pati.String(user.capcom_id)
+            layer_user.hunter_name = pati.String(user.hunter_name)
+            layer_user.layer_host = pati.Binary(user.get_layer_host_data())
+            layer_user.assert_fields(self.search_info["fields"])
+            data += layer_user.pack()
+            data += pati.pack_optional_fields(user.get_optional_fields())
+        self.send_packet(PatID4.AnsLayerUserSearchData, data, seq)
+
+    def recvReqLayerUserSearchFoot(self, packet_id, data, seq):
+        """ReqLayerUserSearchFoot packet.
+
+        ID: 64690100
+        JP: レイヤユーザ検索リスト終了要求
+        TR: Layer user search list end of transmission request
+        """
+        self.sendAnsLayerUserSearchFoot(seq)
+
+    def sendAnsLayerUserSearchFoot(self, seq):
+        """AnsLayerUserSearchFoot packet.
+
+        ID: 64690200
+        JP: レイヤユーザ検索リスト終了返答
+        TR: Layer user search list end of transmission response
+        """
+        self.send_packet(PatID4.AnsLayerUserSearchFoot, b"", seq)
+
     def recvReqFriendList(self, packet_id, data, seq):
         """ReqFriendList packet.
 
