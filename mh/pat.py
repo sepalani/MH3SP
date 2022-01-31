@@ -1199,45 +1199,51 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ユーザ検索データ要求
         TR: User search data request
         """
-        name = pati.unpack_lp2_string(data)
-        offset = 2 + len(name)
+        capcom_id = pati.unpack_lp2_string(data)
+        offset = 2 + len(capcom_id)
         search_info = pati.UserSearchInfo.unpack(data, offset)
-        self.server.debug("SearchInfo: {}, {!r}".format(name, search_info))
-        self.sendAnsUserSearchInfo(name, search_info, seq)
+        self.server.debug("SearchInfo: {}, {!r}".format(capcom_id,
+                                                        search_info))
+        self.sendAnsUserSearchInfo(capcom_id, search_info, seq)
 
-    def sendAnsUserSearchInfo(self, name, search_info, seq):
+    def sendAnsUserSearchInfo(self, capcom_id, search_info, seq):
         """AnsUserSearchInfo packet.
 
         ID: 66360200
         JP: ユーザ検索データ返答
         TR: User search data response
         """
-        user = pati.UserSearchInfo()
-        user.capcom_id = pati.String(OTHER_CAPCOM_ID)
-        user.hunter_name = pati.String(OTHER_HUNTER_NAME)
-        user.unk_binary_0x03 = pati.Binary(pati.getHunterStats(seeking=21))
-        # Warp location ?
-        user.unk_binary_0x04 = pati.Binary(
-            # Long: ? + server_type? / Word: server? + gate? + city?
-            b"\0\0\0\01" + b"\0\0\0\01" + b"\0\01" + b"\0\01" + b"\0\01"
-        )
-        user.unk_byte_0x07 = pati.Byte(1)
-        user.server_name = pati.String("Server\tGate\tCity")
-        user.unk_byte_0x0b = pati.Byte(1)
-        user.unk_string_0x0c = pati.String("StrC")
-        user.city_size = pati.Long(4)
-        user.city_capacity = pati.Long(3)
+        users = self.session.find_users(capcom_id, "", 1, 1)
+        assert users, "Capcom ID not found"
+        user = users[0]
+
+        user_info = pati.UserSearchInfo()
+        user_info.capcom_id = pati.String(user.capcom_id)
+        user_info.hunter_name = pati.String(user.hunter_name)
+        user_info.stats = pati.Binary(user.hunter_info.pack())
+        user_info.layer_host = pati.Binary(user.get_layer_host_data())
+
+        user_info.unk_byte_0x07 = pati.Byte(1)
+        user_info.server_name = pati.String("\t".join([
+            user.local_info["server_name"] or "",
+            user.local_info["gate_name"] or "",
+            user.local_info["city_name"] or ""
+        ]))
+        user_info.unk_byte_0x0b = pati.Byte(1)
+        user_info.unk_string_0x0c = pati.String("StrC")
+        user_info.city_size = pati.Long(4)
+        user_info.city_capacity = pati.Long(3)
 
         # This fields are used to identify a user.
         # Specifically when a client is deserializing data from the packets
         # `NtcLayerBinary` and `NtcLayerBinary2`
         # TODO: Proper field value and name
-        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID))
-                                        & 0xffffffff)
-        user.info_mine_0x10 = pati.Long(int(hash(OTHER_CAPCOM_ID[::-1]))
-                                        & 0xffffffff)
+        user_info.info_mine_0x0f = pati.Long(int(hash(user.capcom_id))
+                                             & 0xffffffff)
+        user_info.info_mine_0x10 = pati.Long(int(hash(user.capcom_id[::-1]))
+                                             & 0xffffffff)
 
-        data = user.pack()
+        data = user_info.pack()
         # TODO: Figure out the optional fields
         data += pati.pack_optional_fields([])
         self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
