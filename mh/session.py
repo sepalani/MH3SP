@@ -44,6 +44,8 @@ class Session(object):
             "gate_name": None,
             "city_id": None,
             "city_name": None,
+            "city_size": 0,
+            "city_capacity": 0,
             "circle_id": None,
         }
         self.connection = connection_handler
