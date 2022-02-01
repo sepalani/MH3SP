@@ -579,8 +579,8 @@ class UserSearchInfo(PatData):
         (0x08, "server_name"),
         (0x0b, "unk_byte_0x0b"),
         (0x0c, "unk_string_0x0c"),
-        (0x0d, "city_size"),
-        (0x0e, "city_capacity"),
+        (0x0d, "city_capacity"),
+        (0x0e, "city_size"),
         (0x0f, "info_mine_0x0f"),
         (0x10, "info_mine_0x10"),
     )
