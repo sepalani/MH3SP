@@ -316,10 +316,13 @@ class TempDatabase(object):
         server = self.get_server(index)
         server.players.add(session)
         session.local_info["server_id"] = index
+        session.local_info["server_name"] = server.name
         return server
 
     def leave_server(self, session, index):
         self.get_server(index).players.remove(session)
+        session.local_info["server_id"] = None
+        session.local_info["server_name"] = None
 
     def get_server_time(self):
         pass
