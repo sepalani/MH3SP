@@ -22,7 +22,7 @@
 import struct
 
 from collections import OrderedDict
-from other.utils import to_bytearray, get_config, get_ip
+from other.utils import to_bytearray, get_config, get_ip, GenericUnpacker
 
 
 class ItemType:
@@ -129,6 +129,53 @@ def unpack_optional_fields(data, offset=0):
             value = None
         info.append((field_id, value))
     return info
+
+
+def pack_detailed_optional_fields(info):
+    """Similar to optional fields but with more fields."""
+    data = struct.pack(">II", info["circle"], len(info["data"]))
+    for field_id, field_type, value in info["data"]:
+        has_value = value is not None
+        data += struct.pack(">BBB", field_id, int(has_value), field_type)
+        if has_value:
+            data += struct.pack(">I", value)
+    return data
+
+
+def unpack_detailed_optional_fields(data, offset=0):
+    """Similar to optional fields but with more fields.
+
+    These fields are used by the following packets:
+     - ReqLayerUserSearchHead
+     - ReqLayerDetailSearchHead
+     - ReqCircleSearchHead
+     - ReqUserSearchHead
+
+    Structure format:
+     - unk_circle, set to 0 unless from sendReqCircleSearchHead
+     - field_count, number of fields
+     - array of fields
+
+    Field structure:
+     - field_id, a byte used as an identifier
+     - has_value, a byte telling if it has a value
+     - field_type?, an unknown byte which often holds the value 0x05
+     - value, an integer with the field's value (only set if has_value is true)
+    """
+    info = []
+    unk_circle, count = struct.unpack_from(">II", data, offset)
+    offset += 1
+    for _ in range(count):
+        field_id, has_value, field_type = struct.unpack_from(">BBB",
+                                                             data, offset)
+        offset += 3
+        if has_value:
+            value, = struct.unpack_from(">I", data, offset)
+            offset += 4
+        else:
+            value = None
+        info.append((field_id, field_type, value))
+    return {"circle": unk_circle, "data": info}
 
 
 class Byte(Item):
@@ -305,6 +352,11 @@ class FallthroughBug(Custom):
     """
     def __new__(cls):
         return Custom.__new__(cls, b"\xff", b"\xff")
+
+
+def pack_bytes(*args):
+    """Pack bytes list."""
+    return struct.pack(">B", len(args)) + bytearray(args)
 
 
 def unpack_bytes(data, offset=0):
@@ -520,15 +572,15 @@ class FmpData(PatData):
 class UserSearchInfo(PatData):
     FIELDS = (
         (0x01, "capcom_id"),
-        (0x02, "name"),
-        (0x03, "unk_binary_0x03"),  # Hunter stat/HR related
-        (0x04, "unk_binary_0x04"),  # Warp related
+        (0x02, "hunter_name"),
+        (0x03, "stats"),
+        (0x04, "layer_host"),
         (0x07, "unk_byte_0x07"),
         (0x08, "server_name"),
         (0x0b, "unk_byte_0x0b"),
         (0x0c, "unk_string_0x0c"),
-        (0x0d, "city_size"),
-        (0x0e, "city_capacity"),
+        (0x0d, "city_capacity"),
+        (0x0e, "city_size"),
         (0x0f, "info_mine_0x0f"),
         (0x10, "info_mine_0x10"),
     )
@@ -661,6 +713,30 @@ class LayerBinaryInfo(PatData):
         (0x02, "capcom_id"),
         (0x03, "hunter_name")
     )
+
+
+class Unpacker(GenericUnpacker):
+    """Simple PAT item unpacker.
+
+    TODO:
+     - Handle PatData unpacking
+    """
+    MAPPING = {
+        "struct": (struct.unpack_from, struct.pack),
+        "lp_string": (unpack_lp_string, lp_string),
+        "lp2_string": (unpack_lp2_string, lp2_string),
+        "byte": (unpack_byte, pack_byte),
+        "word": (unpack_word, pack_word),
+        "long": (unpack_long, pack_long),
+        "longlong": (unpack_longlong, pack_longlong),
+        "string": (unpack_string, pack_string),
+        "binary": (unpack_binary, pack_binary),
+        "bytes": (unpack_bytes, pack_bytes),
+        "optional_fields": (unpack_optional_fields,
+                            pack_optional_fields),
+        "detailed_optional_fields": (unpack_detailed_optional_fields,
+                                     pack_detailed_optional_fields)
+    }
 
 
 class HunterSettings(object):

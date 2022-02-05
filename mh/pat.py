@@ -1099,6 +1099,99 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         self.send_packet(PatID4.AnsBinaryFoot, b"", seq)
 
+    def recvReqUserSearchHead(self, packet_id, data, seq):
+        """ReqUserSearchHead packet.
+
+        ID: 66330100
+        JP: ユーザ検索数要求
+        TR: User search count request
+
+        Sent by the game when searching for players:
+         - Online > Player Search > By Name
+         - Online > Player Search > By Id
+        """
+        unpacker = pati.Unpacker(data)
+        self.search_info = {
+            "capcom_id": unpacker.lp2_string(),
+            "hunter_name": unpacker.lp2_string(),
+            "search": unpacker.detailed_optional_fields(),
+            "offset": unpacker.struct(">I")[0],
+            "limit": unpacker.struct(">I")[0],
+            "fields": unpacker.bytes()
+        }
+        self.server.debug((
+            "ReqUserSearchHead("
+            "hunter_name={hunter_name!r}, capcom_id={capcom_id!r}, "
+            "search={search!r}, offset={offset}, limit={limit}, "
+            "fields={fields!r})"
+        ).format(**self.search_info))
+        self.sendAnsUserSearchHead(seq)
+
+    def sendAnsUserSearchHead(self, seq):
+        """AnsUserSearchHead packet.
+
+        ID: 66330200
+        JP: ユーザ検索数返答
+        TR: User search count response
+        """
+        unk = 0
+        self.search_data = self.session.find_users(
+            self.search_info["capcom_id"], self.search_info["hunter_name"],
+            self.search_info["offset"], self.search_info["limit"]
+        )
+        data = struct.pack(">II", unk, len(self.search_data))
+        self.send_packet(PatID4.AnsUserSearchHead, data, seq)
+
+    def recvReqUserSearchData(self, packet_id, data, seq):
+        """ReqUserSearchData packet.
+
+        ID: 66340100
+        JP: ユーザ検索要求
+        TR: User search request
+        """
+        offset, size = struct.unpack(">II", data)
+        self.sendAnsUserSearchData(offset, size, seq)
+
+    def sendAnsUserSearchData(self, offset, size, seq):
+        """AnsUserSearchData packet.
+
+        ID: 66340200
+        JP: ユーザ検索返答
+        TR: User search response
+        """
+        unk = 0
+        users = self.search_data
+        count = len(users)
+        data = struct.pack(">II", unk, count)
+        for user in users:
+            user_info = pati.UserSearchInfo()
+            user_info.capcom_id = pati.String(user.capcom_id)
+            user_info.hunter_name = pati.String(user.hunter_name)
+            user_info.stats = pati.Binary(user.hunter_info.pack())
+            user_info.layer_host = pati.Binary(user.get_layer_host_data())
+            user_info.assert_fields(self.search_info["fields"])
+            data += user_info.pack()
+            data += pati.pack_optional_fields(user.get_optional_fields())
+        self.send_packet(PatID4.AnsUserSearchData, data, seq)
+
+    def recvReqUserSearchFoot(self, packet_id, data, seq):
+        """ReqUserSearchFoot packet.
+
+        ID: 66350100
+        JP: ユーザ検索終了要求
+        TR: User search end of transmission request
+        """
+        self.sendAnsUserSearchFoot(seq)
+
+    def sendAnsUserSearchFoot(self, seq):
+        """AnsUserSearchFoot packet.
+
+        ID: 66350200
+        JP: ユーザ検索終了返答
+        TR: User search end of transmission response
+        """
+        self.send_packet(PatID4.AnsUserSearchFoot, b"", seq)
+
     def recvReqUserSearchInfo(self, packet_id, data, seq):
         """ReqUserSearchInfo packet.
 
@@ -1106,45 +1199,51 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ユーザ検索データ要求
         TR: User search data request
         """
-        name = pati.unpack_lp2_string(data)
-        offset = 2 + len(name)
+        capcom_id = pati.unpack_lp2_string(data)
+        offset = 2 + len(capcom_id)
         search_info = pati.UserSearchInfo.unpack(data, offset)
-        self.server.debug("SearchInfo: {}, {!r}".format(name, search_info))
-        self.sendAnsUserSearchInfo(name, search_info, seq)
+        self.server.debug("SearchInfo: {}, {!r}".format(capcom_id,
+                                                        search_info))
+        self.sendAnsUserSearchInfo(capcom_id, search_info, seq)
 
-    def sendAnsUserSearchInfo(self, name, search_info, seq):
+    def sendAnsUserSearchInfo(self, capcom_id, search_info, seq):
         """AnsUserSearchInfo packet.
 
         ID: 66360200
         JP: ユーザ検索データ返答
         TR: User search data response
         """
-        user = pati.UserSearchInfo()
-        user.capcom_id = pati.String(OTHER_CAPCOM_ID)
-        user.name = pati.String(OTHER_HUNTER_NAME)
-        user.unk_binary_0x03 = pati.Binary(pati.getHunterStats(seeking=21))
-        # Warp location ?
-        user.unk_binary_0x04 = pati.Binary(
-            # Long: ? + server_type? / Word: server? + gate? + city?
-            b"\0\0\0\01" + b"\0\0\0\01" + b"\0\01" + b"\0\01" + b"\0\01"
-        )
-        user.unk_byte_0x07 = pati.Byte(1)
-        user.server_name = pati.String("Server\tGate\tCity")
-        user.unk_byte_0x0b = pati.Byte(1)
-        user.unk_string_0x0c = pati.String("StrC")
-        user.city_size = pati.Long(4)
-        user.city_capacity = pati.Long(3)
+        users = self.session.find_users(capcom_id, "", 1, 1)
+        assert users, "Capcom ID not found"
+        user = users[0]
+
+        user_info = pati.UserSearchInfo()
+        user_info.capcom_id = pati.String(user.capcom_id)
+        user_info.hunter_name = pati.String(user.hunter_name)
+        user_info.stats = pati.Binary(user.hunter_info.pack())
+        user_info.layer_host = pati.Binary(user.get_layer_host_data())
+
+        user_info.unk_byte_0x07 = pati.Byte(1)
+        user_info.server_name = pati.String("\t".join([
+            user.local_info["server_name"] or "",
+            user.local_info["gate_name"] or "",
+            user.local_info["city_name"] or ""
+        ]))
+        user_info.unk_byte_0x0b = pati.Byte(1)
+        user_info.unk_string_0x0c = pati.String("StrC")
+        user_info.city_capacity = pati.Long(4)
+        user_info.city_size = pati.Long(3)
 
         # This fields are used to identify a user.
         # Specifically when a client is deserializing data from the packets
         # `NtcLayerBinary` and `NtcLayerBinary2`
         # TODO: Proper field value and name
-        user.info_mine_0x0f = pati.Long(int(hash(OTHER_CAPCOM_ID))
-                                        & 0xffffffff)
-        user.info_mine_0x10 = pati.Long(int(hash(OTHER_CAPCOM_ID[::-1]))
-                                        & 0xffffffff)
+        user_info.info_mine_0x0f = pati.Long(int(hash(user.capcom_id))
+                                             & 0xffffffff)
+        user_info.info_mine_0x10 = pati.Long(int(hash(user.capcom_id[::-1]))
+                                             & 0xffffffff)
 
-        data = user.pack()
+        data = user_info.pack()
         # TODO: Figure out the optional fields
         data += pati.pack_optional_fields([])
         self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
@@ -1272,10 +1371,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         depth, server_id, unk_id, gate_id, city_id = struct.unpack_from(
             ">IIHHH", layer)
-        search_payload = (server_id, gate_id, city_id, first_index, count)
-        users = self.session.get_layer_users(*search_payload)
-        self.session.search_payload = search_payload
-        data = struct.pack(">II", first_index, len(users))
+        self.search_data = self.session.find_users_by_layer(
+            server_id, gate_id, city_id, first_index, count)
+        data = struct.pack(">II", first_index, len(self.search_data))
         self.send_packet(PatID4.AnsLayerUserListHead, data, seq)
 
     def recvReqLayerUserListData(self, packet_id, data, seq):
@@ -1296,36 +1394,15 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Layer user list response
         """
         unk = 1
-        search_payload = self.session.search_payload[:-2] + (
-            first_index, count)
-        users = self.session.get_layer_users(*search_payload)
-        self.session.search_payload = None
+        users = self.search_data
         data = struct.pack(">II", unk, len(users))
         for user in users:
             layer_user = pati.LayerUserInfo()
             layer_user.capcom_id = pati.String(user.capcom_id)
             layer_user.hunter_name = pati.String(user.hunter_name)
-            layer_user.layer_host = pati.Binary(
-                b'\x00\x00\x00\x03'  # Depth?
-                b'\x00\x00\x00\x01'  # Unknown
-                b'\x00\x01'          # Server ID?
-                b'\x00\x01'          # Gate ID?
-                b'\x00\x01'          # City ID?
-            )
+            layer_user.layer_host = pati.Binary(user.get_layer_host_data())
             data += layer_user.pack()
-            # User summary?
-            # Index 1/4 - Weapon (u8) + 16-bit padding + Location (u8)
-            # Index 2/4 - HR (u16) + 16-bit padding
-            # Index 3/4 - ??? (u8[4])
-            # Index 4/4 - ??? (u32)
-            count = 4
-            data += pati.pack_optional_fields([
-                (i, 0x03030303)
-                for i in range(3, 5)
-            ] + [
-                (1, 0x03000001),
-                (2, 0x00ff0000)
-            ])
+            data += pati.pack_optional_fields(user.get_optional_fields())
         self.send_packet(PatID4.AnsLayerUserListData, data, seq)
 
     def recvReqLayerUserListFoot(self, packet_id, data, seq):
@@ -1346,6 +1423,104 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         data = b""
         self.send_packet(PatID4.AnsLayerUserListFoot, data, seq)
+
+    def recvReqLayerUserSearchHead(self, packet_id, data, seq):
+        """ReqLayerUserSearchHead packet.
+
+        ID: 64670100
+        JP: レイヤユーザ検索リスト数要求
+        TR: Layer user search list count request
+
+        Sent by the game when searching for players at the gate:
+         - Online > Player Search > Gate Search
+        """
+        unpacker = pati.Unpacker(data)
+        self.search_info = {
+            "unk": unpacker.struct(">B")[0],
+            "layer": unpacker.lp2_string(),
+            "capcom_id": unpacker.lp2_string(),
+            "hunter_name": unpacker.lp2_string(),
+            "search": unpacker.detailed_optional_fields(),
+            "offset": unpacker.struct(">I")[0],
+            "limit": unpacker.struct(">I")[0],
+            "fields": unpacker.bytes()
+        }
+        self.server.debug((
+            "ReqLayerUserSearchHead("
+            "unk={unk}, layer={layer!r}, "
+            "capcom_id={capcom_id!r}, hunter_name={hunter_name!r}, "
+            "search={search!r}, offset={offset}, limit={limit}, "
+            "fields={fields!r})"
+        ).format(**self.search_info))
+        self.sendAnsLayerUserSearchHead(seq)
+
+    def sendAnsLayerUserSearchHead(self, seq):
+        """AnsLayerUserSearchHead packet.
+
+        ID: 64670200
+        JP: レイヤユーザ検索リスト数返答
+        TR: Layer user search list count response
+        """
+        depth, server_id, unk_id, gate_id, city_id = struct.unpack_from(
+            ">IIHHH", self.search_info["layer"]
+        )
+        self.search_data = self.session.find_users_by_layer(
+            server_id, gate_id, city_id,
+            self.search_info["offset"], self.search_info["limit"],
+            recursive=True
+        )
+        unk = 0
+        data = struct.pack(">II", unk, len(self.search_data))
+        self.send_packet(PatID4.AnsLayerUserSearchHead, data, seq)
+
+    def recvReqLayerUserSearchData(self, packet_id, data, seq):
+        """ReqLayerUserSearchData packet.
+
+        ID: 64680100
+        JP: レイヤユーザ検索リスト要求
+        TR: Layer user search list request
+        """
+        offset, size = struct.unpack(">II", data)
+        self.sendAnsLayerUserSearchData(offset, size, seq)
+
+    def sendAnsLayerUserSearchData(self, offset, size, seq):
+        """AnsLayerUserSearchData packet.
+
+        ID: 64680200
+        JP: レイヤユーザ検索リスト返答
+        TR: Layer user search list response
+        """
+        unk = 0
+        layer_users = self.search_data
+        count = len(layer_users)
+        data = struct.pack(">II", unk, count)
+        for user in layer_users:
+            layer_user = pati.LayerUserInfo()
+            layer_user.capcom_id = pati.String(user.capcom_id)
+            layer_user.hunter_name = pati.String(user.hunter_name)
+            layer_user.layer_host = pati.Binary(user.get_layer_host_data())
+            layer_user.assert_fields(self.search_info["fields"])
+            data += layer_user.pack()
+            data += pati.pack_optional_fields(user.get_optional_fields())
+        self.send_packet(PatID4.AnsLayerUserSearchData, data, seq)
+
+    def recvReqLayerUserSearchFoot(self, packet_id, data, seq):
+        """ReqLayerUserSearchFoot packet.
+
+        ID: 64690100
+        JP: レイヤユーザ検索リスト終了要求
+        TR: Layer user search list end of transmission request
+        """
+        self.sendAnsLayerUserSearchFoot(seq)
+
+    def sendAnsLayerUserSearchFoot(self, seq):
+        """AnsLayerUserSearchFoot packet.
+
+        ID: 64690200
+        JP: レイヤユーザ検索リスト終了返答
+        TR: Layer user search list end of transmission response
+        """
+        self.send_packet(PatID4.AnsLayerUserSearchFoot, b"", seq)
 
     def recvReqFriendList(self, packet_id, data, seq):
         """ReqFriendList packet.
