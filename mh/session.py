@@ -19,6 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import struct
+
 import mh.database as db
 import mh.pat_item as pati
 
@@ -42,6 +44,8 @@ class Session(object):
             "gate_name": None,
             "city_id": None,
             "city_name": None,
+            "city_size": 0,
+            "city_capacity": 0,
             "circle_id": None,
         }
         self.connection = connection_handler
@@ -179,10 +183,23 @@ class Session(object):
             return self.get_cities()
         assert False, "Unsupported layer to get sibling"
 
-    def get_layer_users(self, server_id, gate_id, city_id, first_index, count):
-        players = list(DB.get_city(server_id, gate_id, city_id).players)
+    def find_users_by_layer(self, server_id, gate_id, city_id,
+                            first_index, count, recursive=False):
+        if recursive:
+            players = DB.get_all_users(server_id, gate_id, city_id)
+        else:
+            layer = \
+                DB.get_city(server_id, gate_id, city_id) if city_id else \
+                DB.get_gate(server_id, gate_id) if gate_id else \
+                DB.get_server(server_id)
+            players = list(layer.players)
         start = first_index - 1
         return players[start:start+count]
+
+    def find_users(self, capcom_id, hunter_name, first_index, count):
+        users = DB.find_users(capcom_id, hunter_name)
+        start = first_index - 1
+        return users[start:start+count]
 
     def leave_server(self):
         DB.leave_server(self)
@@ -233,3 +250,23 @@ class Session(object):
             return city.players
         else:
             assert False, "Can't find layer"
+
+    def get_layer_host_data(self):
+        """LayerUserInfo's layer_host."""
+        return struct.pack("IIHHH",
+                           3,  # layer depth?
+                           self.local_info["server_id"] or 0,
+                           1,  # ???
+                           self.local_info["gate_id"] or 0,
+                           self.local_info["city_id"] or 0)
+
+    def get_optional_fields(self):
+        """LayerUserInfo's optional fields."""
+        location = 1  # TODO: Don't hardcode location (city, quest, ...)
+        hunter_rank, = struct.unpack_from(">H", self.hunter_info.data, 0)
+        weapon_icon, = struct.unpack_from(">B", self.hunter_info.data, 0x10)
+        weapon_icon -= 7  # Skip armor pieces and start at index zero
+        return [
+                (1, (weapon_icon << 24) | location),
+                (2, hunter_rank << 16)
+        ]
