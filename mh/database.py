@@ -316,10 +316,13 @@ class TempDatabase(object):
         server = self.get_server(index)
         server.players.add(session)
         session.local_info["server_id"] = index
+        session.local_info["server_name"] = server.name
         return server
 
     def leave_server(self, session, index):
         self.get_server(index).players.remove(session)
+        session.local_info["server_id"] = None
+        session.local_info["server_name"] = None
 
     def get_server_time(self):
         pass
@@ -365,6 +368,38 @@ class TempDatabase(object):
         cities = self.get_cities(server_id, gate_id)
         assert 0 < index <= len(cities), "Invalid city index"
         return cities[index - 1]
+
+    def get_all_users(self, server_id, gate_id, city_id):
+        """Search for users in layers and its children.
+
+        Let's assume wildcard search isn't possible for servers and gates.
+        A wildcard search happens when the id is zero.
+        """
+        assert 0 < server_id, "Invalid server index"
+        assert 0 < gate_id, "Invalid gate index"
+        gate = self.get_gate(server_id, gate_id)
+        users = list(gate.players)
+        cities = [
+            self.get_city(server_id, gate_id, city_id)
+        ] if city_id else self.get_cities(server_id, gate_id)
+        for city in cities:
+            users.extend(list(city.players))
+        return users
+
+    def find_users(self, capcom_id="", hunter_name=""):
+        assert capcom_id or hunter_name, "Search can't be empty"
+        users = []
+        for user_id, user_info in self.capcom_ids.items():
+            session = user_info["session"]
+            if not session:
+                continue
+            if capcom_id and capcom_id not in user_id:
+                continue
+            if hunter_name and \
+                    hunter_name.lower() not in user_info["name"].lower():
+                continue
+            users.append(session)
+        return users
 
     def create_city(self, session, server_id, gate_id, index,
                     settings, optional_fields):
