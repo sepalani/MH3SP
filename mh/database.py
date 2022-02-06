@@ -265,6 +265,7 @@ class TempDatabase(object):
         while users[index] == "******":
             capcom_id = new_random_str(6)
             if capcom_id not in self.capcom_ids:
+                self.capcom_ids[capcom_id] = {"name": name, "session": None}
                 users[index] = capcom_id
                 break
         else:
