@@ -164,7 +164,7 @@ def unpack_detailed_optional_fields(data, offset=0):
     """
     info = []
     unk_circle, count = struct.unpack_from(">II", data, offset)
-    offset += 1
+    offset += 8
     for _ in range(count):
         field_id, has_value, field_type = struct.unpack_from(">BBB",
                                                              data, offset)
