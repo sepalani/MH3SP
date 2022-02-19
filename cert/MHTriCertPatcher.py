@@ -16,6 +16,7 @@ It can also patch the EC ticket check for the japanese version of the game.
 
 import os
 import mmap
+from collections import namedtuple
 from contextlib import closing
 
 
@@ -139,45 +140,128 @@ class PALCertPatcher(CertPatcher):
     CERT_LEN = 924
 
 
-class NetworkWiiMediatorIsECTicket(object):
-    """NetworkWiiMediator::IsECTicket patcher."""
+CodePatch = namedtuple("CodePatch", ["name", "address", "signature", "patch"])
 
-    ADDRESS = 0x803f7fcc
 
-    SIGNATURE = bytearray([
-        0x80, 0x6d, 0xbd, 0xb0,  # lwz r3, -0x4250 (r13)
-        0x2c, 0x03, 0x00, 0x00,  # cmpwi r3, 0
-        0x41, 0x82, 0x00, 0x08,  # beq- 0x803F7FDC
-        0x4b, 0xff, 0xb5, 0xec,  # b 0x803F35C4
-        0x38, 0x60, 0x00, 0x00,  # li r3, 0
-        0x4e, 0x80, 0x00, 0x20   # blr
-    ])
+class ECPatcher(object):
+    """EC/Wii Shop patcher."""
 
-    PATCH = bytearray([
-        0x60, 0x00, 0x00, 0x00,  # nop
-        0x60, 0x00, 0x00, 0x00,  # nop
-        0x60, 0x00, 0x00, 0x00,  # nop
-        0x60, 0x00, 0x00, 0x00,  # nop
-        0x38, 0x60, 0x00, 0x01,  # li r3, 1
-        0x4e, 0x80, 0x00, 0x20   # blr
-    ])
+    PATCHES = [
+        CodePatch(
+            name="NetworkWiiMediator::isECConfig",
+            address=0x803f7fb4,
+            signature=bytearray([
+                0x80, 0x6d, 0xbd, 0xb0,  # lwz r3,-0x4250 (r13)
+                0x2c, 0x03, 0x00, 0x00,  # cmpwi r3, 0
+                0x41, 0x82, 0x00, 0x08,  # beq- 0x803F7FC4
+                0x4b, 0xff, 0xb5, 0xfc,  # b 0x803F35BC
+                0x38, 0x60, 0x00, 0x00,  # li r3, 0
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ]),
+            patch=bytearray([
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x38, 0x60, 0x00, 0x01,  # li r3, 1
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ])
+        ),
+        CodePatch(
+            name="NetworkWiiMediator::isECTicket",
+            address=0x803f7fcc,
+            signature=bytearray([
+                0x80, 0x6d, 0xbd, 0xb0,  # lwz r3, -0x4250 (r13)
+                0x2c, 0x03, 0x00, 0x00,  # cmpwi r3, 0
+                0x41, 0x82, 0x00, 0x08,  # beq- 0x803F7FDC
+                0x4b, 0xff, 0xb5, 0xec,  # b 0x803F35C4
+                0x38, 0x60, 0x00, 0x00,  # li r3, 0
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ]),
+            patch=bytearray([
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x38, 0x60, 0x00, 0x01,  # li r3, 1
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ])
+        ),
+        CodePatch(
+            name="EC_Init",
+            address=0x804e2088,
+            signature=bytearray([
+                0x94, 0x21, 0xff, 0xd0,  # stwu sp, -0x0030 (sp)
+                0x7c, 0x08, 0x02, 0xa6,  # mflr r0
+                0x90, 0x01, 0x00, 0x34,  # stw r0, 0x0034 (sp)
+                0x39, 0x61, 0x00, 0x30,  # addi r11, sp, 48
+                0x4b, 0xf7, 0x22, 0xf9   # bl 0x80454390
+            ]),
+            patch=bytearray([
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x38, 0x60, 0x00, 0x00,  # li r3, 0
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ])
+        ),
+        CodePatch(
+            name="EC_SetParameter",
+            address=0x804e2278,
+            signature=bytearray([
+                0x94, 0x21, 0xff, 0xc0,  # stwu sp, -0x0040 (sp)
+                0x7c, 0x08, 0x02, 0xa6,  # mflr r0
+                0x90, 0x01, 0x00, 0x44,  # stw r0, 0x0044 (sp)
+                0x39, 0x61, 0x00, 0x40,  # addi	r11, sp, 64
+                0x4b, 0xf7, 0x20, 0xfd   # bl 0x80454384
+            ]),
+            patch=bytearray([
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x38, 0x60, 0x00, 0x00,  # li r3, 0
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ])
+        ),
+        CodePatch(
+            name="EC_GetIsSyncNeeded",
+            address=0x804e35d4,
+            signature=bytearray([
+                0x94, 0x21, 0xff, 0xf0,  # stwu sp, -0x0010 (sp)
+                0x7c, 0x08, 0x02, 0xa6,  # mflr r0
+                0x3c, 0x60, 0x80, 0x82,  # lis r3, 0x8082
+                0x90, 0x01, 0x00, 0x14,  # stw r0, 0x0014 (sp)
+                0x80, 0x83, 0xb6, 0xa0,  # lwz	r4, -0x4960 (r3)
+                0x2c, 0x04, 0x00, 0x00   # cmpwi r4, 0
+            ]),
+            patch=bytearray([
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x60, 0x00, 0x00, 0x00,  # nop
+                0x38, 0x60, 0x00, 0x00,  # li r3, 0
+                0x4e, 0x80, 0x00, 0x20   # blr
+            ])
+        )
+    ]
 
     def patch(self, path):
-        """Patches NetworkWiiMediator::IsECTicket function.
-
-        It removes the EC ticket check required to play online."""
+        """Patches EC/Wii Shop related functions required to play online."""
         with open(path, "rb+") as f, \
              closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_WRITE)) as m:
-            signature = bytes(self.SIGNATURE)
-            patch = bytes(self.PATCH)
-            pos = m.find(signature)
-            if pos == -1:
-                if m.find(patch) != -1:
-                    print("- NetworkWiiMediator::IsECTicket already patched!")
-                    return
-                raise IndexError("Can't find NetworkWiiMediator::IsECTicket")
-            m.seek(pos)
-            m.write(patch)
+            for code_patch in self.PATCHES:
+                m.seek(0)
+                signature = bytes(code_patch.signature)
+                patch = bytes(code_patch.patch)
+                pos = m.find(signature)
+                if pos == -1:
+                    if m.find(patch) != -1:
+                        print("  - {} already patched".format(code_patch.name))
+                        continue
+                    raise IndexError("Can't find {}".format(code_patch.name))
+                m.seek(pos)
+                m.write(patch)
+            print("  + EC/Wii Shop patching process completed successfully!")
 
 
 def prompt():
@@ -247,8 +331,8 @@ def main():
         patcher.patch_cert(args.cert)
 
         if patcher.CERT_OFF == JAPCertPatcher.CERT_OFF and args.patch_ec:
-            print("+ Patching isECTicket function")
-            ec_patcher = NetworkWiiMediatorIsECTicket()
+            print("+ Patching EC/Wii Shop functions")
+            ec_patcher = ECPatcher()
             ec_patcher.patch(args.dol)
 
     if args.interactive:
