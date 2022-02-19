@@ -731,13 +731,47 @@ class FmpRequestHandler(PatRequestHandler):
         """
 
         circle = self.session.get_circle()
+        if circle.leader == self.session:
+            self.sendNtcCircleBreak(circle, seq)
         self.session.leave_circle()
-        if circle.leader is None and len(circle.players) > 0:
-            # TODO: Handle case
-            pass
+
+        # Delete the quest from the quest board
+        self.sendNtcCircleListLayerChange(circle, circle_index, seq)
 
         data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleLeave, data, seq)
+
+    def sendNtcCircleBreak(self, circle, seq):
+        """NtcCircleBreak packet.
+
+        ID: 65051000
+        JP: サークル解散通知
+        TR: Circle dissolution notice
+        """
+
+        # Unknown field but it doesn't matter becase the client ignore it
+        unk1 = 0
+
+        data = struct.pack(">I", unk1)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleBreak, data, seq,
+                                     self.session)
+
+    def sendNtcCircleKick(self, circle, seq):
+        """NtcCircleKick packet.
+
+        ID: 65351000
+        JP: サークルからキック通知
+        TR: Kick notification from the circle
+        """
+
+        # Unknown field but it doesn't matter becase the client ignore them
+        unk1 = 0
+        unk2 = b""
+
+        data = struct.pack(">B", unk1)
+        data += pati.lp2_string(unk2)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleKick, data, seq,
+                                     self.session)
 
     def recvReqCircleInfoSet(self, packet_id, data, seq):
         """ReqCircleInfoSet packet.
