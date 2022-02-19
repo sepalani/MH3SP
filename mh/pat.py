@@ -2053,9 +2053,22 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         ID: 64900100
         JP: レイヤ検索詳細数要求
         TR: Layer detail search count request
-
-        TODO: Parse the search data.
         """
+        with pati.Unpacker(data) as unpacker:
+            self.search_info = {
+                "layer": unpacker.struct(">B")[0],
+                "search": unpacker.detailed_optional_fields(),
+                "offset": unpacker.struct(">I")[0],
+                "limit": unpacker.struct(">I")[0],
+                "layer_fields": unpacker.bytes(),
+                "user_fields": unpacker.bytes()
+            }
+        self.server.debug((
+            "ReqLayerDetailSearchHead("
+            "layer={layer!r}, search={search!r}, "
+            "offset={offset}, limit={limit}, "
+            "layer_fields={layer_fields!r}, user_fields={user_fields!r})"
+        ).format(**self.search_info))
         self.sendAnsLayerDetailSearchHead(data, seq)
 
     def sendAnsLayerDetailSearchHead(self, data, seq):
@@ -2069,7 +2082,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         unk1 = 0
         unk2 = 0
-        count = 0
+        self.search_data = self.session.layer_detail_search(
+            self.search_info["search"]["data"]
+        )
+        count = len(self.search_data)
         data = struct.pack(">III", unk1, count, unk2)
         self.send_packet(PatID4.AnsLayerDetailSearchHead, data, seq)
 
@@ -2082,10 +2098,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         TODO: Handle this request.
         """
-        unk1, unk2 = struct.unpack_from(">II", data)
-        self.sendAnsLayerDetailSearchData(unk1, unk2, seq)
+        offset, count = struct.unpack_from(">II", data)
+        self.sendAnsLayerDetailSearchData(offset, count, seq)
 
-    def sendAnsLayerDetailSearchData(self, unk1, unk2, seq):
+    def sendAnsLayerDetailSearchData(self, offset, count, seq):
         """AnsLayerDetailSearchData packet.
 
         ID: 64910200
@@ -2095,8 +2111,34 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TODO: Handle this response.
         """
         unk = 0
-        count = 0
-        data = struct.pack(">II", 0, 0)
+        cities = self.search_data
+        data = struct.pack(">II", 0, len(cities))
+        for i, city in enumerate(cities):
+            layer_data = pati.LayerData()
+            layer_data.unk_long_0x01 = pati.Long(i)
+            layer_data.layer_host = pati.Binary(
+                city.players[0].get_layer_host_data()
+            )
+            layer_data.name = pati.String(city.name)
+            layer_data.size = pati.Long(city.get_population())
+            layer_data.size2 = pati.Long(city.get_population())
+            layer_data.capacity = pati.Long(city.get_capacity())
+            layer_data.in_quest_players = pati.Long(city.in_quest_players())
+            layer_data.unk_long_0x0c = pati.Long(0xc)     # TODO: Reverse
+            layer_data.state = pati.Byte(city.get_state())
+            layer_data.layer_depth = pati.Byte(city.LAYER_DEPTH)
+            layer_data.layer_pathname = pati.String(city.get_pathname())
+            layer_data.assert_fields(self.search_info["layer_fields"])
+            data += layer_data.pack()
+            data += pati.pack_optional_fields(city.optional_fields)
+            data += struct.pack(">I", len(city.players))
+            for player in city.players:
+                layer_user = pati.LayerUserInfo()
+                layer_user.capcom_id = pati.String(player.capcom_id)
+                layer_user.hunter_name = pati.String(player.hunter_name)
+                layer_user.assert_fields(self.search_info["user_fields"])
+                data += layer_user.pack()
+                data += pati.pack_optional_fields(player.get_optional_fields())
         self.send_packet(PatID4.AnsLayerDetailSearchData, data, seq)
 
     def recvReqLayerDetailSearchFoot(self, packet_id, data, seq):

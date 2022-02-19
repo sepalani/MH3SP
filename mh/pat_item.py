@@ -603,23 +603,23 @@ class UserSearchInfo(PatData):
 class LayerData(PatData):
     FIELDS = (
         (0x01, "unk_long_0x01"),
-        (0x02, "unk_custom_0x02"),
+        (0x02, "layer_host"),
         (0x03, "name"),
         (0x05, "index"),
         (0x06, "size"),
-        (0x07, "unk_long_0x07"),
+        (0x07, "size2"),  # Used in search
         (0x08, "unk_long_0x08"),
         (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
-        (0x0b, "unk_long_0x0b"),
+        (0x0b, "in_quest_players"),
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
         (0x11, "positionSynchronizationInterval"),
         # player position synchronization timer
         (0x12, "unk_byte_0x12"),
-        (0x15, "unk_bytedec_0x15"),
-        (0x16, "unk_string_0x16"),
+        (0x15, "layer_depth"),
+        (0x16, "layer_pathname"),
         (0x17, "unk_binary_0x17"),
         (0xff, "fallthrough_bug")  # Fill this if field 0x17 is set !!!
     )
@@ -900,8 +900,8 @@ def getDummyLayerData():
 
     # Might be needed to be >=1 to keep NetworkConnectionStable alive
     layer.unk_byte_0x12 = Byte(1)
-    # layer.unk_bytedec_0x15 = Byte(1)
-    # layer.unk_string_0x16 = String("UnkStart")
+    # layer.layer_depth = Byte(1)
+    # layer.layer_pathname = String("UnkStart")
     # layer.unk_binary_0x17 = Binary(b"binStart")
     return layer
 
