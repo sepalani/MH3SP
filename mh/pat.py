@@ -1110,15 +1110,15 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
          - Online > Player Search > By Name
          - Online > Player Search > By Id
         """
-        unpacker = pati.Unpacker(data)
-        self.search_info = {
-            "capcom_id": unpacker.lp2_string(),
-            "hunter_name": unpacker.lp2_string(),
-            "search": unpacker.detailed_optional_fields(),
-            "offset": unpacker.struct(">I")[0],
-            "limit": unpacker.struct(">I")[0],
-            "fields": unpacker.bytes()
-        }
+        with pati.Unpacker(data) as unpacker:
+            self.search_info = {
+                "capcom_id": unpacker.lp2_string(),
+                "hunter_name": unpacker.lp2_string(),
+                "search": unpacker.detailed_optional_fields(),
+                "offset": unpacker.struct(">I")[0],
+                "limit": unpacker.struct(">I")[0],
+                "fields": unpacker.bytes()
+            }
         self.server.debug((
             "ReqUserSearchHead("
             "hunter_name={hunter_name!r}, capcom_id={capcom_id!r}, "
@@ -1434,17 +1434,17 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         Sent by the game when searching for players at the gate:
          - Online > Player Search > Gate Search
         """
-        unpacker = pati.Unpacker(data)
-        self.search_info = {
-            "unk": unpacker.struct(">B")[0],
-            "layer": unpacker.lp2_string(),
-            "capcom_id": unpacker.lp2_string(),
-            "hunter_name": unpacker.lp2_string(),
-            "search": unpacker.detailed_optional_fields(),
-            "offset": unpacker.struct(">I")[0],
-            "limit": unpacker.struct(">I")[0],
-            "fields": unpacker.bytes()
-        }
+        with pati.Unpacker(data) as unpacker:
+            self.search_info = {
+                "unk": unpacker.struct(">B")[0],
+                "layer": unpacker.lp2_string(),
+                "capcom_id": unpacker.lp2_string(),
+                "hunter_name": unpacker.lp2_string(),
+                "search": unpacker.detailed_optional_fields(),
+                "offset": unpacker.struct(">I")[0],
+                "limit": unpacker.struct(">I")[0],
+                "fields": unpacker.bytes()
+            }
         self.server.debug((
             "ReqLayerUserSearchHead("
             "unk={unk}, layer={layer!r}, "
