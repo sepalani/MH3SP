@@ -733,7 +733,9 @@ class FmpRequestHandler(PatRequestHandler):
         circle = self.session.get_circle()
         if circle.leader == self.session:
             self.sendNtcCircleBreak(circle, seq)
-        self.session.leave_circle()
+            circle.reset()
+        else:
+            self.session.leave_circle()
 
         # Delete the quest from the quest board
         self.sendNtcCircleListLayerChange(circle, circle_index, seq)

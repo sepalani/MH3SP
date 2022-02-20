@@ -88,9 +88,10 @@ class Circle(object):
 
     def reset(self):
         self.leader = None
-        self.players.clear()
+        self.players = Players()
         self.questId = 0
-        self.embarked = True
+        self.embarked = False
+        self.capacity = 4
         self.password = None
         self.remarks = None
 

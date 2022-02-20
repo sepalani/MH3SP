@@ -240,14 +240,7 @@ class Session(object):
         # TODO: Move this to the database
         circle = self.get_circle()
         self.local_info['circle_id'] = None
-
-        if circle.leader == self:
-            circle.leader = None
-
         circle.players.remove(self)
-
-        if len(circle.players) < 1:
-            circle.reset()
 
     def get_layer_players(self):
         if self.layer == 0:
