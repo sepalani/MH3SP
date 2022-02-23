@@ -62,6 +62,7 @@ class Circle(object):
         self.parent = parent
         self.leader = None
         self.players = Players()
+        self.departed = False
         self.questId = 0
         self.embarked = False
         self.capacity = 4
@@ -83,12 +84,16 @@ class Circle(object):
     def is_empty(self):
         return self.leader is None
 
+    def is_joinable(self):
+        return not self.departed and not self.is_full()
+
     def has_password(self):
         return self.password is not None
 
     def reset(self):
         self.leader = None
         self.players = Players()
+        self.departed = False
         self.questId = 0
         self.embarked = False
         self.capacity = 4

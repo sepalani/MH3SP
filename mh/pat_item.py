@@ -686,7 +686,7 @@ class CircleInfo(PatData):
         (0x0c, "index2"),
         (0x0d, "leader_capcom_id"),
         (0x0e, "unk_byte_0x0e"),
-        (0x0f, "is_full"),
+        (0x0f, "is_joinable"),
         (0x10, "unk_byte_0x10"),
     )
 
@@ -723,7 +723,7 @@ class CircleInfo(PatData):
             circle_info.leader_capcom_id = String(circle.leader.capcom_id)
 
             circle_info.unk_byte_0x0e = Byte(circle.unk_byte_0x0e)
-            circle_info.is_full = Byte(int(circle.is_full()))
+            circle_info.is_joinable = Byte(int(circle.is_joinable()))
             # circle_info.unk_byte_0x10 = pati.Byte(1)
 
         # TODO: Other optional fields
