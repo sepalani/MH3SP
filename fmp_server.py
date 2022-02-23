@@ -729,8 +729,10 @@ class FmpRequestHandler(PatRequestHandler):
         """
 
         circle = self.session.get_circle()
-        circle.players.remove(self.session)
         self.session.leave_circle()
+        if circle.leader is None and len(circle.players) > 0:
+            # TODO: Handle case
+            pass
 
         data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleLeave, data, seq)
