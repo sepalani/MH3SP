@@ -528,22 +528,22 @@ class FmpRequestHandler(PatRequestHandler):
             self.sendAnsCircleJoin(0, 0, seq)
             return
 
+        # TODO: When appending get the index of the slot
         circle.players.append(self.session)
         self.session.join_circle(circle_index-1)
 
-        # TODO: Figure out what exactly is this value suppose to do
-        unk = circle.get_population()  # This value is suppose to be a byte
+        player_index = circle.get_population()
 
-        self.sendAnsCircleJoin(circle_index, unk, seq)
+        self.sendAnsCircleJoin(circle_index, player_index, seq)
 
-    def sendAnsCircleJoin(self, circle_index, unk, seq):
+    def sendAnsCircleJoin(self, circle_index, player_index, seq):
         """AnsCircleJoin packet.
 
         ID: 65030200
         JP: サークルイン返答
         TR: Circle-in reply
         """
-        data = struct.pack(">IB", circle_index, unk)
+        data = struct.pack(">IB", circle_index, player_index)
         self.send_packet(PatID4.AnsCircleJoin, data, seq)
 
         if circle_index > 0:
@@ -554,11 +554,11 @@ class FmpRequestHandler(PatRequestHandler):
                 self.session.capcom_id)
             ntc_data += pati.lp2_string(
                 self.session.hunter_name)
-            # TODO NEED RE
-            unk1 = circle.get_population()  # NOTE: act as player index
-            unk2 = 0
 
-            ntc_data += struct.pack(">BB", unk1, unk2)
+            # If state == 2 it increment a variable on NetworkSessionManagerPat
+            state = 0
+
+            ntc_data += struct.pack(">BB", player_index, state)
             self.server.circle_broadcast(circle, PatID4.NtcCircleJoin,
                                          ntc_data, seq, self.session)
 
