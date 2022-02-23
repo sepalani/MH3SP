@@ -170,8 +170,6 @@ class FmpRequestHandler(PatRequestHandler):
         leader = city.leader
         assert leader != self.session
 
-        leader_handler = self.server.get_pat_handler(leader)
-
         self.server.debug("ReqLayerHost: Req ({}, {})  Host ({}, {})".format(
             self.session.capcom_id, self.session.hunter_name,
             leader.capcom_id, leader.hunter_name))
@@ -181,10 +179,7 @@ class FmpRequestHandler(PatRequestHandler):
         data += pati.lp2_string(leader.hunter_name)
         self.send_packet(PatID4.AnsLayerHost, data, seq)
 
-        # Notify the leader, being the host
-        # leader_handler.send_packet(PatID4.NtcLayerHost, data, seq)
-
-        # Notify the city leader of the joining player
+        # Notify the city's players of the new player
         user = pati.LayerUserInfo()
         user.capcom_id = pati.String(self.session.capcom_id)
         user.hunter_name = pati.String(self.session.hunter_name)
@@ -193,7 +188,8 @@ class FmpRequestHandler(PatRequestHandler):
         data = pati.lp2_string(self.session.capcom_id)
         data += user.pack()
 
-        leader_handler.send_packet(PatID4.NtcLayerIn, data, seq)
+        self.server.layer_broadcast(self.session, PatID4.NtcLayerIn,
+                                    data, seq)
 
     def recvNtcLayerUserPosition(self, packet_id, data, seq):
         """NtcLayerUserPosition packet.
