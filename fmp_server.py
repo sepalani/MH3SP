@@ -372,11 +372,15 @@ class FmpRequestHandler(PatRequestHandler):
         city = self.session.get_city()
 
         unk = 0
-        count = len(city.circles)
-        data = struct.pack(">II", unk, count)
+        count = 0
 
+        data = b''
         for i, circle in enumerate(city.circles):
-            data += pati.CircleInfo.pack_from(circle, i+1)
+            if not circle.is_empty():
+                data += pati.CircleInfo.pack_from(circle, i+1)
+                count += 1
+
+        data = struct.pack(">II", unk, count) + data
 
         self.send_packet(PatID4.AnsCircleListLayer, data, seq)
 
