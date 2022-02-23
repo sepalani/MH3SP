@@ -74,11 +74,22 @@ class Circle(object):
     def get_capacity(self):
         return self.capacity
 
+    def is_full(self):
+        return self.get_population() == self.get_capacity()
+
     def is_empty(self):
         return self.leader is None
 
     def has_password(self):
         return self.password is not None
+
+    def reset(self):
+        self.leader = None
+        self.players.clear()
+        self.questId = 0
+        self.embarked = True
+        self.password = None
+        self.remarks = None
 
 
 class City(object):
