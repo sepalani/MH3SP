@@ -424,6 +424,20 @@ class PatData(OrderedDict):
             raise ValueError("{!r} not a valid PAT item".format(value))
         return OrderedDict.__setitem__(self, key, value)
 
+    def __contains__(self, key):
+        if isinstance(key, str):
+            for field_id, field_name in self.FIELDS:
+                if field_name == key:
+                    key = field_id
+                    break
+            else:
+                return False
+
+        if not isinstance(key, int):
+            raise IndexError("key must be a valid field's name/index")
+
+        return OrderedDict.__contains__(self, key)
+
     def field_name(self, index):
         for field_id, field_name in self.FIELDS:
             if index == field_id:
@@ -666,14 +680,14 @@ class CircleInfo(PatData):
         (0x06, "remarks"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
-        (0x09, "team_size"),
+        (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
         (0x0c, "index2"),
         (0x0d, "leader_capcom_id"),
         (0x0e, "unk_byte_0x0e"),
         (0x0f, "is_full"),
-        (0x0f, "unk_byte_0x10"),
+        (0x10, "unk_byte_0x10"),
     )
 
     @staticmethod
@@ -689,30 +703,26 @@ class CircleInfo(PatData):
                 circle_info.has_password = Byte(1)
                 circle_info.password = String(circle.password)
 
-            party_members = bytearray(0x100)
-            member_size = 0xf  # TODO: Verify the size
-            for i, player in enumerate(circle.players):
-                start = (i * member_size)
-                end = start + len(player.capcom_id)
-                party_members[start:end] = player.capcom_id
-
-            circle_info.party_members = Binary(party_members)
+            if circle.party_member_binary is not None:
+                circle_info.party_members = Binary(circle.party_member_binary)
 
             if circle.remarks is not None:
                 circle_info.remarks = String(circle.remarks)
 
-            # circle_info.unk_long_0x07 = pati.Long(1)
-            # circle_info.unk_long_0x08 = pati.Long(0)
+            # Can't be 0, otherwise the circle is not properly initialized
+            circle_info.unk_long_0x07 = Long(1)
 
-            circle_info.team_size = Long(circle.get_capacity())
+            # circle_info.unk_long_0x08 = Long(3)
 
-            # circle_info.unk_long_0x0a = pati.Long(1)
-            # circle_info.unk_long_0x0b = pati.Long(1)
+            circle_info.capacity = Long(circle.get_capacity())
+
+            # circle_info.unk_long_0x0a = Long(5)
+            # circle_info.unk_long_0x0b = Long(6)
             circle_info.index2 = Long(circle_index)  # TODO: Verify this
 
-            circle.leader_capcom_id = circle.leader.capcom_id
+            circle_info.leader_capcom_id = String(circle.leader.capcom_id)
 
-            # circle_info.unk_byte_0x0e = pati.Byte(1)
+            circle_info.unk_byte_0x0e = Byte(circle.unk_byte_0x0e)
             circle_info.is_full = Byte(int(circle.is_full()))
             # circle_info.unk_byte_0x10 = pati.Byte(1)
 
