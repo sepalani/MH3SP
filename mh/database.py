@@ -68,6 +68,9 @@ class Circle(object):
         self.password = None
         self.remarks = None
 
+        self.unk_byte_0x0e = 0
+        self.party_member_binary = None
+
     def get_population(self):
         return len(self.players)
 
@@ -90,6 +93,9 @@ class Circle(object):
         self.embarked = True
         self.password = None
         self.remarks = None
+
+        self.unk_byte_0x0e = 0
+        self.party_member_binary = None
 
 
 class City(object):
