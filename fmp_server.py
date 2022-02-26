@@ -394,9 +394,6 @@ class FmpRequestHandler(PatRequestHandler):
         circle_info = pati.CircleInfo.unpack(data)
         circle_optional_fields = pati.unpack_optional_fields(
             data, len(circle_info.pack()))
-        # Extra fields
-        #  - field_id 0x01: Party capacity
-        #  - field_id 0x02: Quest ID
         self.server.debug("CircleCreate: {!r}, {!r}".format(
                           circle_info, circle_optional_fields))
 
@@ -404,7 +401,7 @@ class FmpRequestHandler(PatRequestHandler):
         circle, circle_index = city.get_first_empty_circle()
 
         # TODO: Transmit error when no slot available
-        assert circle is not None
+        assert circle is not None, "No Empty Circle Found"
 
         circle.leader = self.session
         circle.players.add(self.session)
@@ -417,8 +414,18 @@ class FmpRequestHandler(PatRequestHandler):
         if "remarks" in circle_info:
             circle.remarks = pati.unpack_string(circle_info.remarks)
 
-        circle.capacity = pati.unpack_long(circle_info.team_size)
+        if "party_members" in circle_info:
+            circle.party_member_binary = \
+                pati.unpack_binary(circle_info.party_members)
 
+        if "unk_byte_0x0e" in circle_info:
+            circle.unk_byte_0x0e = pati.unpack_byte(circle_info.unk_byte_0x0e)
+
+        circle.capacity = pati.unpack_long(circle_info.capacity)
+
+        # Extra fields
+        #  - field_id 0x01: Party capacity
+        #  - field_id 0x02: Quest ID
         for field_id, value in circle_optional_fields:
             if field_id == 0x02:  # QuestId
                 circle.quest_id = value
@@ -426,12 +433,7 @@ class FmpRequestHandler(PatRequestHandler):
         assert circle.quest_id >= 10000  # Game's quest id minimum
 
         # Notify every city's player
-        ntc_data = struct.pack(">I", circle_index+1)
-        ntc_data += pati.CircleInfo.pack_from(circle, circle_index + 1)
-
-        self.server.layer_broadcast(self.session,
-                                    PatID4.NtcCircleListLayerCreate, ntc_data,
-                                    seq, False)
+        self.sendNtcCircleListLayerChange(circle, circle_index + 1, seq)
 
         self.sendAnsCircleCreate(circle_index+1, seq)
 
@@ -745,15 +747,27 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Circle data setting request
         """
         circle_index, = struct.unpack_from(">I", data)
-        offset = 4
-        circle = pati.CircleInfo.unpack(data, offset)
-        offset += len(circle.pack())
+        circle_info = pati.CircleInfo.unpack(data, 4)
+        offset = 4 + len(circle_info.pack())
         optional_fields = pati.unpack_optional_fields(data, offset)
-        self.server.debug("ReqCircleInfoSet: Circle({}) {!r}, {!r}".format(
-                          circle_index, circle, optional_fields))
-        self.sendAnsCircleInfoSet(circle_index, circle, optional_fields, seq)
 
-    def sendAnsCircleInfoSet(self, circle_index, circle, optional_fields, seq):
+        self.server.debug("CircleInfo: {!r}".format(circle_info))
+
+        city = self.session.get_city()
+        circle = city.circles[circle_index-1]
+
+        # TODO: Set other fields too, find how to trigger them
+        if "party_members" in circle_info:
+            circle.party_member_binary = pati.unpack_binary(
+                circle_info.party_members)
+
+        self.sendAnsCircleInfoSet(circle_index, circle_info, optional_fields,
+                                  seq)
+
+        self.sendNtcCircleListLayerChange(circle, circle_index, seq)
+
+    def sendAnsCircleInfoSet(self, circle_index, circle_info, optional_fields,
+                             seq):
         """AnsCircleInfoSet packet.
 
         ID: 65200200
@@ -761,7 +775,7 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Circle data setting reply
         """
         ntc_data = struct.pack(">I", circle_index)
-        ntc_data += circle.pack()
+        ntc_data += circle_info.pack()
         ntc_data += pati.pack_optional_fields(optional_fields)
 
         city = self.session.get_city()
@@ -835,6 +849,35 @@ class FmpRequestHandler(PatRequestHandler):
         """
 
         self.send_packet(PatID4.AnsCircleMatchEnd, b"", seq)
+
+    def sendNtcCircleListLayerDelete(self, circle, seq):
+        """NtcCircleMatchStart packet.
+
+        ID: 65831000
+        JP: サークル削除通知 (レイヤ)
+        TR: Circle deletion notification (layer)
+        """
+
+        circle_index = circle.parent.circles.index(circle) + 1
+        ntc_data = struct.pack(">I", circle_index)
+        self.server.layer_broadcast(self.session,
+                                    PatID4.NtcCircleListLayerDelete, ntc_data,
+                                    seq, False)
+
+    def sendNtcCircleListLayerChange(self, circle, circle_index, seq):
+        """NtcCircleListLayerChange packet.
+
+        ID: 65821000
+        JP: サークル変更通知 (レイヤ)
+        TR: Circle change notification (layer)
+        """
+
+        ntc_data = struct.pack(">I", circle_index)
+        ntc_data += pati.CircleInfo.pack_from(circle, circle_index)
+
+        self.server.layer_broadcast(self.session,
+                                    PatID4.NtcCircleListLayerChange, ntc_data,
+                                    seq, False)
 
 
 BASE = server_base("FMP", FmpServer, FmpRequestHandler)
