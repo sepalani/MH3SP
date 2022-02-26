@@ -372,36 +372,16 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークル同期リスト返答 (レイヤ)
         TR: Circle sync list response (layer)
         """
-        unk = 0
-        circles = []
 
         city = self.session.get_city()
-        for i, circle in enumerate(city.circles):
-            if circle.is_empty():
-                continue
 
-            info = pati.CircleInfo()
-            info.index = pati.Long(i+1)
-            info.leader_capcom_id = pati.String(circle.leader.capcom_id)
-            info.has_password = pati.Byte(int(circle.has_password()))
-            info.team_size = pati.Long(circle.capacity)
-
-            if circle.remarks is not None:
-                info.remarks = pati.String(circle.remarks)
-
-            # TODO: Other optional fields
-            optional_fields = [
-                (1, circle.get_capacity()),
-                (2, circle.questId)
-            ]
-
-            circles.append([info, optional_fields])
-
-        count = len(circles)
+        unk = 0
+        count = len(city.circles)
         data = struct.pack(">II", unk, count)
-        for circle, optional_fields in circles:
-            data += circle.pack()
-            data += pati.pack_optional_fields(optional_fields)
+
+        for i, circle in enumerate(city.circles):
+            data += pati.CircleInfo.pack_from(circle, i+1)
+
         self.send_packet(PatID4.AnsCircleListLayer, data, seq)
 
     def recvReqCircleCreate(self, packet_id, data, seq):
@@ -427,7 +407,7 @@ class FmpRequestHandler(PatRequestHandler):
         assert circle is not None
 
         circle.leader = self.session
-        circle.players.append(self.session)
+        circle.players.add(self.session)
 
         self.session.join_circle(circle_index)
 
@@ -441,43 +421,28 @@ class FmpRequestHandler(PatRequestHandler):
 
         for field_id, value in circle_optional_fields:
             if field_id == 0x02:  # QuestId
-                circle.questId = value
+                circle.quest_id = value
 
-        assert circle.questId >= 10000  # Game's quest id minimum
-
-        circle_info.index = pati.Long(circle_index+1)
-        circle_info.unk_long_0x07 = pati.Long(2)
-        circle_info.unk_long_0x08 = pati.Long(3)
-        circle_info.team_size = pati.Long(circle.get_capacity())
-        circle_info.unk_long_0x0a = pati.Long(5)
-        circle_info.unk_long_0x0b = pati.Long(6)
-        # TODO: RE what exactly is this field
-        circle_info.unk_long_0x0c = pati.Long(circle_index+1)
-        circle_info.leader_capcom_id = pati.String(self.session.capcom_id)
-        circle_info.unk_byte_0x0f = pati.Byte(0)  # Is Full? VERIFY this
+        assert circle.quest_id >= 10000  # Game's quest id minimum
 
         # Notify every city's player
-        ntc_circle_list_layer_create_data = struct.pack(">I", circle_index+1)
-        ntc_circle_list_layer_create_data += circle_info.pack()
-        ntc_circle_list_layer_create_data += pati.pack_optional_fields(
-            circle_optional_fields)
+        ntc_data = struct.pack(">I", circle_index+1)
+        ntc_data += pati.CircleInfo.pack_from(circle, circle_index + 1)
 
-        for city_player in city.players:
-            city_player_handler = self.server.get_pat_handler(city_player)
-            city_player_handler.send_packet(
-                PatID4.NtcCircleListLayerCreate,
-                ntc_circle_list_layer_create_data, seq)
+        self.server.layer_broadcast(self.session,
+                                    PatID4.NtcCircleListLayerCreate, ntc_data,
+                                    seq, False)
 
-        self.sendAnsCircleCreate(circle_index+1, circle_optional_fields, seq)
+        self.sendAnsCircleCreate(circle_index+1, seq)
 
-    def sendAnsCircleCreate(self, circle, extra, seq):
+    def sendAnsCircleCreate(self, circle_index, seq):
         """AnsCircleCreate packet.
 
         ID: 65010200
         JP: サークル作成返答
         TR: Circle creation response
         """
-        data = struct.pack(">I", circle)
+        data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleCreate, data, seq)
 
     def recvReqCircleMatchOptionSet(self, packet_id, data, seq):
@@ -528,47 +493,14 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルデータ取得返答
         TR: Circle data acquisition reply
         """
-        data = struct.pack(">I", circle_index)
 
         city = self.session.get_city()
 
         # TODO: Verify circle index
         circle = city.circles[circle_index-1]
 
-        circle_info = pati.CircleInfo()
-        circle_info.index = pati.Long(circle_index)
-        # circle_info.unk_string_0x02 = pati.String("192.168.23.1")
-        if circle.has_password():
-            circle_info.has_password = pati.Byte(1)
-            circle_info.password = pati.String(circle.password)
-        else:
-            circle_info.has_password = pati.Byte(0)
-
-        # TODO: Do party member field
-        # circle_info.unk_binary_0x05 = pati.Binary([])
-
-        if circle.remarks is not None:
-            circle_info.remarks = pati.String(circle.remarks)
-
-        # circle_info.unk_long_0x07 = pati.Long(1)
-        # circle_info.unk_long_0x08 = pati.Long(0)
-
-        circle_info.team_size = pati.Long(circle.capacity)
-
-        # circle_info.unk_long_0x0a = pati.Long(1)
-        # circle_info.unk_long_0x0b = pati.Long(1)
-
-        # TODO: Other optional fields
-        optional_fields = [
-            (1, circle.get_population()),
-            (2, circle.questId)
-        ]
-
-        self.server.debug("AnsCircleInfo: {!r} {!r}".format(
-                          circle_info, optional_fields))
-
-        data += circle_info.pack()
-        data += pati.pack_optional_fields(optional_fields)
+        data = struct.pack(">I", circle_index)
+        data += pati.CircleInfo.pack_from(circle, circle_index)
 
         self.send_packet(PatID4.AnsCircleInfo, data, seq)
 
@@ -680,9 +612,7 @@ class FmpRequestHandler(PatRequestHandler):
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
 
-        leader_index = 0
-        # leader_index = next(i for i in range(0, circle.get_population())
-        #                     if circle.players[i] == circle.leader)
+        leader_index = circle.players.index(circle.leader)
         assert leader_index is not None
 
         # TODO: Verify this field
@@ -692,8 +622,6 @@ class FmpRequestHandler(PatRequestHandler):
         data += pati.lp2_string(circle.leader.capcom_id)
         data += pati.lp2_string(circle.leader.hunter_name)
 
-        self.server.circle_broadcast(circle, PatID4.NtcCircleHost, data,
-                                     seq, self.session)
         self.send_packet(PatID4.AnsCircleHost, data, seq)
 
     def recvNtcCircleBinary(self, packet_id, data, seq):
@@ -799,6 +727,11 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルアウト返答
         TR: Circle out reply
         """
+
+        circle = self.session.get_circle()
+        circle.players.remove(self.session)
+        self.session.leave_circle()
+
         data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleLeave, data, seq)
 
@@ -867,13 +800,11 @@ class FmpRequestHandler(PatRequestHandler):
 
         count = circle.get_population()
         data = struct.pack(">I", count)
-        i = 0
-        for circle_player in circle.players:
+        for i, player in enumerate(circle.players):
             data += struct.pack(">B", i+1)
-            data += pati.lp2_string(circle_player.capcom_id)
+            data += pati.lp2_string(player.capcom_id)
             data += pati.lp2_string(b"\1")
             data += struct.pack(">H", 21)  # TODO: Field??
-            i += 1
         data = struct.pack(">H", len(data))+data
         data += struct.pack(">I", 1)  # Field??
 
@@ -887,6 +818,10 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング終了要求
         TR: Matching end request
         """
+
+        unk, = struct.unpack_from(">B", data)
+        # unk is a bolean, but is unknown what it represent
+
         self.sendAnsCircleMatchEnd(seq)
 
     def sendAnsCircleMatchEnd(self, seq):
@@ -896,6 +831,7 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング終了返答
         TR: Matching end reply
         """
+
         self.send_packet(PatID4.AnsCircleMatchEnd, b"", seq)
 
 
