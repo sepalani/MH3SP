@@ -424,6 +424,20 @@ class PatData(OrderedDict):
             raise ValueError("{!r} not a valid PAT item".format(value))
         return OrderedDict.__setitem__(self, key, value)
 
+    def __contains__(self, key):
+        if isinstance(key, str):
+            for field_id, field_name in self.FIELDS:
+                if field_name == key:
+                    key = field_id
+                    break
+            else:
+                return False
+
+        if not isinstance(key, int):
+            raise IndexError("key must be a valid field's name/index")
+
+        return OrderedDict.__contains__(self, key)
+
     def field_name(self, index):
         for field_id, field_name in self.FIELDS:
             if index == field_id:
@@ -662,19 +676,63 @@ class CircleInfo(PatData):
         (0x02, "unk_string_0x02"),
         (0x03, "has_password"),
         (0x04, "password"),
-        (0x05, "unk_binary_0x05"),  # party members?
+        (0x05, "party_members"),
         (0x06, "remarks"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
-        (0x09, "team_size"),
+        (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
-        (0x0c, "unk_long_0x0c"),
+        (0x0c, "index2"),
         (0x0d, "leader_capcom_id"),
         (0x0e, "unk_byte_0x0e"),
-        (0x0f, "unk_byte_0x0f"),
-        (0x0f, "unk_byte_0x10"),
+        (0x0f, "not_joinable"),
+        (0x10, "unk_byte_0x10"),
     )
+
+    @staticmethod
+    def pack_from(circle, circle_index):
+        circle_info = CircleInfo()
+        circle_info.index = Long(circle_index)
+
+        if not circle.is_empty():
+
+            # circle_info.unk_string_0x02 = pati.String("192.168.23.1")
+
+            if circle.has_password():
+                circle_info.has_password = Byte(1)
+                circle_info.password = String(circle.password)
+
+            if circle.party_member_binary is not None:
+                circle_info.party_members = Binary(circle.party_member_binary)
+
+            if circle.remarks is not None:
+                circle_info.remarks = String(circle.remarks)
+
+            # Can't be 0, otherwise the circle is not properly initialized
+            circle_info.unk_long_0x07 = Long(1)
+
+            # circle_info.unk_long_0x08 = Long(3)
+
+            circle_info.capacity = Long(circle.get_capacity())
+
+            # circle_info.unk_long_0x0a = Long(5)
+            # circle_info.unk_long_0x0b = Long(6)
+            circle_info.index2 = Long(circle_index)  # TODO: Verify this
+
+            circle_info.leader_capcom_id = String(circle.leader.capcom_id)
+
+            circle_info.unk_byte_0x0e = Byte(circle.unk_byte_0x0e)
+            circle_info.not_joinable = Byte(int(not circle.is_joinable()))
+            # circle_info.unk_byte_0x10 = pati.Byte(1)
+
+        # TODO: Other optional fields
+        optional_fields = [
+            (1, circle.get_capacity()),
+            (2, circle.quest_id)
+        ]
+
+        return circle_info.pack() + pack_optional_fields(optional_fields)
 
 
 class CircleUserData(PatData):
