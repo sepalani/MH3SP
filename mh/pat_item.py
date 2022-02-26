@@ -662,19 +662,67 @@ class CircleInfo(PatData):
         (0x02, "unk_string_0x02"),
         (0x03, "has_password"),
         (0x04, "password"),
-        (0x05, "unk_binary_0x05"),  # party members?
+        (0x05, "party_members"),
         (0x06, "remarks"),
         (0x07, "unk_long_0x07"),
         (0x08, "unk_long_0x08"),
         (0x09, "team_size"),
         (0x0a, "unk_long_0x0a"),
         (0x0b, "unk_long_0x0b"),
-        (0x0c, "unk_long_0x0c"),
+        (0x0c, "index2"),
         (0x0d, "leader_capcom_id"),
         (0x0e, "unk_byte_0x0e"),
-        (0x0f, "unk_byte_0x0f"),
+        (0x0f, "is_full"),
         (0x0f, "unk_byte_0x10"),
     )
+
+    @staticmethod
+    def pack_from(circle, circle_index):
+        circle_info = CircleInfo()
+        circle_info.index = Long(circle_index)
+
+        if not circle.is_empty():
+
+            # circle_info.unk_string_0x02 = pati.String("192.168.23.1")
+
+            if circle.has_password():
+                circle_info.has_password = Byte(1)
+                circle_info.password = String(circle.password)
+
+            party_members = bytearray(0x100)
+            member_size = 0xf  # TODO: Verify the size
+            for i, player in enumerate(circle.players):
+                start = (i * member_size)
+                end = start + len(player.capcom_id)
+                party_members[start:end] = player.capcom_id
+
+            circle_info.party_members = Binary(party_members)
+
+            if circle.remarks is not None:
+                circle_info.remarks = String(circle.remarks)
+
+            # circle_info.unk_long_0x07 = pati.Long(1)
+            # circle_info.unk_long_0x08 = pati.Long(0)
+
+            circle_info.team_size = Long(circle.get_capacity())
+
+            # circle_info.unk_long_0x0a = pati.Long(1)
+            # circle_info.unk_long_0x0b = pati.Long(1)
+            circle_info.index2 = Long(circle_index)  # TODO: Verify this
+
+            circle.leader_capcom_id = circle.leader.capcom_id
+
+            # circle_info.unk_byte_0x0e = pati.Byte(1)
+            circle_info.is_full = Byte(int(circle.is_full()))
+            # circle_info.unk_byte_0x10 = pati.Byte(1)
+
+        # TODO: Other optional fields
+        optional_fields = [
+            (1, circle.get_capacity()),
+            (2, circle.quest_id)
+        ]
+
+        return circle_info.pack() + pack_optional_fields(optional_fields)
 
 
 class CircleUserData(PatData):
