@@ -62,11 +62,15 @@ class Circle(object):
         self.parent = parent
         self.leader = None
         self.players = Players()
-        self.questId = 0
+        self.departed = False
+        self.quest_id = 0
         self.embarked = False
         self.capacity = 4
         self.password = None
         self.remarks = None
+
+        self.unk_byte_0x0e = 0
+        self.party_member_binary = None
 
     def get_population(self):
         return len(self.players)
@@ -74,11 +78,30 @@ class Circle(object):
     def get_capacity(self):
         return self.capacity
 
+    def is_full(self):
+        return self.get_population() == self.get_capacity()
+
     def is_empty(self):
         return self.leader is None
 
+    def is_joinable(self):
+        return not self.departed and not self.is_full()
+
     def has_password(self):
         return self.password is not None
+
+    def reset(self):
+        self.leader = None
+        self.players = Players()
+        self.departed = False
+        self.quest_id = 0
+        self.embarked = False
+        self.capacity = 4
+        self.password = None
+        self.remarks = None
+
+        self.unk_byte_0x0e = 0
+        self.party_member_binary = None
 
 
 class City(object):
