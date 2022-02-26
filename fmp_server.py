@@ -848,7 +848,9 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング開始通知
         TR: Matching start notification
         """
+
         circle = self.session.get_circle()
+        circle.departed = True
 
         count = circle.get_population()
         data = struct.pack(">I", count)
