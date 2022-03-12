@@ -166,6 +166,14 @@ class Session(object):
             assert False, "Can't go up a layer"
         self.layer -= 1
 
+    def layer_detail_search(self, detailed_fields):
+        server_type = self.get_server().server_type
+        fields = [
+            (field_id, value)
+            for field_id, field_type, value in detailed_fields
+        ]  # Convert detailed to simple optional fields
+        return DB.layer_detail_search(server_type, fields)
+
     def join_server(self, server_id):
         return DB.join_server(self, server_id)
 

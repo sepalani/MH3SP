@@ -86,11 +86,34 @@ class GenericUnpacker(object):
     """
     MAPPING = dict()
 
-    def __init__(self, data, offset=0):
+    def __init__(self, data, offset=0, check=True):
         self.data = data
         self.offset = offset
+        self.check = check
         for name, (unpack_function, pack_function) in self.MAPPING.items():
             self.bind(name, unpack_function, pack_function)
+
+    def __len__(self):
+        """Used for truth value testing instead of __nonzero__ and __bool__.
+
+        References:
+        https://docs.python.org/2/reference/datamodel.html#object.__nonzero__
+        https://docs.python.org/3/reference/datamodel.html#object.__bool__
+        """
+        return len(self.data[self.offset:])
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, ex_type, ex_val, tb):
+        if ex_type or ex_val or tb:
+            return  # Raise an exception normally
+        if self.check and self:
+            message = (
+                "Data buffer not emptied, remaining bytes at offset {}:\n"
+                " -> {!r}"
+            ).format(self.offset, self.data[self.offset:])
+            raise AssertionError(message)
 
     def bind(self, name, unpack_function, pack_function):
         def handler(self, name, unpack_function, pack_function,
@@ -107,9 +130,10 @@ class GenericUnpacker(object):
             length = len(pack_result)
             matching_results = self.data[self.offset:
                                          self.offset+length] == pack_result
-            assert matching_results, "Unpacker mismatch in {}:\n{}\n{}".format(
+            message = "Unpacker mismatch in {}:\n{!r}\n{!r}".format(
                 name, self.data[self.offset:self.offset+length], pack_result
             )
+            assert matching_results, message
             self.offset += len(pack_result)
             return unpack_result
 

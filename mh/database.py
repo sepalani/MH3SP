@@ -105,6 +105,8 @@ class Circle(object):
 
 
 class City(object):
+    LAYER_DEPTH = 3
+
     def __init__(self, name, parent):
         self.name = name
         self.parent = parent
@@ -120,6 +122,9 @@ class City(object):
     def get_population(self):
         return len(self.players)
 
+    def in_quest_players(self):
+        return 0  # TODO
+
     def get_capacity(self):
         return self.capacity
 
@@ -131,6 +136,14 @@ class City(object):
             return LayerState.JOINABLE
         else:
             return LayerState.FULL
+
+    def get_pathname(self):
+        pathname = self.name
+        it = self.parent
+        while it is not None:
+            pathname = it.name + "\t" + pathname
+            it = it.parent
+        return pathname
 
     def get_first_empty_circle(self):
         for index, circle in enumerate(self.circles):
@@ -146,6 +159,8 @@ class City(object):
 
 
 class Gate(object):
+    LAYER_DEPTH = 2
+
     def __init__(self, name, parent, city_count=40, player_capacity=100):
         self.name = name
         self.parent = parent
@@ -178,9 +193,12 @@ class Gate(object):
 
 
 class Server(object):
+    LAYER_DEPTH = 1
+
     def __init__(self, name, server_type, gate_count=40, capacity=2000,
                  addr=None, port=None):
         self.name = name
+        self.parent = None
         self.server_type = server_type
         self.capacity = capacity
         self.addr = addr
@@ -447,6 +465,28 @@ class TempDatabase(object):
         city.players.remove(session)
         session.local_info["city_id"] = None
         session.local_info["city_name"] = None
+
+    def layer_detail_search(self, server_type, fields):
+        cities = []
+
+        def match_city(city, fields):
+            return all((
+                field in city.optional_fields
+                for field in fields
+            ))
+
+        for server in self.servers:
+            if server.server_type != server_type:
+                continue
+            for gate in server.gates:
+                if not gate.get_population():
+                    continue
+                cities.extend([
+                    city
+                    for city in gate.cities
+                    if match_city(city, fields)
+                ])
+        return cities
 
 
 CURRENT_DB = TempDatabase()
