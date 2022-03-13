@@ -1199,9 +1199,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ユーザ検索データ要求
         TR: User search data request
         """
-        capcom_id = pati.unpack_lp2_string(data)
-        offset = 2 + len(capcom_id)
-        search_info = pati.UserSearchInfo.unpack(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            capcom_id = unpacker.lp2_string()
+            search_info = unpacker.UserSearchInfo()
         self.server.debug("SearchInfo: {}, {!r}".format(capcom_id,
                                                         search_info))
         self.sendAnsUserSearchInfo(capcom_id, search_info, seq)
@@ -1349,12 +1349,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: レイヤユーザリスト数要求
         TR: Layer user list count request
         """
-        unk, = struct.unpack_from(">B", data)
-        layer = pati.unpack_lp2_string(data, 1)
-        offset = 1 + len(layer) + 2
-        first_index, count = struct.unpack_from(">II", data, offset)
-        offset += 8
-        fields = pati.unpack_bytes(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            unk, = unpacker.struct(">B")
+            layer = unpacker.lp2_string()
+            first_index, count = unpacker.struct(">II")
+            fields = unpacker.bytes()
         self.server.debug("LayerUserListHead({}, {!r}, {}, {}, {!r}".format(
                           unk, layer, first_index, count, fields))
         self.sendAnsLayerUserListHead(unk, layer, first_index, count, fields,
@@ -1561,9 +1560,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: ブラックデータ登録要求
         TR: Black data registration request
         """
-        capcom_id = pati.unpack_lp2_string(data)
-        offset = len(capcom_id) + 2
-        black_data = pati.BlackListUserData.unpack(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            capcom_id = unpacker.lp2_string()
+            black_data = unpacker.BlackListUserData()
         self.sendAnsBlackAdd(capcom_id, black_data, seq)
 
     def sendAnsBlackAdd(self, capcom_id, black_data, seq):
@@ -1634,10 +1633,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         NB: The message won't be displayed if the Capcom ID is blank.
         """
-        unk1, = struct.unpack_from(">B", data)
-        info = pati.MessageInfo.unpack(data, 1)
-        offset = 1 + len(info.pack())
-        message = pati.unpack_lp2_string(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            unk1, = unpacker.struct(">B")
+            info = unpacker.MessageInfo()
+            message = unpacker.lp2_string()
         self.server.debug("NtcLayerChat: {}, {!r}, {}".format(
             unk1, info, message))
         self.sendNtcLayerChat(unk1, info, message, seq)
@@ -1671,11 +1670,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: 相手指定チャット送信
         TR: Send partner message
         """
-        recipient_id = pati.unpack_lp2_string(data)
-        offset = 2 + len(recipient_id)
-        info = pati.MessageInfo.unpack(data, offset)
-        offset += len(info.pack())
-        message = pati.unpack_lp2_string(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            recipient_id = unpacker.lp2_string()
+            info = unpacker.MessageInfo()
+            message = unpacker.lp2_string()
         self.server.debug("ReqTell: {}, {!r}, {}".format(
             recipient_id, info, message))
         self.sendAnsTell(recipient_id, info, message, seq)
@@ -1713,11 +1711,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
 
         TODO: Merge this with ReqTell?
         """
-        recipient_id = pati.unpack_lp2_string(data)
-        offset = 2 + len(recipient_id)
-        info = pati.MessageInfo.unpack(data, offset)
-        offset += len(info.pack())
-        message = pati.unpack_lp2_string(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            recipient_id = unpacker.lp2_string()
+            info = unpacker.MessageInfo()
+            message = unpacker.lp2_string()
         self.server.debug("ReqFriendAdd: {}, {!r}, {}".format(
             recipient_id, info, message))
         self.sendAnsFriendAdd(recipient_id, info, message, seq)
@@ -2188,11 +2185,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         JP: レイヤ作成設定要求（番号指定）
         TR: Layer creation settings request (number specified)
         """
-        number, = struct.unpack_from(">H", data)
-        offset = 2
-        layer_set = pati.LayerSet.unpack(data, offset)
-        offset += len(layer_set.pack())
-        extra = pati.unpack_optional_fields(data, offset)
+        with pati.Unpacker(data) as unpacker:
+            number, = unpacker.struct(">H")
+            layer_set = unpacker.LayerSet()
+            extra = unpacker.optional_fields()
         self.server.debug("LayerCreateSet: {}, {!r}, {!r}".format(
             number, layer_set, extra))
         self.sendAnsLayerCreateSet(number, layer_set, extra, seq)

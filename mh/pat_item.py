@@ -773,12 +773,20 @@ class LayerBinaryInfo(PatData):
     )
 
 
-class Unpacker(GenericUnpacker):
-    """Simple PAT item unpacker.
+def patdata_extender(unpacker):
+    """PatData classes must be defined above this function."""
+    for name, value in globals().items():
+        if not isinstance(value, type):
+            continue  # Not a valid class
+        if not issubclass(value, PatData):
+            continue
+        unpacker.MAPPING[name] = (value.unpack, value.pack)
+    return unpacker
 
-    TODO:
-     - Handle PatData unpacking
-    """
+
+@patdata_extender
+class Unpacker(GenericUnpacker):
+    """PAT item unpacker with PatData support."""
     MAPPING = {
         "struct": (struct.unpack_from, struct.pack),
         "lp_string": (unpack_lp_string, lp_string),
