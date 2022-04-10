@@ -48,24 +48,107 @@ class LayerState(object):
     FULL = 2
 
 
-class Players(list):
-    """
-    TODO: Probably use a better container or another approach.
-    """
+class Players(object):
+    def __init__(self, capacity):
+        assert capacity > 0, "Collection capacity can't be zero"
+
+        self.slots = [None for _ in range(capacity)]
+        self.used = 0
+
+    def get_used_count(self):
+        return self.used
+
+    def get_capacity(self):
+        return len(self.slots)
+
     def add(self, item):
-        if item not in self:
-            self.append(item)
+        if self.used >= len(self.slots):
+            return -1
+
+        item_index = self.index(item)
+        if item_index != -1:
+            return item_index
+
+        for i, v in enumerate(self.slots):
+            if v is not None:
+                continue
+
+            self.slots[i] = item
+            self.used += 1
+            return i
+
+        return -1
+
+    def remove(self, item):
+        assert item is not None, "Item != None"
+
+        if self.used < 1:
+            return False
+
+        for i, v in enumerate(self.slots):
+            if v != item:
+                continue
+
+            self.slots[i] = None
+            self.used -= 1
+            return True
+
+        return False
+
+    def index(self, item):
+        assert item is not None, "Item != None"
+
+        for i, v in enumerate(self.slots):
+            if v == item:
+                return i
+
+        return -1
+
+    def clear(self):
+        for i in range(self.get_capacity()):
+            self.slots[i] = None
+
+    def find_first(self, **kwargs):
+        if self.used < 1:
+            return None
+
+        for p in self.slots:
+            if p is None:
+                continue
+
+            for k, v in kwargs.items():
+                if getattr(p, k) != v:
+                    break
+            else:
+                return p
+
+        return None
+
+    def find_by_capcom_id(self, capcom_id):
+        return self.find_first(capcom_id=capcom_id)
+
+    def __len__(self):
+        return self.used
+
+    def __iter__(self):
+        if self.used < 1:
+            raise StopIteration
+
+        for i, v in enumerate(self.slots):
+            if v is None:
+                continue
+
+            yield i, v
 
 
 class Circle(object):
     def __init__(self, parent):
         self.parent = parent
         self.leader = None
-        self.players = Players()
+        self.players = Players(4)
         self.departed = False
         self.quest_id = 0
         self.embarked = False
-        self.capacity = 4
         self.password = None
         self.remarks = None
 
@@ -76,7 +159,7 @@ class Circle(object):
         return len(self.players)
 
     def get_capacity(self):
-        return self.capacity
+        return self.players.get_capacity()
 
     def is_full(self):
         return self.get_population() == self.get_capacity()
@@ -92,11 +175,10 @@ class Circle(object):
 
     def reset(self):
         self.leader = None
-        self.players = Players()
+        self.players = Players(4)
         self.departed = False
         self.quest_id = 0
         self.embarked = False
-        self.capacity = 4
         self.password = None
         self.remarks = None
 
@@ -110,13 +192,13 @@ class City(object):
     def __init__(self, name, parent):
         self.name = name
         self.parent = parent
-        self.capacity = 4
         self.state = LayerState.EMPTY
-        self.players = Players()
+        self.players = Players(4)
         self.optional_fields = []
         self.leader = None
         self.circles = [
-            Circle(self) for _ in range(self.capacity)  # One circle per player
+            # One circle per player
+            Circle(self) for _ in range(self.get_capacity())
         ]
 
     def get_population(self):
@@ -126,7 +208,7 @@ class City(object):
         return 0  # TODO
 
     def get_capacity(self):
-        return self.capacity
+        return self.players.get_capacity()
 
     def get_state(self):
         size = self.get_population()
@@ -165,12 +247,11 @@ class Gate(object):
         self.name = name
         self.parent = parent
         self.state = LayerState.EMPTY
-        self.capacity = player_capacity
         self.cities = [
             City("City{}".format(i), self)
             for i in range(1, city_count+1)
         ]
-        self.players = Players()
+        self.players = Players(player_capacity)
         self.optional_fields = []
 
     def get_population(self):
@@ -180,7 +261,7 @@ class Gate(object):
         ))
 
     def get_capacity(self):
-        return self.capacity
+        return self.players.get_capacity()
 
     def get_state(self):
         size = self.get_population()
@@ -200,14 +281,13 @@ class Server(object):
         self.name = name
         self.parent = None
         self.server_type = server_type
-        self.capacity = capacity
         self.addr = addr
         self.port = port
         self.gates = [
             Gate("City Gate{}".format(i), self)
             for i in range(1, gate_count+1)
         ]
-        self.players = Players()
+        self.players = Players(capacity)
 
     def get_population(self):
         return len(self.players) + sum((
@@ -215,7 +295,7 @@ class Server(object):
         ))
 
     def get_capacity(self):
-        return self.capacity
+        return self.players.get_capacity()
 
 
 def new_servers():
