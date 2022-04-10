@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from mh.database import Players
 import mh.pat_item as pati
 from mh.constants import *
 from mh.pat import PatRequestHandler, PatServer
@@ -141,7 +142,7 @@ class FmpRequestHandler(PatRequestHandler):
         count = len(players)
         data = struct.pack(">I", count)
 
-        for player in players:
+        for _, player in players:
             user = pati.LayerUserInfo()
             user.capcom_id = pati.String(player.capcom_id)
             user.hunter_name = pati.String(player.hunter_name)
@@ -270,8 +271,7 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Binary transmission for layer users (specify the other party)
         """
         city = self.session.get_city()
-        partner_session = next(p for p in city.players
-                               if p.capcom_id == partner)
+        partner_session = city.players.find_by_capcom_id(partner)
         if partner_session is None:
             return
 
@@ -404,9 +404,6 @@ class FmpRequestHandler(PatRequestHandler):
         assert circle is not None, "No Empty Circle Found"
 
         circle.leader = self.session
-        circle.players.add(self.session)
-
-        self.session.join_circle(circle_index)
 
         if "password" in circle_info:
             circle.password = pati.unpack_string(circle_info.password)
@@ -421,7 +418,10 @@ class FmpRequestHandler(PatRequestHandler):
         if "unk_byte_0x0e" in circle_info:
             circle.unk_byte_0x0e = pati.unpack_byte(circle_info.unk_byte_0x0e)
 
-        circle.capacity = pati.unpack_long(circle_info.capacity)
+        circle.players = Players(pati.unpack_long(circle_info.capacity))
+        circle.players.add(self.session)
+
+        self.session.join_circle(circle_index)
 
         # Extra fields
         #  - field_id 0x01: Party capacity
@@ -530,13 +530,11 @@ class FmpRequestHandler(PatRequestHandler):
             self.sendAnsCircleJoin(0, 0, seq)
             return
 
-        # TODO: When appending get the index of the slot
-        circle.players.append(self.session)
+        player_index = circle.players.add(self.session)
+        assert player_index != -1, "Circle is full"
         self.session.join_circle(circle_index-1)
 
-        player_index = circle.get_population()
-
-        self.sendAnsCircleJoin(circle_index, player_index, seq)
+        self.sendAnsCircleJoin(circle_index, player_index+1, seq)
 
     def sendAnsCircleJoin(self, circle_index, player_index, seq):
         """AnsCircleJoin packet.
@@ -584,7 +582,7 @@ class FmpRequestHandler(PatRequestHandler):
         circle = self.session.get_circle()
 
         data = struct.pack(">I", circle.get_population())
-        for i, player in enumerate(circle.players):
+        for i, player in circle.players:
             circle_user_data = pati.CircleUserData()
             circle_user_data.is_standby = pati.Byte(0)
             circle_user_data.player_index = pati.Byte(i+1)
@@ -615,12 +613,9 @@ class FmpRequestHandler(PatRequestHandler):
         circle = city.circles[circle_index-1]
 
         leader_index = circle.players.index(circle.leader)
-        assert leader_index is not None
+        assert leader_index != -1, "Leader wasn't found"
 
-        # TODO: Verify this field
-        unk1 = leader_index + 1
-
-        data = struct.pack(">IB", circle_index, unk1)
+        data = struct.pack(">IB", circle_index, leader_index+1)
         data += pati.lp2_string(circle.leader.capcom_id)
         data += pati.lp2_string(circle.leader.hunter_name)
 
@@ -691,8 +686,7 @@ class FmpRequestHandler(PatRequestHandler):
         """
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
-        partner_session = next(p for p in circle.players
-                               if p.capcom_id == partner)
+        partner_session = circle.players.find_by_capcom_id(partner)
         if partner_session is None:
             return
 
@@ -854,7 +848,7 @@ class FmpRequestHandler(PatRequestHandler):
 
         count = circle.get_population()
         data = struct.pack(">I", count)
-        for i, player in enumerate(circle.players):
+        for i, player in circle.players:
             data += struct.pack(">B", i+1)
             data += pati.lp2_string(player.capcom_id)
             data += pati.lp2_string(b"\1")
