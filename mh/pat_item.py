@@ -589,7 +589,7 @@ class UserSearchInfo(PatData):
         (0x02, "hunter_name"),
         (0x03, "stats"),
         (0x04, "layer_host"),
-        (0x07, "unk_byte_0x07"),
+        (0x07, "unk_byte_0x07"),  # Index
         (0x08, "server_name"),
         (0x0b, "unk_byte_0x0b"),
         (0x0c, "unk_string_0x0c"),
