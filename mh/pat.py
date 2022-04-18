@@ -75,7 +75,7 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
 
     def layer_broadcast(self, session, packet_id, data, seq,
                         exclude_self=True):
-        for player in session.get_layer_players():
+        for _, player in session.get_layer_players():
             if exclude_self and player == session:
                 continue
 
@@ -84,7 +84,7 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
 
     def circle_broadcast(self, circle, packet_id, data, seq,
                          session=None):
-        for player in circle.players:
+        for _, player in circle.players:
             if session and player == session:
                 continue
 
@@ -1395,7 +1395,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unk = 1
         users = self.search_data
         data = struct.pack(">II", unk, len(users))
-        for user in users:
+        for _, user in users:
             layer_user = pati.LayerUserInfo()
             layer_user.capcom_id = pati.String(user.capcom_id)
             layer_user.hunter_name = pati.String(user.hunter_name)
@@ -1493,7 +1493,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         layer_users = self.search_data
         count = len(layer_users)
         data = struct.pack(">II", unk, count)
-        for user in layer_users:
+        for _, user in layer_users:
             layer_user = pati.LayerUserInfo()
             layer_user.capcom_id = pati.String(user.capcom_id)
             layer_user.hunter_name = pati.String(user.hunter_name)
@@ -2114,7 +2114,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             layer_data = pati.LayerData()
             layer_data.unk_long_0x01 = pati.Long(i)
             layer_data.layer_host = pati.Binary(
-                city.players[0].get_layer_host_data()
+                city.leader.get_layer_host_data()
             )
             layer_data.name = pati.String(city.name)
             layer_data.size = pati.Long(city.get_population())
@@ -2129,7 +2129,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             data += layer_data.pack()
             data += pati.pack_optional_fields(city.optional_fields)
             data += struct.pack(">I", len(city.players))
-            for player in city.players:
+            for _, player in city.players:
                 layer_user = pati.LayerUserInfo()
                 layer_user.capcom_id = pati.String(player.capcom_id)
                 layer_user.hunter_name = pati.String(player.hunter_name)
