@@ -526,14 +526,12 @@ class FmpRequestHandler(PatRequestHandler):
 
         circle = city.circles[circle_index-1]
 
-        if circle.get_population() >= circle.get_capacity():
+        player_index = circle.players.add(self.session)
+        if player_index == -1:  # Circle is full
             self.sendAnsCircleJoin(0, 0, seq)
             return
 
-        player_index = circle.players.add(self.session)
-        assert player_index != -1, "Circle is full"
         self.session.join_circle(circle_index-1)
-
         self.sendAnsCircleJoin(circle_index, player_index+1, seq)
 
     def sendAnsCircleJoin(self, circle_index, player_index, seq):
