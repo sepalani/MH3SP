@@ -851,13 +851,24 @@ class FmpRequestHandler(PatRequestHandler):
         circle = self.session.get_circle()
         circle.departed = True
 
-        count = circle.get_population()
-        data = struct.pack(">I", count)
+        count = 0
+        data = b''
         for i, player in circle.players:
-            data += struct.pack(">B", i+1)
-            data += pati.lp2_string(player.capcom_id)
-            data += pati.lp2_string(b"\1")
-            data += struct.pack(">H", 21)  # TODO: Field??
+            if player.is_circle_standby():
+                data += struct.pack(">B", i+1)
+                data += pati.lp2_string(player.capcom_id)
+                data += pati.lp2_string(b"\1")
+                data += struct.pack(">H", 21)  # TODO: Field??
+                count += 1
+            else:
+                # Client ignore field
+                ntc_circle_kick = struct.pack(">B", 0) + pati.lp2_string('')
+                pat_handler = self.server.get_pat_handler(player)
+                pat_handler.send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
+                                        seq)
+                circle.players.remove(i)
+
+        data = struct.pack(">I", count)+data
         data = struct.pack(">H", len(data))+data
         data += struct.pack(">I", 1)  # Field??
 
