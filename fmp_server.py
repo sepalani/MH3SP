@@ -544,21 +544,21 @@ class FmpRequestHandler(PatRequestHandler):
         data = struct.pack(">IB", circle_index, player_index)
         self.send_packet(PatID4.AnsCircleJoin, data, seq)
 
-        if circle_index > 0:
-            city = self.session.get_city()
-            circle = city.circles[circle_index-1]
-            ntc_data = struct.pack(">I", circle_index)
-            ntc_data += pati.lp2_string(
-                self.session.capcom_id)
-            ntc_data += pati.lp2_string(
-                self.session.hunter_name)
+        if circle_index < 1:
+            return
 
-            # If state == 2 it increment a variable on NetworkSessionManagerPat
-            state = 0
+        city = self.session.get_city()
+        circle = city.circles[circle_index-1]
+        ntc_data = struct.pack(">I", circle_index)
+        ntc_data += pati.lp2_string(self.session.capcom_id)
+        ntc_data += pati.lp2_string(self.session.hunter_name)
 
-            ntc_data += struct.pack(">BB", player_index, state)
-            self.server.circle_broadcast(circle, PatID4.NtcCircleJoin,
-                                         ntc_data, seq, self.session)
+        # If state == 2 it increment a variable on NetworkSessionManagerPat
+        state = 0
+
+        ntc_data += struct.pack(">BB", player_index, state)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleJoin, ntc_data,
+                                     seq, self.session)
 
     def recvReqCircleUserList(self, packet_id, data, seq):
         """ReqCircleUserList packet.
