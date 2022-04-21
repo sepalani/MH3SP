@@ -465,6 +465,12 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチングオプション設定返答
         TR: Match option settings response
         """
+
+        is_standby = 'is_standby' in options and \
+            pati.unpack_byte(options.is_standby) == 1
+
+        self.session.set_circle_standby(is_standby)
+
         circle = self.session.get_circle()
         options.capcom_id = pati.String(self.session.capcom_id)
         options.hunter_name = pati.String(self.session.hunter_name)
@@ -582,7 +588,8 @@ class FmpRequestHandler(PatRequestHandler):
         data = struct.pack(">I", circle.get_population())
         for i, player in circle.players:
             circle_user_data = pati.CircleUserData()
-            circle_user_data.is_standby = pati.Byte(0)
+            circle_user_data.is_standby = pati.Byte(
+                int(player.is_circle_standby()))
             circle_user_data.player_index = pati.Byte(i+1)
             circle_user_data.capcom_id = pati.String(player.capcom_id)
             circle_user_data.hunter_name = pati.String(player.hunter_name)
