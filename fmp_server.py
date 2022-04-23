@@ -465,6 +465,12 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチングオプション設定返答
         TR: Match option settings response
         """
+
+        is_standby = 'is_standby' in options and \
+            pati.unpack_byte(options.is_standby) == 1
+
+        self.session.set_circle_standby(is_standby)
+
         circle = self.session.get_circle()
         options.capcom_id = pati.String(self.session.capcom_id)
         options.hunter_name = pati.String(self.session.hunter_name)
@@ -526,14 +532,12 @@ class FmpRequestHandler(PatRequestHandler):
 
         circle = city.circles[circle_index-1]
 
-        if circle.get_population() >= circle.get_capacity():
+        player_index = circle.players.add(self.session)
+        if player_index == -1:  # Circle is full
             self.sendAnsCircleJoin(0, 0, seq)
             return
 
-        player_index = circle.players.add(self.session)
-        assert player_index != -1, "Circle is full"
         self.session.join_circle(circle_index-1)
-
         self.sendAnsCircleJoin(circle_index, player_index+1, seq)
 
     def sendAnsCircleJoin(self, circle_index, player_index, seq):
@@ -546,21 +550,21 @@ class FmpRequestHandler(PatRequestHandler):
         data = struct.pack(">IB", circle_index, player_index)
         self.send_packet(PatID4.AnsCircleJoin, data, seq)
 
-        if circle_index > 0:
-            city = self.session.get_city()
-            circle = city.circles[circle_index-1]
-            ntc_data = struct.pack(">I", circle_index)
-            ntc_data += pati.lp2_string(
-                self.session.capcom_id)
-            ntc_data += pati.lp2_string(
-                self.session.hunter_name)
+        if circle_index < 1:
+            return
 
-            # If state == 2 it increment a variable on NetworkSessionManagerPat
-            state = 0
+        city = self.session.get_city()
+        circle = city.circles[circle_index-1]
+        ntc_data = struct.pack(">I", circle_index)
+        ntc_data += pati.lp2_string(self.session.capcom_id)
+        ntc_data += pati.lp2_string(self.session.hunter_name)
 
-            ntc_data += struct.pack(">BB", player_index, state)
-            self.server.circle_broadcast(circle, PatID4.NtcCircleJoin,
-                                         ntc_data, seq, self.session)
+        # If state == 2 it increment a variable on NetworkSessionManagerPat
+        state = 0
+
+        ntc_data += struct.pack(">BB", player_index, state)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleJoin, ntc_data,
+                                     seq, self.session)
 
     def recvReqCircleUserList(self, packet_id, data, seq):
         """ReqCircleUserList packet.
@@ -584,7 +588,8 @@ class FmpRequestHandler(PatRequestHandler):
         data = struct.pack(">I", circle.get_population())
         for i, player in circle.players:
             circle_user_data = pati.CircleUserData()
-            circle_user_data.is_standby = pati.Byte(0)
+            circle_user_data.is_standby = pati.Byte(
+                int(player.is_circle_standby()))
             circle_user_data.player_index = pati.Byte(i+1)
             circle_user_data.capcom_id = pati.String(player.capcom_id)
             circle_user_data.hunter_name = pati.String(player.hunter_name)
@@ -846,13 +851,24 @@ class FmpRequestHandler(PatRequestHandler):
         circle = self.session.get_circle()
         circle.departed = True
 
-        count = circle.get_population()
-        data = struct.pack(">I", count)
+        count = 0
+        data = b''
         for i, player in circle.players:
-            data += struct.pack(">B", i+1)
-            data += pati.lp2_string(player.capcom_id)
-            data += pati.lp2_string(b"\1")
-            data += struct.pack(">H", 21)  # TODO: Field??
+            if player.is_circle_standby():
+                data += struct.pack(">B", i+1)
+                data += pati.lp2_string(player.capcom_id)
+                data += pati.lp2_string(b"\1")
+                data += struct.pack(">H", 21)  # TODO: Field??
+                count += 1
+            else:
+                # Client ignore field
+                ntc_circle_kick = struct.pack(">B", 0) + pati.lp2_string('')
+                pat_handler = self.server.get_pat_handler(player)
+                pat_handler.send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
+                                        seq)
+                circle.players.remove(i)
+
+        data = struct.pack(">I", count)+data
         data = struct.pack(">H", len(data))+data
         data += struct.pack(">I", 1)  # Field??
 

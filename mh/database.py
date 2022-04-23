@@ -85,6 +85,14 @@ class Players(object):
         if self.used < 1:
             return False
 
+        if isinstance(item, int):
+            if item >= self.get_capacity():
+                return False
+
+            self.slots[item] = None
+            self.used -= 1
+            return True
+
         for i, v in enumerate(self.slots):
             if v != item:
                 continue
