@@ -29,6 +29,16 @@ from other.utils import to_bytearray, to_str
 DB = db.get_instance()
 
 
+class SessionState:
+    UNKNOWN = -1
+    LOG_IN = 0
+    GATE = 1
+    CITY = 2
+    CIRCLE = 3
+    CIRCLE_STANDBY = 4
+    QUEST = 5
+
+
 class Session(object):
     """Server session class.
 
@@ -55,6 +65,7 @@ class Session(object):
         self.hunter_name = ""
         self.hunter_stats = None
         self.layer = 0
+        self.state = SessionState.UNKNOWN
         self.binary_setting = b""
         self.search_payload = None
         self.hunter_info = pati.HunterSettings()
@@ -135,10 +146,12 @@ class Session(object):
 
     def layer_start(self):
         self.layer = 0
+        self.state = SessionState.LOG_IN
         return pati.getDummyLayerData()
 
     def layer_end(self):
         self.layer = 0
+        self.state = SessionState.UNKNOWN
 
     def layer_down(self, layer_id):
         if self.layer == 0:
@@ -217,9 +230,11 @@ class Session(object):
 
     def join_gate(self, gate_id):
         DB.join_gate(self, self.local_info["server_id"], gate_id)
+        self.state = SessionState.GATE
 
     def leave_gate(self):
         DB.leave_gate(self)
+        self.state = SessionState.LOG_IN
 
     def get_cities(self):
         return DB.get_cities(self.local_info["server_id"],
@@ -236,18 +251,32 @@ class Session(object):
                      self.local_info["server_id"],
                      self.local_info["gate_id"],
                      city_id)
+        self.state = SessionState.CITY
 
     def leave_city(self):
         DB.leave_city(self)
+        self.state = SessionState.GATE
 
     def join_circle(self, circle_id):
         # TODO: Move this to the database
         self.local_info['circle_id'] = circle_id
+        self.state = SessionState.CIRCLE
+
+    def set_circle_standby(self, val):
+        assert self.state == SessionState.CIRCLE or \
+            self.state == SessionState.CIRCLE_STANDBY
+
+        self.state = \
+            SessionState.CIRCLE_STANDBY if val else SessionState.CIRCLE
+
+    def is_circle_standby(self):
+        return self.state == SessionState.CIRCLE_STANDBY
 
     def leave_circle(self):
         # TODO: Move this to the database
         circle = self.get_circle()
         self.local_info['circle_id'] = None
+        self.state = SessionState.CITY
 
         if circle.leader == self:
             circle.reset()
