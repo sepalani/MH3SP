@@ -540,8 +540,9 @@ class FmpRequestHandler(PatRequestHandler):
             return
 
         player_index = circle.players.add(self.session)
-        if player_index == -1:  # Circle is full
-            self.sendAnsCircleJoin(0, 0, seq)
+        if player_index == -1:
+            self.sendAnsAlert(PatID4.AnsCircleJoin,
+                              "<LF=8><BODY><CENTER>Quest is full!<END>", seq)
             return
 
         self.session.join_circle(circle_index-1)
@@ -554,11 +555,10 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルイン返答
         TR: Circle-in reply
         """
+        assert circle_index > 0 and player_index > 0
+
         data = struct.pack(">IB", circle_index, player_index)
         self.send_packet(PatID4.AnsCircleJoin, data, seq)
-
-        if circle_index < 1:
-            return
 
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
