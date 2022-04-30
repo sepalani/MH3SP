@@ -532,6 +532,13 @@ class FmpRequestHandler(PatRequestHandler):
 
         circle = city.circles[circle_index-1]
 
+        if circle.has_password() and ("password" not in circle_info or
+                                      pati.unpack_string(circle_info.password)
+                                      != circle.password):
+            self.sendAnsAlert(PatID4.AnsCircleJoin,
+                              "<LF=8><BODY><CENTER>Wrong Password!<END>", seq)
+            return
+
         player_index = circle.players.add(self.session)
         if player_index == -1:  # Circle is full
             self.sendAnsCircleJoin(0, 0, seq)
