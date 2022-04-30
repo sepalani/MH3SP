@@ -213,7 +213,7 @@ class City(object):
         return len(self.players)
 
     def in_quest_players(self):
-        return 0  # TODO
+        return sum(p.is_in_quest() for _, p in self.players)
 
     def get_capacity(self):
         return self.players.get_capacity()
