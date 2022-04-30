@@ -866,6 +866,7 @@ class FmpRequestHandler(PatRequestHandler):
                 data += pati.lp2_string(player.capcom_id)
                 data += pati.lp2_string(b"\1")
                 data += struct.pack(">H", 21)  # TODO: Field??
+                player.set_in_quest()
                 count += 1
             else:
                 # Client ignore field
