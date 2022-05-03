@@ -411,10 +411,6 @@ class FmpRequestHandler(PatRequestHandler):
         if "remarks" in circle_info:
             circle.remarks = pati.unpack_string(circle_info.remarks)
 
-        if "party_members" in circle_info:
-            circle.party_member_binary = \
-                pati.unpack_binary(circle_info.party_members)
-
         if "unk_byte_0x0e" in circle_info:
             circle.unk_byte_0x0e = pati.unpack_byte(circle_info.unk_byte_0x0e)
 
@@ -797,11 +793,6 @@ class FmpRequestHandler(PatRequestHandler):
 
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
-
-        # TODO: Set other fields too, find how to trigger them
-        if "party_members" in circle_info:
-            circle.party_member_binary = pati.unpack_binary(
-                circle_info.party_members)
 
         self.sendAnsCircleInfoSet(circle_index, circle_info, optional_fields,
                                   seq)
