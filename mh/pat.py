@@ -130,6 +130,22 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             packet_id, seq, hexdump(data)
         )
 
+    def sendAnsNg(self, packet_id, message, seq):
+        unk1 = 1  # If value is 0, the message is not rendered
+        data = struct.pack(">I", unk1)
+        data += pati.lp2_string(message)
+
+        packet_id = packet_id | 0xff
+        self.send_packet(packet_id, data, seq)
+
+    def sendAnsAlert(self, packet_id, message, seq):
+        unk1 = 1  # If value is 0, the message is not rendered
+        data = struct.pack(">I", unk1)
+        data += pati.lp2_string(message)
+
+        packet_id = packet_id | 0x01
+        self.send_packet(packet_id, data, seq)
+
     def send_error(self, message, seq=0):
         """Send an error message."""
         try:
