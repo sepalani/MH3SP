@@ -264,13 +264,20 @@ class Session(object):
 
     def set_circle_standby(self, val):
         assert self.state == SessionState.CIRCLE or \
-            self.state == SessionState.CIRCLE_STANDBY
+            self.state == SessionState.CIRCLE_STANDBY or \
+            self.state == SessionState.QUEST
 
         self.state = \
             SessionState.CIRCLE_STANDBY if val else SessionState.CIRCLE
 
     def is_circle_standby(self):
         return self.state == SessionState.CIRCLE_STANDBY
+
+    def is_in_quest(self):
+        return self.state == SessionState.QUEST
+
+    def set_in_quest(self):
+        self.state = SessionState.QUEST
 
     def leave_circle(self):
         # TODO: Move this to the database
@@ -307,7 +314,7 @@ class Session(object):
 
     def get_optional_fields(self):
         """LayerUserInfo's optional fields."""
-        location = 1  # TODO: Don't hardcode location (city, quest, ...)
+        location = int(self.is_in_quest())  # City - 0, Quest - 1
         hunter_rank, = struct.unpack_from(">H", self.hunter_info.data, 0)
         weapon_icon, = struct.unpack_from(">B", self.hunter_info.data, 0x10)
         weapon_icon -= 7  # Skip armor pieces and start at index zero
