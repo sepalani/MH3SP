@@ -22,6 +22,7 @@
 import struct
 
 from collections import OrderedDict
+from mh.constants import pad
 from other.utils import to_bytearray, get_config, get_ip, GenericUnpacker
 
 
@@ -703,8 +704,21 @@ class CircleInfo(PatData):
                 circle_info.has_password = Byte(1)
                 circle_info.password = String(circle.password)
 
-            if circle.party_member_binary is not None:
-                circle_info.party_members = Binary(circle.party_member_binary)
+            party_members = bytearray(0x88)
+            for i, player in circle.players:
+                start_offset = 0x10 * i
+                end_offset = start_offset + 0x10
+
+                party_members[start_offset:end_offset] = \
+                    pad(player.capcom_id.encode('ascii'), 0x10)
+
+                party_members[start_offset+0x40:end_offset+0x40] = \
+                    pad(player.hunter_name.encode('ascii'), 0x10)
+
+                # TODO: Discover flag meaning?
+                party_members[0x80+i] = 0x08 if i == 0 else 0x01
+
+            circle_info.party_members = Binary(party_members)
 
             if circle.remarks is not None:
                 circle_info.remarks = String(circle.remarks)

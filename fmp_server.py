@@ -411,10 +411,6 @@ class FmpRequestHandler(PatRequestHandler):
         if "remarks" in circle_info:
             circle.remarks = pati.unpack_string(circle_info.remarks)
 
-        if "party_members" in circle_info:
-            circle.party_member_binary = \
-                pati.unpack_binary(circle_info.party_members)
-
         if "unk_byte_0x0e" in circle_info:
             circle.unk_byte_0x0e = pati.unpack_byte(circle_info.unk_byte_0x0e)
 
@@ -798,11 +794,6 @@ class FmpRequestHandler(PatRequestHandler):
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
 
-        # TODO: Set other fields too, find how to trigger them
-        if "party_members" in circle_info:
-            circle.party_member_binary = pati.unpack_binary(
-                circle_info.party_members)
-
         self.sendAnsCircleInfoSet(circle_index, circle_info, optional_fields,
                                   seq)
 
@@ -859,6 +850,7 @@ class FmpRequestHandler(PatRequestHandler):
         circle.departed = True
 
         count = 0
+        changed = False
         data = b''
         for i, player in circle.players:
             if player.is_circle_standby():
@@ -875,6 +867,7 @@ class FmpRequestHandler(PatRequestHandler):
                 pat_handler.send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
                                         seq)
                 circle.players.remove(i)
+                changed = True
 
         data = struct.pack(">I", count)+data
         data = struct.pack(">H", len(data))+data
@@ -882,6 +875,10 @@ class FmpRequestHandler(PatRequestHandler):
 
         self.server.circle_broadcast(circle, PatID4.NtcCircleMatchStart, data,
                                      seq)
+
+        if changed:
+            circle_index = circle.parent.circles.index(circle) + 1
+            self.sendNtcCircleListLayerChange(circle, circle_index, seq)
 
     def recvReqCircleMatchEnd(self, packet_id, data, seq):
         """ReqCircleMatchEnd packet.
