@@ -241,6 +241,9 @@ class Session(object):
         start = first_index - 1
         return users[start:start+count]
 
+    def find_capcom_id(self, capcom_id):
+        return DB.find_capcom_id(capcom_id)
+
     def leave_server(self):
         DB.leave_server(self, self.local_info["server_id"])
 
@@ -361,3 +364,20 @@ class Session(object):
                 (1, (weapon_type << 24) | location),
                 (2, hunter_rank << 16)
         ]
+
+    def update_hunter_info(self, data, length, offset):
+        self.hunter_info.unpack(data, length, offset)
+        DB.update_hunter_settings(self.capcom_id, self.hunter_info.pack())
+
+    def fetch_hunter_info(self, capcom_id=None):
+        return DB.fetch_hunter_settings(capcom_id or self.capcom_id)
+
+    def get_friends_list(self):
+        """Fetch friend list from database"""
+        return DB.get_friends(self)
+
+    def add_friends(self, partner_id):
+        DB.add_friends(self.capcom_id, partner_id)
+
+    def remove_friends(self, partner_id):
+        DB.remove_friends(self.capcom_id, partner_id)

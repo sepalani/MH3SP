@@ -1256,39 +1256,65 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         TR: User search data response
         """
         users = self.session.find_users(capcom_id, "", 1, 1)
-        assert users, "Capcom ID not found"
-        user = users[0]
+        if not users:
+            # User is offline or doesn't exist
+            basic_user_info = self.session.find_capcom_id(capcom_id)
+            hunter_info = self.session.fetch_hunter_info(capcom_id)
+            assert basic_user_info is not None, "Capcom ID not found"
+            assert hunter_info is not None, "Hunter information not found"
 
-        user_info = pati.UserSearchInfo()
-        user_info.capcom_id = pati.String(user.capcom_id)
-        user_info.hunter_name = pati.String(user.hunter_name)
-        user_info.stats = pati.Binary(user.hunter_info.pack())
-        user_info.layer_host = pati.Binary(user.get_layer_host_data())
+            search_info.capcom_id = pati.String(capcom_id)
+            search_info.hunter_name = pati.String(basic_user_info['name'])
+            data = search_info.pack()
 
-        user_info.unk_byte_0x07 = pati.Byte(1)
-        user_info.server_name = pati.String("\t".join([
-            user.local_info["server_name"] or "",
-            user.local_info["gate_name"] or "",
-            user.local_info["city_name"] or ""
-        ]))
-        user_info.unk_byte_0x0b = pati.Byte(1)
-        user_info.unk_string_0x0c = pati.String("StrC")
-        user_info.city_capacity = pati.Long(4)
-        user_info.city_size = pati.Long(3)
+            # TODO: Figure out the optional fields
+            # field0_0x0, unk
+            # field1_0x1, unk
+            # field4_0x4, unk
+            data += pati.pack_optional_fields([
+                (0, 0xffffffff),
+                (1, 0xffffffff),
+                (2, 0xffffffff),
+                (3, 0xffffffff),
+                (4, 0xffffffff),
+                (5, 0xffffffff),
+            ])
+            self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
+        else:
+            user = users[0]
 
-        # This fields are used to identify a user.
-        # Specifically when a client is deserializing data from the packets
-        # `NtcLayerBinary` and `NtcLayerBinary2`
-        # TODO: Proper field value and name
-        user_info.info_mine_0x0f = pati.Long(int(hash(user.capcom_id))
-                                             & 0xffffffff)
-        user_info.info_mine_0x10 = pati.Long(int(hash(user.capcom_id[::-1]))
-                                             & 0xffffffff)
+            user_info = pati.UserSearchInfo()
+            user_info.capcom_id = pati.String(user.capcom_id)
+            user_info.hunter_name = pati.String(user.hunter_name)
+            user_info.stats = pati.Binary(user.hunter_info.pack())
+            user_info.layer_host = pati.Binary(user.get_layer_host_data())
 
-        data = user_info.pack()
-        # TODO: Figure out the optional fields
-        data += pati.pack_optional_fields([])
-        self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
+            user_info.unk_byte_0x07 = pati.Byte(1)
+            user_info.server_name = pati.String("\t".join([
+                user.local_info["server_name"] or "",
+                user.local_info["gate_name"] or "",
+                user.local_info["city_name"] or ""
+            ]))
+            user_info.unk_byte_0x0b = pati.Byte(1)
+            user_info.unk_string_0x0c = pati.String("StrC")
+            user_info.city_capacity = pati.Long(4)
+            user_info.city_size = pati.Long(3)
+
+            # This fields are used to identify a user.
+            # Specifically when a client is deserializing data from the packets
+            # `NtcLayerBinary` and `NtcLayerBinary2`
+            # TODO: Proper field value and name
+            user_info.info_mine_0x0f = pati.Long(int(hash(user.capcom_id))
+                                                 & 0xffffffff)
+            user_info.info_mine_0x10 = pati.Long(int(hash(user.capcom_id[::-1]))
+                                                 & 0xffffffff)
+
+            data = user_info.pack()
+            # field0_0x0, unk
+            # field1_0x1, unk
+            # field4_0x4, unk
+            data += pati.pack_optional_fields(user.get_optional_fields())                                                                                      
+            self.send_packet(PatID4.AnsUserSearchInfo, data, seq)
 
     def recvReqLayerStart(self, packet_id, data, seq):
         """ReqLayerStart packet.
@@ -1584,15 +1610,17 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         TODO: Investigate why the game throws warning debug messages if the
         list is empty.
         """
-        friend = pati.FriendData()
-        friend.index = pati.Long(1)
-        friend.capcom_id = pati.String(OTHER_CAPCOM_ID)
-        friend.hunter_name = pati.String(OTHER_HUNTER_NAME)
-        friends = [friend]
+        friends_list = self.session.get_friends_list()
+        count = len(friends_list)
         unk = 0
-        count = len(friends)
         data = struct.pack(">II", unk, count)
-        data += b"".join([item.pack() for item in friends])
+        data = struct.pack(">II", unk, count)
+        for index, (capcom_id, hunter_name) in enumerate(friends_list, 1):
+            friend = pati.FriendData()
+            friend.index = pati.Long(index)
+            friend.capcom_id = pati.String(capcom_id)
+            friend.hunter_name = pati.String(hunter_name)
+            data += friend.pack()
         self.send_packet(PatID4.AnsFriendList, data, seq)
 
     def recvReqBlackAdd(self, packet_id, data, seq):
@@ -1756,6 +1784,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         with pati.Unpacker(data) as unpacker:
             recipient_id = unpacker.lp2_string()
             info = unpacker.MessageInfo()
+            info.sender_id = pati.String(self.session.capcom_id)
+            info.sender_name = pati.String(self.session.hunter_name)
             message = unpacker.lp2_string()
         self.server.debug("ReqFriendAdd: {}, {!r}, {}".format(
             recipient_id, info, message))
@@ -1768,11 +1798,15 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: フレンド登録返答
         TR: Friend registration response
         """
+        users = self.session.find_users(recipient_id, "", 1, 1)
+        if len(users) == 0:
+            self.sendAnsAlert(PatID4.AnsFriendAdd, "<LF=8><BODY><CENTER>Player is Offline.<END>", seq)
+            return
         self.send_packet(PatID4.AnsFriendAdd, b"", seq)
-        # Send a dummy friend request
-        self.sendNtcFriendAccept(recipient_id, info, message, seq)
+        # Send a friend request
+        self.sendNtcFriendAccept(recipient_id, users[0], info, message, seq)
 
-    def sendNtcFriendAdd(self, recipient_id, accepted, seq):
+    def sendNtcFriendAdd(self, recipient_id, partner_session, accepted, seq):
         """NtcFriendAdd packet.
 
         ID: 66501000
@@ -1781,15 +1815,32 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         """
         if not accepted:
             return
-        data = b""
-        data += pati.lp2_string(recipient_id)
+
+        # Tell sender their friend request was accepted
+        data_1 = pati.lp2_string(recipient_id)
         friend = pati.FriendData()
-        friend.index = pati.Long(2)
+        friend.index = pati.Long(len(partner_session.get_friends_list()))
+        friend.capcom_id = pati.String(self.session.capcom_id)
+        friend.hunter_name = pati.String(self.session.hunter_name)
+        data_1 += friend.pack()
+        data_1 += struct.pack(">B", accepted)
+        partner_pat_handler = self.server.get_pat_handler(partner_session)
+        if partner_pat_handler is None:
+            return
+        partner_pat_handler.send_packet(PatID4.NtcFriendAdd, data_1, seq)
+
+        # Tell accepter that their acceptance was acknowledged
+        data_2 = pati.lp2_string(self.session.capcom_id)
+        friend = pati.FriendData()
+        friend.index = pati.Long(len(self.session.get_friends_list()))
         friend.capcom_id = pati.String(recipient_id)
-        friend.hunter_name = pati.String("Cid")
-        data += friend.pack()
-        data += struct.pack(">B", accepted)
-        self.send_packet(PatID4.NtcFriendAdd, data, seq)
+        friend.hunter_name = pati.String(partner_session.hunter_name)
+        data_2 += friend.pack()
+        data_2 += struct.pack(">B", accepted)
+        self.send_packet(PatID4.NtcFriendAdd, data_2, seq)
+
+        # Update database
+        self.session.add_friends(recipient_id)
 
     def recvReqFriendAccept(self, packet_id, data, seq):
         """ReqFriendAccept packet.
@@ -1800,8 +1851,12 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         """
         recipient_id = pati.unpack_lp2_string(data)
         accepted, = struct.unpack_from(">B", data, -1)
+        users = self.session.find_users(recipient_id, "", 1, 1)
+        if accepted and len(users) == 0:
+            self.sendAnsAlert(PatID4.AnsFriendAccept, "<LF=8><BODY><CENTER>Player is Offline.<END>", seq)
+            return
         self.sendAnsFriendAccept(recipient_id, accepted, seq)
-        self.sendNtcFriendAdd(recipient_id, accepted, seq)
+        self.sendNtcFriendAdd(recipient_id, users[0], accepted, seq)
 
     def sendAnsFriendAccept(self, recipient_id, accepted, seq):
         """AnsFriendAccept packet.
@@ -1812,7 +1867,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         """
         self.send_packet(PatID4.AnsFriendAccept, b"", seq)
 
-    def sendNtcFriendAccept(self, recipient_id, info, message, seq):
+    def sendNtcFriendAccept(self, recipient_id, partner_session, info, message, seq):
         """NtcFriendAccept packet.
 
         ID: 66511000
@@ -1826,7 +1881,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         info.unk_long_0x02 = pati.Long(20)
         data += info.pack()
         data += pati.lp2_string(message)
-        self.send_packet(PatID4.NtcFriendAccept, data, seq)
+
+        partner_pat_handler = self.server.get_pat_handler(partner_session)
+        if partner_pat_handler:
+            partner_pat_handler.send_packet(PatID4.NtcFriendAccept, data, seq)
 
     def recvReqFriendDelete(self, packet_id, data, seq):
         """ReqFriendDelete packet.
@@ -1846,6 +1904,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         TR: Friend data deletion response
         """
         self.send_packet(PatID4.AnsFriendDelete, b"", seq)
+        self.session.remove_friends(capcom_id)
 
     def recvReqLayerChildListHead(self, packet_id, data, seq):
         """ReqLayerChildListHead packet.

@@ -355,6 +355,14 @@ class TempDatabase(object):
             "C9I7D4": {"name": "Cid", "session": None},
             "D9R7K4": {"name": "Drakea", "session": None},
         }
+        self.friends_lists = {
+            # Capcom ID => Friends list
+            #"C9I7D4": ["D9R7K4"],
+            #"D9R7K4": ["C9I7D4"],
+        }
+        self.hunter_settings = {
+            # Capcom ID => 0x100 bytearray
+        }
         self.servers = new_servers()
 
     def get_support_code(self, session):
@@ -411,6 +419,8 @@ class TempDatabase(object):
         name = self.use_capcom_id(session, capcom_id, name)
         session.capcom_id = capcom_id
         session.hunter_name = name
+        if session.capcom_id not in self.friends_lists:
+            self.friends_lists[session.capcom_id] = []
 
     def get_session(self, pat_ticket):
         """Returns existing PAT session or None."""
@@ -447,6 +457,31 @@ class TempDatabase(object):
                 for index in range(first_index+size, first_index+count)
             ])
         return capcom_ids
+
+    def get_friends(self, session):
+        assert session.capcom_id in self.capcom_ids, "Capcom ID does not exist"
+        friends_list = []
+        for capcom_id in self.friends_lists[session.capcom_id]:
+            assert capcom_id in self.capcom_ids, "Friend's Capcom ID does not exist"
+            friends_list.append((capcom_id, self.capcom_ids[capcom_id]["name"]))
+        return friends_list
+
+    def add_friends(self, id1, id2):
+        if id1 not in self.friends_lists:
+            self.friends_lists[id1] = []
+        if id2 not in self.friends_lists:
+            self.friends_lists[id2] = []
+        
+        if id2 not in self.friends_lists[id1]:
+            self.friends_lists[id1].append(id2)
+        if id1 not in self.friends_lists[id2]:
+            self.friends_lists[id2].append(id1)
+
+    def remove_friends(self, id1, id2):
+        if id2 in self.friends_lists[id1]:
+            self.friends_lists[id1].remove(id2)
+        if id1 in self.friends_lists[id2]:
+            self.friends_lists[id2].remove(id1)
 
     def join_server(self, session, index):
         if session.local_info["server_id"] is not None:
@@ -591,6 +626,15 @@ class TempDatabase(object):
                     if match_city(city, fields)
                 ])
         return cities
+
+    def update_hunter_settings(self, capcom_id, hunter_info_bytearray):
+        self.hunter_settings[capcom_id] = hunter_info_bytearray
+
+    def fetch_hunter_settings(self, capcom_id):
+        return self.hunter_settings.get(capcom_id, None)
+
+    def find_capcom_id(self, capcom_id):
+        return self.capcom_ids.get(capcom_id, None)
 
 
 CURRENT_DB = TempDatabase()

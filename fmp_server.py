@@ -78,8 +78,7 @@ class FmpRequestHandler(PatRequestHandler):
         """
         offset, length = struct.unpack_from(">IH", data)
         binary = pati.unpack_lp2_string(data, 4)
-        self.session.hunter_info.unpack(data[6:], length, offset)
-
+        self.session.update_hunter_info(data[6:], length, offset)
         self.sendAnsUserBinarySet(offset, binary, seq)
 
     def sendAnsUserBinarySet(self, unk1, profile_info, seq):
