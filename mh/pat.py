@@ -92,7 +92,7 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
             pat_handler.send_packet(packet_id, data, seq)
 
 
-class PatRequestHandler(SocketServer.StreamRequestHandler):
+class PatRequestHandler(SocketServer.StreamRequestHandler, object):
     """Generic PAT request handler class.
 
     When possible, each packet is described with:
@@ -105,6 +105,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
     the best of our understanding of the packets and might be
     inaccurate. `unk` stands for `unknown`.
     """
+
+    def setup(self):
+        self.finished = False
+        super(PatRequestHandler, self).setup()
 
     def recv_packet(self, header):
         """Receive PAT packet."""
@@ -596,6 +600,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         """
         data = struct.pack(">B", login_type)
         self.send_packet(PatID4.AnsShut, data, seq)
+        self.finish()
 
     def sendNtcShut(self, message, seq):
         """NtcShut packet.
@@ -608,6 +613,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">B", int(has_message))
         data += pati.lp2_string(message[:0x200])
         self.send_packet(PatID4.NtcShut, data, seq)
+        self.finish()
 
     def recvReqChargeInfo(self, packet_id, data, seq):
         """ReqChargeInfo packet.
@@ -2351,6 +2357,18 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         data = struct.pack(">B", success)
         self.send_packet(PatID4.AnsLayerMediationUnlock, data, seq)
 
+    def finish(self):
+        self.finished = True
+        try:
+            super(PatRequestHandler, self).finish()
+        except AttributeError:
+            # Swallow exception caused by a bug?
+            #
+            # File "/usr/lib/python2.7/socket.py", line 286, in close
+            #   self._sock.close()
+            # AttributeError: 'NoneType' object has no attribute 'close'
+            pass
+
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
         if packet_id not in PAT_NAMES:
@@ -2368,7 +2386,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
     def handle_client(self):
         """Select handler."""
         timeout = time.time() + 30
-        while True:
+        while not self.finished:
             r, w, e = select.select([self.rfile], [self.wfile], [], 0.2123)
             if r:
                 header = self.rfile.read(8)
