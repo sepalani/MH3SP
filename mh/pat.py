@@ -2395,9 +2395,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         self.server.add_to_debug(self)
         self.session = Session(self)
 
-        # There are connect errors if too fast
-        # TODO: investigate if it's Dolphin's fault
-        time.sleep(2)
         self.sendReqConnection()
         try:
             self.handle_client()
