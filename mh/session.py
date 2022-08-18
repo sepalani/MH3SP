@@ -329,7 +329,7 @@ class Session(object):
         else:
             assert False, "Can't find layer"
 
-    def shutdown(self, shutdown_type):
+    def attempt_leave_all_layers(self, shutdown_type):
         assert 1 <= shutdown_type <= 2, "Invalid shutdown type"
         if shutdown_type != 1:
             return  # only shutdown_type 1 requires removal from layers

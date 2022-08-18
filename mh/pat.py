@@ -246,7 +246,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         The server sends a request to the game to establish a PAT connection.
         It also sends a parameter that seems unused on the western versions.
         """
-        self.session.graceful_shutdown = False
         data = struct.pack(">I", unused)
         self.send_packet(PatID4.ReqConnection, data, seq)
 
@@ -593,7 +592,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         # 2: logout to different server(?)
         """
         shutdown_type, = struct.unpack(">B", data)
-        self.session.shutdown(shutdown_type)
+        self.session.attempt_leave_all_layers(shutdown_type)
         self.sendAnsShut(shutdown_type, seq)
 
     def sendAnsShut(self, shutdown_type, seq):
@@ -996,7 +995,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: レイヤ終了要求
         TR: Layer end request
         """
-        self.leave_layer()
+        self.notify_layer_departure()
         self.sendAnsLayerEnd(seq)
 
     def sendAnsLayerEnd(self, seq):
@@ -2375,7 +2374,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.layer_broadcast(self.session, PatID4.NtcLayerHost, data,
                                     seq)
 
-    def leave_layer(self):
+    def notify_layer_departure(self):
         if self.session.layer == 2:
             new_host = self.session.try_transfer_city_leadership()
             if new_host:
@@ -2453,7 +2452,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
             self.session.disconnect()
             if not self.finished:
                 try:
-                    self.leave_layer()
+                    self.notify_layer_departure()
                 except Exception:
                     # We tried to comunicate the error to the client but it
                     # seems that the exception was caused by a connection
@@ -2461,7 +2460,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
                     # to communicate that error to the client
                     pass
 
-                self.session.shutdown(1)
+                self.session.attempt_leave_all_layers(1)
                 self.session.delete()
 
         self.server.del_from_debug(self)
