@@ -2439,18 +2439,20 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.info("Handle client")
         self.server.add_to_debug(self)
         self.session = Session(self)
-
+        exception_raised = False
+        
         # Temporary workaround for Dolphin bug
         time.sleep(2)
         self.sendReqConnection()
         try:
             self.handle_client()
         except Exception as e:
+            exception_raised = True
             self.server.error(traceback.format_exc())
             self.send_error("{}: {}".format(type(e).__name__, str(e)))
         finally:
             self.session.disconnect()
-            if not self.finished:
+            if not self.finished or exception_raised:
                 try:
                     self.notify_layer_departure()
                 except Exception:
