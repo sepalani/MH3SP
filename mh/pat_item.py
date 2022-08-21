@@ -715,8 +715,10 @@ class CircleInfo(PatData):
                 party_members[start_offset+0x40:end_offset+0x40] = \
                     pad(player.hunter_name.encode('ascii'), 0x10)
 
+                party_members[0x80+i] = player.hunter_info.weapon_type()
+
                 # TODO: Discover flag meaning?
-                party_members[0x80+i] = 0x08 if i == 0 else 0x01
+                party_members[0x84+i] = 0xff
 
             circle_info.party_members = Binary(party_members)
 
@@ -828,6 +830,14 @@ class HunterSettings(object):
     def unpack(self, data, length, offset=0):
         self.data[offset:offset+length] = data
         return self
+
+    def rank(self):
+        rank, = struct.unpack_from(">H", self.data, 0x00)
+        return rank
+
+    def weapon_type(self):
+        weapon_type, = struct.unpack_from(">B", self.data, 0x05)
+        return weapon_type
 
     def pack(self):
         return self.data
