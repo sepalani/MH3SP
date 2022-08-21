@@ -2413,6 +2413,8 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.add_to_debug(self)
         self.session = Session(self)
 
+        # Temporary workaround for Dolphin bug
+        time.sleep(2)
         self.sendReqConnection()
         try:
             self.handle_client()
