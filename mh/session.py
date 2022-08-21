@@ -233,7 +233,6 @@ class Session(object):
     def leave_server(self):
         old_server = self.local_info["server_id"]
         if old_server is not None:
-            self.local_info["server_id"] = None
             DB.leave_server(self, old_server)
 
     def get_gates(self):
