@@ -400,8 +400,13 @@ class FmpRequestHandler(PatRequestHandler):
         city = self.session.get_city()
         circle, circle_index = city.get_first_empty_circle()
 
-        # TODO: Transmit error when no slot available
-        assert circle is not None, "No Empty Circle Found"
+        if circle is None:
+            self.sendAnsAlert(
+                PatID4.AnsCircleCreate,
+                "<LF=8><BODY><CENTER>No Quest Slot Available<END>",
+                seq
+            )
+            return
 
         circle.leader = self.session
 
