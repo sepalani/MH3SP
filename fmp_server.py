@@ -431,8 +431,6 @@ class FmpRequestHandler(PatRequestHandler):
             if field_id == 0x02:  # QuestId
                 circle.quest_id = value
 
-        assert circle.quest_id >= 10000  # Game's quest id minimum
-
         # Notify every city's player
         self.sendNtcCircleListLayerChange(circle, circle_index + 1, seq)
 
