@@ -526,8 +526,13 @@ class FmpRequestHandler(PatRequestHandler):
 
         city = self.session.get_city()
 
-        # TODO: Error out, gracefully
-        assert (circle_index-1) < len(city.circles)
+        if circle_index-1 >= len(city.circles):
+            self.sendAnsAlert(
+                PatID4.AnsCircleJoin,
+                "<LF=8><BODY><CENTER>Invalid Quest Slot<END>",
+                seq
+            )
+            return
 
         circle = city.circles[circle_index-1]
 
