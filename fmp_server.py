@@ -629,7 +629,13 @@ class FmpRequestHandler(PatRequestHandler):
         circle = city.circles[circle_index-1]
 
         leader_index = circle.players.index(circle.leader)
-        assert leader_index != -1, "Leader wasn't found"
+        if leader_index == -1:
+            self.sendAnsAlert(
+                PatID4.AnsCircleHost,
+                "<LF=8><BODY><CENTER>Unknown Quest Leader<END>",
+                seq
+            )
+            return
 
         data = struct.pack(">IB", circle_index, leader_index+1)
         data += pati.lp2_string(circle.leader.capcom_id)
