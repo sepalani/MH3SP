@@ -315,10 +315,9 @@ class Session(object):
     def get_optional_fields(self):
         """LayerUserInfo's optional fields."""
         location = int(self.is_in_quest())  # City - 0, Quest - 1
-        hunter_rank, = struct.unpack_from(">H", self.hunter_info.data, 0)
-        weapon_icon, = struct.unpack_from(">B", self.hunter_info.data, 0x10)
-        weapon_icon -= 7  # Skip armor pieces and start at index zero
+        hunter_rank = self.hunter_info.rank()
+        weapon_type = self.hunter_info.weapon_type()
         return [
-                (1, (weapon_icon << 24) | location),
+                (1, (weapon_type << 24) | location),
                 (2, hunter_rank << 16)
         ]
