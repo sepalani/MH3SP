@@ -231,9 +231,8 @@ class Session(object):
         return users[start:start+count]
 
     def leave_server(self):
-        old_server = self.local_info["server_id"]
-        if old_server is not None:
-            DB.leave_server(self, old_server)
+        if self.local_info["server_id"] is not None:
+            DB.leave_server(self, self.local_info["server_id"])
 
     def get_gates(self):
         return DB.get_gates(self.local_info["server_id"])
