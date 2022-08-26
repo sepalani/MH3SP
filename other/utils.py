@@ -153,6 +153,7 @@ def get_config(name, config_file=CONFIG_FILE):
         "Port": config.getint(name, "Port"),
         "Name": config.get(name, "Name"),
         "UseSSL": config.getboolean(name, "UseSSL"),
+        "LegacySSL": config.getboolean("SSL", "LegacySSL"),
         "SSLCert":
             config.get(name, "SSLCert") or
             config.get("SSL", "DefaultCert"),
@@ -212,6 +213,9 @@ def argparse_from_config(config):
     parser.add_argument("-s", "--use-ssl", action="store", type=typebool,
                         default=config["UseSSL"], dest="use_ssl",
                         help="use SSL protocol")
+    parser.add_argument("-f", "--legacy-ssl", action="store", type=typebool,
+                        default=config["LegacySSL"], dest="legacy_ssl",
+                        help="force legacy SSL ciphers")
     parser.add_argument("-c", "--ssl-cert", action="store", type=str,
                         default=config["SSLCert"], dest="ssl_cert",
                         help="set server SSL certificate")
@@ -237,7 +241,7 @@ def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server",
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
-                  log_to_console=True, log_to_window=False):
+                  log_to_console=True, log_to_window=False, legacy_ssl=False):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG,
@@ -249,7 +253,9 @@ def create_server(server_class, server_handler,
     if use_ssl:
         import ssl
 
-        context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        if legacy_ssl:
+            context.set_ciphers('ALL:@SECLEVEL=0')
         context.load_cert_chain(ssl_cert, ssl_key)
         server.socket = context.wrap_socket(server.socket, server_side=True)
 
@@ -268,6 +274,7 @@ def create_server_from_base(name, server_class, server_handler, silent=False):
         port=config["Port"],
         name=config["Name"],
         use_ssl=config["UseSSL"],
+        legacy_ssl=config["LegacySSL"],
         ssl_cert=config["SSLCert"],
         ssl_key=config["SSLKey"],
         log_to_file=config["LogToFile"],
