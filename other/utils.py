@@ -158,6 +158,12 @@ def to_str(data):
     return "".join(chr(b) for b in to_bytearray(data))
 
 
+def pad(s, size, p=b'\0'):
+    data = bytearray(s + p * max(0, size-len(s)))
+    data[-1] = 0
+    return data
+
+
 def hexdump(data):
     """Get data hexdump."""
     data = bytearray(data)
