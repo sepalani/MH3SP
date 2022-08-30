@@ -20,12 +20,10 @@
 """
 
 import struct
-
-
-def pad(s, size, p=b'\0'):
-    data = bytearray(s + p * max(0, size-len(s)))
-    data[-1] = 0
-    return data
+from other.utils import pad
+from quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
+    QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
+    QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS
 
 
 def make_binary_type_time_events(state=0):
@@ -283,43 +281,43 @@ PAT_BINARIES = {
     },
     0x06: {
         "version": 1,
-        "content": b"dummy_06\0"
+        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
     },
     0x07: {
         "version": 1,
-        "content": b"dummy_07\0"
+        "content": QUEST_EVENT_BLOOD_SPORT
     },
     0x08: {
         "version": 1,
-        "content": b"dummy_08\0"
+        "content": QUEST_EVENT_MERCY_MISSION
     },
     0x09: {
         "version": 1,
-        "content": b"dummy_09\0"
+        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
     },
     0x0a: {  # Japanese
         "version": 1,
-        "content": b"6" * 0x50  # b"foo\tbar\tfuu\nboo\tfaa\bbaa\nree\t"
+        "content": QUEST_EVENT_WORLD_EATER
     },
     0x0b: {
         "version": 1,
-        "content": b"dummy_0b\0"
+        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
     },
     0x0c: {
         "version": 1,
-        "content": b"dummy_0c\0"
+        "content": QUEST_EVENT_GREEN_EGGS
     },
     0x0d: {
         "version": 1,
-        "content": b"dummy_0d\0"
+        "content": b"\0"
     },
     0x0e: {
         "version": 1,
-        "content": b"dummy_0e\0"
+        "content": b"\0"
     },
     0x0f: {
         "version": 1,
-        "content": b"dummy_0f\0"
+        "content": b"\0"
     },
     0x10: {  # French
         "version": 1,
