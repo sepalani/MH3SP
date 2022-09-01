@@ -240,6 +240,12 @@ class Session(object):
         return DB.get_cities(self.local_info["server_id"],
                              self.local_info["gate_id"])
 
+    def is_city_empty(self, city_id):
+        return DB.get_city(self.local_info["server_id"], self.local_info["gate_id"], city_id).get_state() == db.LayerState.EMPTY
+
+    def reserve_city(self, city_id, reserve):
+        return DB.reserve_city(self.local_info["server_id"], self.local_info["gate_id"], city_id, reserve)
+
     def create_city(self, city_id, settings, optional_fields):
         return DB.create_city(self,
                               self.local_info["server_id"],

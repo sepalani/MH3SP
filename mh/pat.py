@@ -2198,6 +2198,12 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         TR: Layer creation response
         """
         data = struct.pack(">H", number)
+        if not self.session.is_city_empty(number):
+            self.sendAnsAlert(PatID4.AnsLayerCreateHead, "<LF=8><BODY><CENTER>City already exists.<END>", seq)
+            return
+        if not self.session.reserve_city(number, True):
+            self.sendAnsAlert(PatID4.AnsLayerCreateHead, "<LF=8><BODY><CENTER>City reserved.<END>", seq)
+            return
         self.send_packet(PatID4.AnsLayerCreateHead, data, seq)
 
     def recvReqLayerCreateSet(self, packet_id, data, seq):
@@ -2234,6 +2240,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         TR: Layer creation end of transmission request
         """
         number, unk = struct.unpack(">HB", data)
+        self.session.reserve_city(number, False)
         self.sendAnsLayerCreateFoot(number, unk, seq)
 
     def sendAnsLayerCreateFoot(self, number, unk, seq):
