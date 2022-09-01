@@ -20,6 +20,7 @@
 """
 
 import random
+import time
 
 CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -29,6 +30,8 @@ MEDIA_VERSIONS = {
     "1001301045": "RMHE08",
     "1002121503": "RMHP08",
 }
+
+RESERVE_DC_TIMEOUT = 40.0
 
 
 def new_random_str(length=6):
@@ -202,6 +205,7 @@ class City(object):
         self.players = Players(4)
         self.optional_fields = []
         self.leader = None
+        self.reserved = None
         self.circles = [
             # One circle per player
             Circle(self) for _ in range(self.get_capacity())
@@ -244,6 +248,12 @@ class City(object):
             if circle.leader == leader_session:
                 return circle, index
         return None, None
+
+    def reserve(self, reserve):
+        if reserve:
+            self.reserved = time.time()
+        else:
+            self.reserved = None
 
 
 class Gate(object):
@@ -496,6 +506,14 @@ class TempDatabase(object):
         cities = self.get_cities(server_id, gate_id)
         assert 0 < index <= len(cities), "Invalid city index"
         return cities[index - 1]
+
+    def reserve_city(self, server_id, gate_id, index, reserve):
+        city = self.get_city(server_id, gate_id, index)
+        reserved_time = city.reserved
+        if reserve and reserved_time and time.time()-reserved_time < RESERVE_DC_TIMEOUT:
+            return False
+        city.reserve(reserve)
+        return True
 
     def get_all_users(self, server_id, gate_id, city_id):
         """Search for users in layers and its children.
