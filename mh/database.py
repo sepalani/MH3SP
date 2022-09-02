@@ -383,6 +383,7 @@ class TempDatabase(object):
 
         name = name or self.capcom_ids[capcom_id]["name"]
         self.capcom_ids[capcom_id] = {"name": name, "session": session}
+        return name
 
     def use_user(self, session, index, name):
         """Use User from the slot or create one if empty"""
@@ -397,7 +398,7 @@ class TempDatabase(object):
                 break
         else:
             capcom_id = users[index]
-        self.use_capcom_id(session, capcom_id, name)
+        name = self.use_capcom_id(session, capcom_id, name)
         session.capcom_id = capcom_id
         session.hunter_name = name
 
@@ -438,9 +439,8 @@ class TempDatabase(object):
         return capcom_ids
 
     def join_server(self, session, index):
-        old_server = session.local_info["server_id"]
-        if old_server is not None:
-            self.leave_server(session, old_server)
+        if session.local_info["server_id"] is not None:
+            self.leave_server(session, session.local_info["server_id"])
         server = self.get_server(index)
         server.players.add(session)
         session.local_info["server_id"] = index
