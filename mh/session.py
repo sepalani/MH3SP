@@ -60,6 +60,7 @@ class Session(object):
         }
         self.connection = connection_handler
         self.online_support_code = None
+        self.request_reconnection = False
         self.pat_ticket = None
         self.capcom_id = ""
         self.hunter_name = ""
@@ -85,6 +86,13 @@ class Session(object):
             assert session.connection is None, "Session is already in use"
             session.connection = self.connection
             self.connection = None
+
+        # Preserve session during login process (From OPN to FMP)
+        # if no online support code is found
+        # Reset upon entering the FMP server (always)
+        session.request_reconnection = \
+            not ("pat_ticket" in connection_data or
+                 "online_support_code" in connection_data)
         return session
 
     def get_support_code(self):
@@ -96,6 +104,7 @@ class Session(object):
 
         It doesn't purge the session state nor its PAT ticket.
         """
+        self.layer_end()
         self.connection = None
         DB.disconnect_session(self)
 
@@ -106,7 +115,8 @@ class Session(object):
          - Find a good place to purge old tickets.
          - We should probably create a SessionManager thread per server.
         """
-        DB.delete_session(self)
+        if not self.request_reconnection:
+            DB.delete_session(self)
 
     def is_jap(self):
         """TODO: Heuristic using the connection data to detect region."""
@@ -150,6 +160,15 @@ class Session(object):
         return pati.getDummyLayerData()
 
     def layer_end(self):
+        if self.layer > 1:
+            # City path
+            self.leave_city()
+        if self.layer > 0:
+            # Gate path
+            self.leave_gate()
+            if not self.request_reconnection:
+                # Server path (executed at gate and higher)
+                self.leave_server()
         self.layer = 0
         self.state = SessionState.UNKNOWN
 
@@ -223,7 +242,7 @@ class Session(object):
         return users[start:start+count]
 
     def leave_server(self):
-        DB.leave_server(self)
+        DB.leave_server(self, self.local_info["server_id"])
 
     def get_gates(self):
         return DB.get_gates(self.local_info["server_id"])
@@ -256,6 +275,21 @@ class Session(object):
     def leave_city(self):
         DB.leave_city(self)
         self.state = SessionState.GATE
+
+    def try_transfer_city_leadership(self):
+        if self.local_info['city_id'] is None:
+            return None
+
+        city = self.get_city()
+        if city.leader != self:
+            return None
+
+        for _, player in city.players:
+            if player == self:
+                continue
+            city.leader = player
+            return player
+        return None
 
     def join_circle(self, circle_id):
         # TODO: Move this to the database

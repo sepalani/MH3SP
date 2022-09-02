@@ -600,18 +600,21 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         ID: 60100100
         JP: 切断要求
         TR: Disconnection request
-        """
-        login_type, = struct.unpack(">B", data)
-        self.sendAnsShut(login_type, seq)
 
-    def sendAnsShut(self, login_type, seq):
+        # 1: full logout(?)
+        # 2: logout to different server(?)
+        """
+        shutdown_type, = struct.unpack(">B", data)
+        self.sendAnsShut(shutdown_type, seq)
+
+    def sendAnsShut(self, shutdown_type, seq):
         """AnsShut packet.
 
         ID: 60100200
         JP: 切断返答
         TR: Disconnection response
         """
-        data = struct.pack(">B", login_type)
+        data = struct.pack(">B", shutdown_type)
         self.send_packet(PatID4.AnsShut, data, seq)
         self.finish()
 
@@ -822,7 +825,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.debug("UserObject: {}, {}, {!r}".format(
             is_slot_empty, slot_index, user_obj
         ))
-        hunter_name = ""
+        hunter_name = None
         if hasattr(user_obj, "hunter_name"):
             hunter_name = pati.unpack_string(user_obj.hunter_name)
         self.session.use_user(slot_index, hunter_name)
@@ -1004,6 +1007,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: レイヤ終了要求
         TR: Layer end request
         """
+        self.notify_layer_departure()
         self.sendAnsLayerEnd(seq)
 
     def sendAnsLayerEnd(self, seq):
@@ -1039,6 +1043,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
             self.sendAnsFmpInfo(fmp_data, fields, seq)
         elif packet_id == PatID4.ReqFmpInfo2:
             self.sendAnsFmpInfo2(fmp_data, fields, seq)
+
+        # Preserve session in database, due to server selection
+        self.session.request_reconnection = True
 
     def sendAnsFmpInfo(self, fmp_data, fields, seq):
         """AnsFmpInfo packet.
@@ -2370,6 +2377,28 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         data = struct.pack(">B", success)
         self.send_packet(PatID4.AnsLayerMediationUnlock, data, seq)
 
+    def sendNtcLayerHost(self, new_leader, seq):
+        """NtcLayerHost packet.
+        ID: 64411000
+        JP: レイヤのホスト通知
+        TR: Layer host notification
+        """
+        data = struct.pack(">HII", 0x08, 0x00, 0x00)  # unk short array patitem
+        data += pati.lp2_string(new_leader.capcom_id)
+        data += pati.lp2_string(new_leader.hunter_name)
+        self.server.layer_broadcast(self.session, PatID4.NtcLayerHost, data,
+                                    seq)
+
+    def notify_layer_departure(self):
+        if self.session.layer == 2:
+            new_host = self.session.try_transfer_city_leadership()
+            if new_host:
+                self.sendNtcLayerHost(new_host, 0)
+        if self.session.layer > 0:
+            ntc_data = pati.lp2_string(self.session.capcom_id)
+            self.server.layer_broadcast(self.session, PatID4.NtcLayerOut,
+                                        ntc_data, 0)
+
     def finish(self):
         self.finished = True
         try:
@@ -2431,11 +2460,17 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.sendReqConnection()
         try:
             self.handle_client()
-            self.session.disconnect()
         except Exception as e:
             self.server.error(traceback.format_exc())
             self.send_error("{}: {}".format(type(e).__name__, str(e)))
-            self.session.delete()
+
+        try:
+            self.notify_layer_departure()
+        except Exception:
+            pass
+
+        self.session.disconnect()
+        self.session.delete()
 
         self.server.del_from_debug(self)
         self.server.info("Client finished!")
