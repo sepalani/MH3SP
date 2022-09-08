@@ -1359,8 +1359,9 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = make_binary_event_quest(61001, "Jump Three Jaggi",
 
 """
 EVENT QUEST 7: The Phantom Uragaan
+Quest description from https://www.youtube.com/watch?v=Py5PkCXhf6w
 """
-QUEST_EVENT_THE_PHANTOM_URAGAAN = make_binary_event_quest(61007, "The Phantom Uragaan", "MH3SP Dev Team", "Hunt an Uragaan", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,1,0,0,0,0),(1,0,1,0,0,0,1,1)),  # quest id, name, client, description, flags
+QUEST_EVENT_THE_PHANTOM_URAGAAN = make_binary_event_quest(61007, "The Phantom Uragaan", "Spoiled Princess", "Hunt an Uragaan", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,1,0,0,0,0),(1,0,1,0,0,0,1,1)),  # quest id, name, client, description, flags
     Monster.uragaan, 0x0000, True, 0x1D, 0x13, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
     Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
     Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
@@ -1369,9 +1370,10 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = make_binary_event_quest(61007, "The Phantom Ur
     0x00000001, Monster.uragaan, 0x01,  # Main quest: type, target, number
     "None.", 0x00000000, Monster.none, 0x00,  # Subquest 1: Description, type, target, number
     "None.", 0x00000000, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "Wanted:" + '\x0A' + "The description for this" + '\x0A' +
-        "quest! If you can find" + '\x0A' + "it, please let us know!" + '\x0A' +
-        "Thanks!",  # Quest details
+    "Oooh, I just heard they've" + '\x0A' + "spotted the cutest, tiniest," + '\x0A' +
+        "most adorable little Uragaan" + '\x0A' + "on the Volcano. Hunt me one" + '\x0A' +
+        "this instant or I will get" + '\x0A' + "very angry. And if I'm angry," + '\x0A' +
+        "Daddy's angry. Now go!",  # Quest details
     StartingPositionType.camp, 0x1D, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
     0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
     0x00000000, 0x00000000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
@@ -1385,8 +1387,9 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = make_binary_event_quest(61007, "The Phantom Ur
 
 """
 EVENT QUEST 8: Blood Sport
+Quest description from https://www.youtube.com/watch?v=tuRSdC_mlO4
 """
-QUEST_EVENT_BLOOD_SPORT = make_binary_event_quest(61008, "Blood Sport", "MH3SP Dev Team", "Hunt an Uragaan" + '\x0A' + "and a Diablos", generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),  # quest id, name, client, description, flags
+QUEST_EVENT_BLOOD_SPORT = make_binary_event_quest(61008, "Blood Sport", "Spoiled Princess", "Hunt an Uragaan" + '\x0A' + "and a Diablos", generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),  # quest id, name, client, description, flags
     Monster.uragaan, 0x0000, True, 0x1D, 0x64, 0x01, 0x03,  # monster 1:  type, boss id, enabled, level, size, min, max
     Monster.diablos, 0x0001, True, 0x1D, 0x64, 0x01, 0x03,  # monster 2:  type, boss id, enabled, level, size, min, max
     Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
@@ -1395,9 +1398,10 @@ QUEST_EVENT_BLOOD_SPORT = make_binary_event_quest(61008, "Blood Sport", "MH3SP D
     0x00000001, Monster.uragaan, 0x01,  # Main quest: type, target, number
     "None.", 0x00000001, Monster.diablos, 0x01,  # Subquest 1: Description, type, target, number
     "None.", 0, Monster.none, 0,  # Subquest 2: Description, type, target, number
-    "Wanted:" + '\x0A' + "The description for this" + '\x0A' +
-        "quest! If you can find" + '\x0A' + "it, please let us know!" + '\x0A' +
-        "Thanks!",  # Quest details
+    "Oh, boo! I'm tired of watching" + '\x0A' + "run-of-the-mill hunts. The" + '\x0A' +
+        "Diablos and the Uragaan are" + '\x0A' + "supposed to be the ultimate" + '\x0A' +
+        "monster duo. I'd love to watch" + '\x0A' + "them maim some foolish hunter!" + '\x0A' +
+        "Do put on a good show...",  # Quest details
     StartingPositionType.camp, 0x001D, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
     0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
     0x00000000, 0x00010000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
@@ -1470,10 +1474,12 @@ QUEST_EVENT_WORLD_EATER = make_binary_event_quest(61020, "World Eater", "Guildma
 
 """
 EVENT QUEST 20: Where Gods Fear To Tread
-Quest description from MH3U, thanks to "soulmizute, emperor of the abyss#5094"
+Quest description from https://www.youtube.com/watch?v=mQHTdPRlD1w,
+    thanks to "soulmizute, emperor of the abyss#5094"
+    and "El Matiah#8904"
 """
 QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = make_binary_event_quest(61021, "Where Gods Fear to Tread", "Scarlet Mystery Man", "Slay the Alatreon", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,0,0,0,0,1,0)),  # quest id, name, client, description, flags
-    Monster.alatreon, 0x0000, True, 0x40, 0x64, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
+    Monster.alatreon, 0x0000, True, 0x40, 0x7D, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
     Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
     Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
     42000, 0, 0, 14000, 4200, 50, Monster.none, Monster.none,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
@@ -1481,7 +1487,7 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = make_binary_event_quest(61021, "Where God
     0x00000101, Monster.alatreon, 0x01,  # Main quest: type, target, number
     "None", 0x00000000, Monster.none, 0x00,  # Subquest 1: Description, type, target, number
     "None", 0x00000000, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "I've been waiting, hunter." + '\x0A' + "Now comes your final challenge:" + '\x0A' +
+    "I've been waiting, hunter. Now" + '\x0A' + "comes your final challenge:" + '\x0A' +
         "Alatreon, a dragon of darkness" + '\x0A' + "and light. Can mere mortals" + '\x0A' +
         "fell an elder dragon feared" + '\x0A' + "even by the gods? Don't even" + '\x0A' +
         "bother saying your prayers...",  # Quest details
