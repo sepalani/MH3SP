@@ -279,43 +279,43 @@ PAT_BINARIES = {
         # "version": 1,
         # "content": b"TEST_BINARY"
     },
-    0x06: {
+    0x06: {  # English
         "version": 1,
         "content": QUEST_EVENT_JUMP_FOUR_JAGGI
     },
-    0x07: {
+    0x07: {  # English
         "version": 1,
         "content": QUEST_EVENT_BLOOD_SPORT
     },
-    0x08: {
+    0x08: {  # English
         "version": 1,
         "content": QUEST_EVENT_MERCY_MISSION
     },
-    0x09: {
+    0x09: {  # English
         "version": 1,
         "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
     },
-    0x0a: {  # Japanese
+    0x0a: {  # Japanese(?)English
         "version": 1,
         "content": QUEST_EVENT_WORLD_EATER
     },
-    0x0b: {
+    0x0b: {  # Japanese(?)English
         "version": 1,
         "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
     },
-    0x0c: {
+    0x0c: {  # Japanese(?)English
         "version": 1,
         "content": QUEST_EVENT_GREEN_EGGS
     },
-    0x0d: {
+    0x0d: {  # Japanese(?)English
         "version": 1,
         "content": b"\0"
     },
-    0x0e: {
+    0x0e: {  # Japanese(?)English
         "version": 1,
         "content": b"\0"
     },
-    0x0f: {
+    0x0f: {  # Japanese(?)English
         "version": 1,
         "content": b"\0"
     },
@@ -341,31 +341,31 @@ PAT_BINARIES = {
     },
     0x15: {  # French
         "version": 1,
-        "content": b"dummy_15\0"
+        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
     },
     0x16: {  # French
         "version": 1,
-        "content": b"dummy_16\0"
+        "content": QUEST_EVENT_BLOOD_SPORT
     },
     0x17: {  # French
         "version": 1,
-        "content": b"dummy_17\0"
+        "content": QUEST_EVENT_MERCY_MISSION
     },
     0x18: {  # French
         "version": 1,
-        "content": b"dummy_18\0"
+        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
     },
     0x19: {  # French
         "version": 1,
-        "content": b"dummy_19\0"
+        "content": QUEST_EVENT_WORLD_EATER
     },
     0x1a: {  # French
         "version": 1,
-        "content": b"dummy_1a\0"
+        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
     },
     0x1b: {  # French
         "version": 1,
-        "content": b"dummy_1b\0"
+        "content": QUEST_EVENT_GREEN_EGGS
     },
     0x1c: {  # French
         "version": 1,
@@ -401,31 +401,31 @@ PAT_BINARIES = {
     },
     0x24: {  # German
         "version": 1,
-        "content": b"dummy_24\0"
+        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
     },
     0x25: {  # German
         "version": 1,
-        "content": b"dummy_25\0"
+        "content": QUEST_EVENT_BLOOD_SPORT
     },
     0x26: {  # German
         "version": 1,
-        "content": b"dummy_26\0"
+        "content": QUEST_EVENT_MERCY_MISSION
     },
     0x27: {  # German
         "version": 1,
-        "content": b"dummy_27\0"
+        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
     },
     0x28: {  # German
         "version": 1,
-        "content": b"dummy_28\0"
+        "content": QUEST_EVENT_WORLD_EATER
     },
     0x29: {  # German
         "version": 1,
-        "content": b"dummy_29\0"
+        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
     },
     0x2a: {  # German
         "version": 1,
-        "content": b"dummy_2a\0"
+        "content": QUEST_EVENT_GREEN_EGGS
     },
     0x2b: {  # German
         "version": 1,
@@ -461,31 +461,31 @@ PAT_BINARIES = {
     },
     0x33: {  # Italian
         "version": 1,
-        "content": b"dummy_33\0"
+        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
     },
     0x34: {  # Italian
         "version": 1,
-        "content": b"dummy_34\0"
+        "content": QUEST_EVENT_BLOOD_SPORT
     },
     0x35: {  # Italian
         "version": 1,
-        "content": b"dummy_35\0"
+        "content": QUEST_EVENT_MERCY_MISSION
     },
     0x36: {  # Italian
         "version": 1,
-        "content": b"dummy_36\0"
+        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
     },
     0x37: {  # Italian
         "version": 1,
-        "content": b"dummy_37\0"
+        "content": QUEST_EVENT_WORLD_EATER
     },
     0x38: {  # Italian
         "version": 1,
-        "content": b"dummy_38\0"
+        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
     },
     0x39: {  # Italian
         "version": 1,
-        "content": b"dummy_39\0"
+        "content": QUEST_EVENT_GREEN_EGGS
     },
     0x3a: {  # Italian
         "version": 1,
@@ -521,31 +521,31 @@ PAT_BINARIES = {
     },
     0x42: {  # Spanish
         "version": 1,
-        "content": b"dummy_42\0"
+        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
     },
     0x43: {  # Spanish
         "version": 1,
-        "content": b"dummy_43\0"
+        "content": QUEST_EVENT_BLOOD_SPORT
     },
     0x44: {  # Spanish
         "version": 1,
-        "content": b"dummy_44\0"
+        "content": QUEST_EVENT_MERCY_MISSION
     },
     0x45: {  # Spanish
         "version": 1,
-        "content": b"dummy_45\0"
+        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
     },
     0x46: {  # Spanish
         "version": 1,
-        "content": b"dummy_46\0"
+        "content": QUEST_EVENT_WORLD_EATER
     },
     0x47: {  # Spanish
         "version": 1,
-        "content": b"dummy_47\0"
+        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
     },
     0x48: {  # Spanish
         "version": 1,
-        "content": b"dummy_48\0"
+        "content": QUEST_EVENT_GREEN_EGGS
     },
     0x49: {  # Spanish
         "version": 1,
