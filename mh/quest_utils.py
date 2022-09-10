@@ -1519,11 +1519,11 @@ QUEST_EVENT_GREEN_EGGS = make_binary_event_quest(61050, "[MH3SP] Green Eggs and.
     0x00000000, 0x00000000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
     'sm_emptylandarena.dat', # Small monster data
     [(ItemsType.flabby_hide, 1, 18), (ItemsType.uncanny_hide, 1, 6), (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 15),
-        (ItemsType.diablos_ridge, 1, 10), (ItemsType.diablos_shell, 1, 16), (ItemsType.diablos_fang, 1, 13), (ItemsType.twisted_horn, 1, 6),
-        (ItemsType.diablos_marrow, 1, 5)],
+        (ItemsType.agnaktor_shell, 1, 10), (ItemsType.agnaktor_scale, 1, 16), (ItemsType.agnaktor_hide, 1, 13), (ItemsType.agnaktor_fin, 1, 6),
+        (ItemsType.agnaktor_beak, 1, 5)],
     [(ItemsType.flabby_hide, 1, 13), (ItemsType.uncanny_hide, 1, 6), (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 10),
-        (ItemsType.diablos_ridge, 1, 9), (ItemsType.diablos_shell, 1, 10), (ItemsType.diablos_fang, 1, 10), (ItemsType.twisted_horn, 1, 6),
-        (ItemsType.diablos_marrow, 1, 5), (ItemsType.commendation, 1, 20)],
+        (ItemsType.agnaktor_shell, 1, 9), (ItemsType.agnaktor_scale, 1, 10), (ItemsType.agnaktor_hide, 1, 10), (ItemsType.agnaktor_fin, 1, 6),
+        (ItemsType.agnaktor_beak, 1, 5), (ItemsType.commendation, 1, 20)],
     [],
     [])
 
