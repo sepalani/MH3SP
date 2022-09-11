@@ -254,8 +254,25 @@ def create_server(server_class, server_handler,
         import ssl
 
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        wii_ciphers = ":".join([
+            "AES128-SHA", "AES256-SHA",
+            # The following ones are often unavailable
+            "DES-CBC-SHA", "3DES-CBC-SHA",
+            "RC4-MD5", "RC4-SHA"
+            # NB: Python might enforce additional (unsupported) ciphers
+            # for security reasons
+            # TODO: Disable them in Dolphin to emulate the Wii accurately
+        ])
         if legacy_ssl:
-            context.set_ciphers('ALL:@SECLEVEL=0')
+            # https://www.openssl.org/docs/man1.0.2/man1/ciphers.html
+            # https://www.openssl.org/docs/man1.1.1/man1/ciphers.html
+            # https://www.openssl.org/docs/man3.0/man1/openssl-ciphers.html
+            openssl_version = ssl.OPENSSL_VERSION_INFO[:2]
+            message = "Unsupported LegacySSL option (OpenSSL {}.{})".format(
+                *openssl_version)
+            assert openssl_version > (1, 0), message
+            wii_ciphers += ":@SECLEVEL=0"  # Allow weak cert chain
+        context.set_ciphers(wii_ciphers)
         context.load_cert_chain(ssl_cert, ssl_key)
         server.socket = context.wrap_socket(server.socket, server_side=True)
 
