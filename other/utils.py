@@ -253,7 +253,10 @@ def create_server(server_class, server_handler,
     if use_ssl:
         import ssl
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        if hasattr(ssl, "TLSVersion"):  # Since Python 3.7
+            # Required since Python 3.10
+            context.minimum_version = ssl.TLSVersion.SSLv3
         wii_ciphers = ":".join([
             "AES128-SHA", "AES256-SHA",
             # The following ones are often unavailable
