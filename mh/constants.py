@@ -21,19 +21,14 @@
 
 import struct
 from other.utils import pad
+from mh.time_utils import current_tick, TICKS_PER_CYCLE, get_jhen_event_times
 from quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
     QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
     QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS
 
 
-def make_binary_type_time_events(state=0):
-    # TODO: Use the server in-game time and handle this time array properly
-    if state == 1:
-        return struct.pack(">iii", 0, -1, 0)  # Fog
-    elif state == 2:
-        return struct.pack(">iii", 0, 0, -1)  # Kujira
-    else:
-        return struct.pack(">iii", 0, 0, 0)
+def make_binary_type_time_events():
+    return struct.pack(">III", *get_jhen_event_times())
 
 
 def make_binary_server_type_list(is_jap=False):
@@ -59,8 +54,9 @@ def make_binary_server_type_list(is_jap=False):
                 desc[i:i+1] = b' ' * padding
         data += pad(desc, 112 if is_jap else 168)
 
-    # TODO: Figure out what it is
-    data += b"\0" * 12
+    data += struct.pack(">I", 0)  # unk
+    data += struct.pack(">I", current_tick())  # Current time tick, counts backwards
+    data += struct.pack(">I", TICKS_PER_CYCLE)  # Max Tick Per Cycle, if 0 game defaults to 3000
 
     # Handle city seekings (x32)
     SEEKINGS = [
@@ -259,11 +255,11 @@ OTHER_HUNTER_NAME = b"Drakea"
 PAT_BINARIES = {
     0x01: {
         "version": 1,
-        "content": make_binary_server_type_list(is_jap=IS_JAP)
+        "content": lambda: make_binary_server_type_list(is_jap=IS_JAP)
     },
     0x02: {
         "version": 1,
-        "content": make_binary_type_time_events(state=TIME_STATE)
+        "content": make_binary_type_time_events
     },
     0x03: {
         "version": 1,
@@ -321,11 +317,11 @@ PAT_BINARIES = {
     },
     0x10: {  # French
         "version": 1,
-        "content": make_binary_server_type_list()
+        "content": make_binary_server_type_list
     },
     0x11: {  # French
         "version": 1,
-        "content": make_binary_type_time_events(state=TIME_STATE)
+        "content": make_binary_type_time_events
     },
     0x12: {  # French
         "version": 1,
@@ -381,11 +377,11 @@ PAT_BINARIES = {
     },
     0x1f: {  # German
         "version": 1,
-        "content": make_binary_server_type_list()
+        "content": make_binary_server_type_list
     },
     0x20: {  # German
         "version": 1,
-        "content": make_binary_type_time_events(state=TIME_STATE)
+        "content": make_binary_type_time_events
     },
     0x21: {  # German
         "version": 1,
@@ -441,11 +437,11 @@ PAT_BINARIES = {
     },
     0x2e: {  # Italian
         "version": 1,
-        "content": make_binary_server_type_list()
+        "content": make_binary_server_type_list
     },
     0x2f: {  # Italian
         "version": 1,
-        "content": make_binary_type_time_events(state=TIME_STATE)
+        "content": make_binary_type_time_events
     },
     0x30: {  # Italian
         "version": 1,
@@ -501,11 +497,11 @@ PAT_BINARIES = {
     },
     0x3d: {  # Spanish
         "version": 1,
-        "content": make_binary_server_type_list()
+        "content": make_binary_server_type_list
     },
     0x3e: {  # Spanish
         "version": 1,
-        "content": make_binary_type_time_events(state=TIME_STATE)
+        "content": make_binary_type_time_events
     },
     0x3f: {  # Spanish
         "version": 1,
