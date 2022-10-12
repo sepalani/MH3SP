@@ -162,6 +162,9 @@ class Session(object):
     def layer_end(self):
         if self.layer > 1:
             # City path
+            if self.local_info['circle_id'] is not None:
+                # TODO: Address that circle_id is zero-based
+                self.leave_circle()
             self.leave_city()
         if self.layer > 0:
             # Gate path
@@ -296,6 +299,22 @@ class Session(object):
             city.leader = player
             return player
         return None
+
+    def try_transfer_circle_leadership(self):
+        if self.local_info['circle_id'] is None:
+            # TODO: Address that circle_id is zero-based
+            return None, None
+
+        circle = self.get_circle()
+        if circle.leader != self or circle.get_population() <= 1 or not circle.departed:
+            return None, None
+
+        for i, player in circle.players:
+            if player == self:
+                continue
+            circle.leader = player
+            return i, player
+        return None, None
 
     def join_circle(self, circle_id):
         # TODO: Move this to the database

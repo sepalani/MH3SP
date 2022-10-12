@@ -249,6 +249,10 @@ class City(object):
                 return circle, index
         return None, None
 
+    def clear_circles(self):
+        for circle in self.circles:
+            circle.reset()
+
     def reserve(self, reserve):
         if reserve:
             self.reserved = time.time()
@@ -567,6 +571,8 @@ class TempDatabase(object):
                              session.local_info["city_id"])
         city.parent.players.add(session)
         city.players.remove(session)
+        if not city.get_population():
+            city.clear_circles()
         session.local_info["city_id"] = None
         session.local_info["city_name"] = None
 

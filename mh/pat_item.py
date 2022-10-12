@@ -679,7 +679,7 @@ class CircleInfo(PatData):
         (0x04, "password"),
         (0x05, "party_members"),
         (0x06, "remarks"),
-        (0x07, "unk_long_0x07"),
+        (0x07, "player_count"),
         (0x08, "unk_long_0x08"),
         (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
@@ -725,8 +725,8 @@ class CircleInfo(PatData):
             if circle.remarks is not None:
                 circle_info.remarks = String(circle.remarks)
 
-            # Can't be 0, otherwise the circle is not properly initialized
-            circle_info.unk_long_0x07 = Long(1)
+            # Number of players currently in the quest
+            circle_info.player_count = Long(len(circle.players))
 
             # circle_info.unk_long_0x08 = Long(3)
 

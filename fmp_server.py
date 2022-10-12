@@ -731,17 +731,7 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルアウト返答
         TR: Circle out reply
         """
-
-        circle = self.session.get_circle()
-
-        if circle.leader == self.session:
-            self.sendNtcCircleBreak(circle, seq)
-
-        self.session.leave_circle()
-
-        # Delete the quest from the quest board
-        self.sendNtcCircleListLayerChange(circle, circle_index, seq)
-
+        self.notify_circle_leave(circle_index, seq)
         data = struct.pack(">I", circle_index)
         self.send_packet(PatID4.AnsCircleLeave, data, seq)
 
@@ -866,7 +856,7 @@ class FmpRequestHandler(PatRequestHandler):
                 handler = self.server.get_pat_handler(player)
                 handler.try_send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
                                         seq)
-                circle.players.remove(i)
+                handler.notify_circle_leave(player.local_info['circle_id'] + 1, seq)
                 changed = True
 
         data = struct.pack(">I", count)+data
