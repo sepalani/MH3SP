@@ -319,14 +319,15 @@ def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server",
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
-                  log_to_console=True, log_to_window=False, legacy_ssl=False):
+                  log_to_console=True, log_to_window=False, legacy_ssl=False,
+                  debug_mode=False):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
-        name, level=logging.DEBUG,
+        name, level=logging.DEBUG if debug_mode else logging.INFO,
         log_to_file=log_filename if log_to_file else "",
         log_to_console=log_to_console,
         log_to_window=log_to_window)
-    server = server_class((address, port), server_handler, logger)
+    server = server_class((address, port), server_handler, logger, debug_mode)
 
     if use_ssl:
         import ssl
@@ -343,7 +344,8 @@ def create_server(server_class, server_handler,
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
 
 
-def create_server_from_base(name, server_class, server_handler, silent=False):
+def create_server_from_base(name, server_class, server_handler, silent=False,
+                            debug_mode=False):
     """Create a server based on its config parameters."""
     config = get_config(name)
     return create_server(
@@ -358,7 +360,8 @@ def create_server_from_base(name, server_class, server_handler, silent=False):
         log_to_file=config["LogToFile"],
         log_filename=config["LogFilename"],
         log_to_console=config["LogToConsole"] and not silent,
-        log_to_window=config["LogToWindow"]
+        log_to_window=config["LogToWindow"],
+        debug_mode=debug_mode
     ), config["LogToWindow"]
 
 
