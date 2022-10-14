@@ -45,13 +45,14 @@ g_circle_info_set = None
 class PatServer(SocketServer.ThreadingTCPServer, Logger):
     """Generic PAT server class."""
 
-    def __init__(self, address, handler_class, logger=None):
+    def __init__(self, address, handler_class, logger=None, debug_mode=False):
         SocketServer.TCPServer.__init__(self, address, handler_class)
         Logger.__init__(self)
         if logger:
             self.set_logger(logger)
         self.info("Running on {} port {}".format(*address))
         self.debug_con = []
+        self.debug_mode = debug_mode
 
     def add_to_debug(self, con):
         """Add connection to the debug connection list."""
@@ -64,6 +65,9 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
     def get_debug(self):
         """Return the debug connection list."""
         return self.debug_con
+
+    def debug_enabled(self):
+        return self.debug_mode
 
     def get_pat_handler(self, session):
         """Return pat handler from session"""
@@ -110,6 +114,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
 
     def setup(self):
         self.finished = False
+        self.line_check = True
         super(PatRequestHandler, self).setup()
 
     def recv_packet(self, header):
@@ -247,7 +252,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
 
         The game sends this packet after receiving a ReqLineCheck packet.
         """
-        pass
+        self.line_check = True
 
     def sendReqConnection(self, unused=0, seq=0):
         """ReqConnection packet.
@@ -2451,6 +2456,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
                 # Send a ping with 30 seconds interval
                 current_time = time.time()
                 if current_time > timeout:
+                    if not self.server.debug_enabled() and not self.line_check:
+                        raise Exception("Client timed out.")
+                    self.line_check = False
                     self.sendReqLineCheck()
                     timeout = current_time + 30
             if e:
