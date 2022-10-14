@@ -29,13 +29,14 @@ import rfp_server as RFP
 from other.utils import create_server_from_base
 
 
-def create_servers(silent=False):
+def create_servers(silent=False, debug_mode=False):
     """Create servers and check if it has ui."""
     servers = []
     has_ui = False
     for module in (OPN, LMP, FMP, RFP):
         server, has_window = create_server_from_base(*module.BASE,
-                                                     silent=silent)
+                                                     silent=silent,
+                                                     debug_mode=debug_mode)
         has_ui = has_ui or has_window
         servers.append(server)
     return servers, has_ui
@@ -43,7 +44,8 @@ def create_servers(silent=False):
 
 def main(args):
     """Master server main function."""
-    servers, has_ui = create_servers(silent=args.silent)
+    servers, has_ui = create_servers(silent=args.silent,
+                                     debug_mode=args.debug_mode)
     threads = [
         threading.Thread(target=server.serve_forever)
         for server in servers
@@ -93,5 +95,9 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--silent", action="store_true",
                         dest="silent",
                         help="silent console logs")
+    parser.add_argument("-d", "--debug_mode", action="store_true",
+                        dest="debug_mode",
+                        help="enable debug mode, disabling timeouts and \
+                        lower logging verbosity level")
     args = parser.parse_args()
     main(args)
