@@ -806,9 +806,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: サーバ時刻返答
         TR: Server time response
         """
-        dummy_1 = 0  # in-game time?
-        current_time = time_utils.datetime_to_int(datetime.now())
-        data = struct.pack(">II", dummy_1, current_time)
+        server_time = time_utils.current_server_time()  # Counter that ticks up once per second, Epoch works
+        current_time = time_utils.current_server_time()  # Always Epoch, used for Wii Shop subscription ticket
+        data = struct.pack(">II", server_time, current_time)
         self.send_packet(PatID4.AnsServerTime, data, seq)
 
     def recvReqUserObject(self, packet_id, data, seq):
@@ -1095,7 +1095,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
          - Spanish: 0x41, 0x3d, 0x41, 0x3e, 0x3f, 0x40
         """
         binary = PAT_BINARIES[binary_type]
-        data = struct.pack(">II", binary["version"], len(binary["content"]))
+        content = binary["content"]
+        if callable(content):
+            content = content()
+        data = struct.pack(">II", binary["version"], len(content))
         self.send_packet(PatID4.AnsBinaryHead, data, seq)
 
     def recvReqBinaryData(self, packet_id, data, seq):
@@ -1109,7 +1112,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         """
         binary_type, version, offset, size = struct.unpack(">BIII", data)
         binary = PAT_BINARIES[binary_type]
-        self.sendAnsBinaryData(version, offset, size, binary["content"], seq)
+        content = binary["content"]
+        if callable(content):
+            content = content()
+        self.sendAnsBinaryData(version, offset, size, content, seq)
 
     def sendAnsBinaryData(self, version, offset, size, binary, seq):
         """AnsBinaryData packet.
