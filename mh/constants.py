@@ -25,7 +25,7 @@ from mh.time_utils import current_tick, TICKS_PER_CYCLE, get_jhen_event_times
 from quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
     QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
     QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS
-
+from arena_utils import GRUDGE_MATCH_ROYAL_LUDROTH, GRUDGE_MATCH_BIRD_BRUTE, GRUDGE_MATCH_TWO_FLAMES
 
 def make_binary_type_time_events():
     return struct.pack(">III", *get_jhen_event_times())
@@ -305,15 +305,15 @@ PAT_BINARIES = {
     },
     0x0d: {  # Japanese(?)English
         "version": 1,
-        "content": b"\0"
+        "content": GRUDGE_MATCH_ROYAL_LUDROTH
     },
     0x0e: {  # Japanese(?)English
         "version": 1,
-        "content": b"\0"
+        "content": GRUDGE_MATCH_BIRD_BRUTE
     },
     0x0f: {  # Japanese(?)English
         "version": 1,
-        "content": b"\0"
+        "content": GRUDGE_MATCH_TWO_FLAMES
     },
     0x10: {  # French
         "version": 1,
@@ -365,15 +365,15 @@ PAT_BINARIES = {
     },
     0x1c: {  # French
         "version": 1,
-        "content": b"dummy_1c\0"
+        "content": GRUDGE_MATCH_ROYAL_LUDROTH
     },
     0x1d: {  # French
         "version": 1,
-        "content": b"dummy_1d\0"
+        "content": GRUDGE_MATCH_BIRD_BRUTE
     },
     0x1e: {  # French
         "version": 1,
-        "content": b"dummy_1e\0"
+        "content": GRUDGE_MATCH_TWO_FLAMES
     },
     0x1f: {  # German
         "version": 1,
@@ -425,15 +425,15 @@ PAT_BINARIES = {
     },
     0x2b: {  # German
         "version": 1,
-        "content": b"dummy_2b\0"
+        "content": GRUDGE_MATCH_ROYAL_LUDROTH
     },
     0x2c: {  # German
         "version": 1,
-        "content": b"dummy_2c\0"
+        "content": GRUDGE_MATCH_BIRD_BRUTE
     },
     0x2d: {  # German
         "version": 1,
-        "content": b"dummy_2d\0"
+        "content": GRUDGE_MATCH_TWO_FLAMES
     },
     0x2e: {  # Italian
         "version": 1,
@@ -485,15 +485,15 @@ PAT_BINARIES = {
     },
     0x3a: {  # Italian
         "version": 1,
-        "content": b"dummy_3a\0"
+        "content": GRUDGE_MATCH_ROYAL_LUDROTH
     },
     0x3b: {  # Italian
         "version": 1,
-        "content": b"dummy_3b\0"
+        "content": GRUDGE_MATCH_BIRD_BRUTE
     },
     0x3c: {  # Italian
         "version": 1,
-        "content": b"dummy_3c\0"
+        "content": GRUDGE_MATCH_TWO_FLAMES
     },
     0x3d: {  # Spanish
         "version": 1,
@@ -545,17 +545,18 @@ PAT_BINARIES = {
     },
     0x49: {  # Spanish
         "version": 1,
-        "content": b"dummy_49\0"
+        "content": GRUDGE_MATCH_ROYAL_LUDROTH
     },
     0x4a: {  # Spanish
         "version": 1,
-        "content": b"dummy_4a\0"
+        "content": GRUDGE_MATCH_BIRD_BRUTE
     },
     0x4b: {  # Spanish
         "version": 1,
-        "content": b"dummy_4b\0"
+        "content": GRUDGE_MATCH_TWO_FLAMES
     },
 }
+
 
 PAT_CATEGORIES = {
     0x60: "Opn",

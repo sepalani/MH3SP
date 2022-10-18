@@ -1280,10 +1280,14 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     data += b'\0' * (4 * 11)
 
     assert len(data) == 0x4B4
+    tail = 0x4B4 + 4
     try:
-        data += read_quest_sm_data(smallmonster_data)
+        sm_data = read_quest_sm_data(smallmonster_data)[4:]
+        tail += len(sm_data)
+        data += struct.pack(">I", tail)
+        data += sm_data
     except Exception as e:
-        pass
+        data += struct.pack(">I", tail)
 
     return data
 
@@ -1293,7 +1297,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
 # byte 1: Boss Order 1 (+1: Unknown1  +2: All At Once(CombineSubquestsRequireMQAndFirstSubquest)  +4: Marathon (CombineSubquestsRequireMQAndBothSubquests) +8: Unknown4  +16: Unknown5  +32: Unknown6  +64: Unknown7  +128: CombineMainAndSubquests)
 # byte 2: Boss Order 2 (+1: Unknown1  +2: Unknown2  +4: RequireMQAndBothSubquests  +8: Unknown4  +16: QualifyingTime  +32: DontAnnounceSubquestCompletion  +64: Unknown7  +128: ElderDragonLeftWounded)
 # byte 3: Boss Order 3 (+1: 2Mon_NoSubs_ReqSub1_Unstable  +2: Unknown2  +4: Unknown3  +8: BanjoMusic  +16: Unknown5  +32: Unknown6  +64: Unknown7  +128: Unknown8)
-# byte 4: Quest Flags (+1: Slay  +2: Deliver  +4: Capture  +8: Defend  +16: Unknown1  +32: Unknown2  +64: Repel(EndAtMainQuest)  +128: Unknown3)
+# byte 4: Quest Flags (+1: Slay  +2: Deliver  +4: Capture  +8: Defend  +16: ArenaQuest  +32: Unknown2  +64: Repel(EndAtMainQuest)  +128: Unknown3)
 def generate_flags(byte1, byte2, byte3, byte4):
     res = 0x00000000
 
