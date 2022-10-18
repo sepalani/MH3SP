@@ -514,7 +514,8 @@ class TempDatabase(object):
     def reserve_city(self, server_id, gate_id, index, reserve):
         city = self.get_city(server_id, gate_id, index)
         reserved_time = city.reserved
-        if reserve and reserved_time and time.time()-reserved_time < RESERVE_DC_TIMEOUT:
+        if reserve and reserved_time and \
+           time.time()-reserved_time < RESERVE_DC_TIMEOUT:
             return False
         city.reserve(reserve)
         return True

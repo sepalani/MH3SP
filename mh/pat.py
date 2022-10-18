@@ -811,8 +811,10 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: サーバ時刻返答
         TR: Server time response
         """
-        server_time = time_utils.current_server_time()  # Counter that ticks up once per second, Epoch works
-        current_time = time_utils.current_server_time()  # Always Epoch, used for Wii Shop subscription ticket
+        # Counter that ticks up once per second, Epoch works
+        server_time = time_utils.current_server_time()
+        # Always Epoch, used for Wii Shop subscription ticket
+        current_time = time_utils.current_server_time()
         data = struct.pack(">II", server_time, current_time)
         self.send_packet(PatID4.AnsServerTime, data, seq)
 
@@ -2249,10 +2251,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         """
         data = struct.pack(">H", number)
         if not self.session.is_city_empty(number):
-            self.sendAnsAlert(PatID4.AnsLayerCreateHead, "<LF=8><BODY><CENTER>City already exists.<END>", seq)
+            self.sendAnsAlert(PatID4.AnsLayerCreateHead,
+                              "<LF=8><BODY><CENTER>City already exists.<END>",
+                              seq)
             return
         if not self.session.reserve_city(number, True):
-            self.sendAnsAlert(PatID4.AnsLayerCreateHead, "<LF=8><BODY><CENTER>City reserved.<END>", seq)
+            self.sendAnsAlert(PatID4.AnsLayerCreateHead,
+                              "<LF=8><BODY><CENTER>City reserved.<END>",
+                              seq)
             return
         self.send_packet(PatID4.AnsLayerCreateHead, data, seq)
 
@@ -2427,11 +2433,12 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.layer_broadcast(self.session, PatID4.NtcLayerHost, data,
                                     seq)
 
-    def sendNtcCircleHostHandover(self, circle, new_leader, new_leader_index, seq):
+    def sendNtcCircleHostHandover(self, circle, new_leader, new_leader_index,
+                                  seq):
         """NtcCircleHostHandover packet.
 
         ID: 65401000
-        JP: サークルのホスト移譲通知	
+        JP: サークルのホスト移譲通知
         TR: Circle host transfer notice
 
         This packet is presently unused as it does not appear to have
@@ -2442,14 +2449,14 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         data += pati.lp2_string(new_leader.capcom_id)
         data += pati.lp2_string(new_leader.hunter_name)
         data += pati.lp2_string(b"")  # Unk max-1 length short array
-        self.server.circle_broadcast(circle, PatID4.NtcCircleHostHandover, data,
-                                     seq, self.session)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleHostHandover,
+                                     data, seq, self.session)
 
     def sendNtcCircleHost(self, circle, new_leader, new_leader_index, seq):
         """NtcCircleHost packet.
 
         ID: 65411000
-        JP: サークルのホスト通知	
+        JP: サークルのホスト通知
         TR: Circle host notification
         """
         unk1 = 0
@@ -2457,7 +2464,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         data += pati.lp2_string(new_leader.capcom_id)
         data += pati.lp2_string(new_leader.hunter_name)
         self.server.circle_broadcast(circle, PatID4.NtcCircleHost, data,
-                                    seq, self.session)
+                                     seq, self.session)
 
     def notify_layer_departure(self):
         if self.session.layer == 2:
@@ -2477,9 +2484,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.sendNtcCircleLeave(circle, circle_index, seq)
         if circle.leader == self.session:
             if circle.departed:
-                new_host_index, new_host = self.session.try_transfer_circle_leadership()
+                new_host_index, new_host = \
+                    self.session.try_transfer_circle_leadership()
                 if new_host:
-                    self.sendNtcCircleHost(circle, new_host, new_host_index, seq)
+                    self.sendNtcCircleHost(circle, new_host, new_host_index,
+                                           seq)
             else:
                 self.sendNtcCircleBreak(circle, seq)
         self.session.leave_circle()

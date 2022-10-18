@@ -41,16 +41,16 @@ def current_tick():
     This product of this function is based on the assumption that
     any decreasing integer value is sufficient for tracking the
     passage of time in Monster Hunter Tri.
-    
+
     Debugging has shown that the internal time value (initialized
     via a request to the server which responds using this function)
     continuously decreases by one per second, and an internal modulus
     is used to turn the ever-decreasing value into a point in the
     day/night cycle (with a cycle length specified by the server).
-    
+
     It is also suspected that, should this value ever reach zero, an
     integer underflow happens, which disrupts the day/night cycle.
-    
+
     As a result, to ensure that the underflow never happens, the current
     implementation uses a reversed epoch time that counts down from
     UINT_MAX (the game's internal maximum for this value) as the seconds
@@ -68,7 +68,8 @@ def get_jhen_event_times():
     """
     If the first int is less than the gametime at server login:
       If the second int is greater than the gametime at server login, fog
-      Otherwise, if the third int is greater than the gametime at server login, sandstorm
+      Otherwise, if the third int is greater than the gametime at server login,
+      sandstorm
     FIRST INT: Start of fog (epoch seconds)
     SECOND INT: Start of Jhen event (epoch seconds)
     THIRD INT: End of Jhen event (epoch seconds)
@@ -78,7 +79,8 @@ def get_jhen_event_times():
     if day_in_cycle < JHEN_END:  # Current period
         cycle_start = (current_day - day_in_cycle) * SECONDS_PER_DAY
     else:  # Upcoming period
-        cycle_start = (current_day - day_in_cycle + JHEN_EVENT_OFFSET) * SECONDS_PER_DAY
+        cycle_start = (current_day - day_in_cycle + JHEN_EVENT_OFFSET) * \
+                      SECONDS_PER_DAY
     return (int(cycle_start + FOG_START*SECONDS_PER_DAY),  # fog start
             int(cycle_start + JHEN_START*SECONDS_PER_DAY),  # sandstorm start
             int(cycle_start + JHEN_END*SECONDS_PER_DAY))  # sandstorm end
