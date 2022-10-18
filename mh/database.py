@@ -356,8 +356,6 @@ class TempDatabase(object):
         }
         self.capcom_ids = {
             # Capcom ID => Owner's session
-            "C9I7D4": {"name": "Cid", "session": None},
-            "D9R7K4": {"name": "Drakea", "session": None},
         }
         self.servers = new_servers()
 
@@ -374,7 +372,7 @@ class TempDatabase(object):
         # Create some default users
         if support_code not in self.consoles:
             self.consoles[support_code] = [
-                "C9I7D4", "D9R7K4", "******",
+                "******", "******", "******",
                 "******", "******", "******"
             ]
         return support_code
