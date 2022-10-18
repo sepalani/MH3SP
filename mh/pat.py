@@ -1322,6 +1322,25 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         layer = self.session.layer_start()
         self.send_packet(PatID4.AnsLayerStart, layer.pack(), seq)
 
+    def sendNtcCircleLeave(self, circle, circle_index, seq):
+        """NtcCircleLeave packet.
+
+        ID: 65041000
+        JP: サークルアウト通知
+        TR: Circle out notification
+        """
+
+        player_index = circle.players.index(self.session) + 1
+        data = struct.pack(">I", circle_index)
+        data += pati.lp2_string(self.session.capcom_id)
+        data += struct.pack(">B", player_index)
+
+        unk01 = 0x00  # Flag of some sort
+        data += struct.pack(">B", unk01)
+
+        self.server.circle_broadcast(circle, PatID4.NtcCircleLeave, data, seq,
+                                     self.session)
+
     def recvReqCircleInfoNoticeSet(self, packet_id, data, seq):
         """ReqCircleInfoNoticeSet packet.
 
@@ -2397,6 +2416,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
 
     def sendNtcLayerHost(self, new_leader, seq):
         """NtcLayerHost packet.
+
         ID: 64411000
         JP: レイヤのホスト通知
         TR: Layer host notification
@@ -2407,6 +2427,38 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.server.layer_broadcast(self.session, PatID4.NtcLayerHost, data,
                                     seq)
 
+    def sendNtcCircleHostHandover(self, circle, new_leader, new_leader_index, seq):
+        """NtcCircleHostHandover packet.
+
+        ID: 65401000
+        JP: サークルのホスト移譲通知	
+        TR: Circle host transfer notice
+
+        This packet is presently unused as it does not appear to have
+        any valid callback function branch within Monster Hunter 3.
+        """
+        unk1 = 0
+        data = struct.pack(">IB", unk1, new_leader_index + 1)
+        data += pati.lp2_string(new_leader.capcom_id)
+        data += pati.lp2_string(new_leader.hunter_name)
+        data += pati.lp2_string(b"")  # Unk max-1 length short array
+        self.server.circle_broadcast(circle, PatID4.NtcCircleHostHandover, data,
+                                     seq, self.session)
+
+    def sendNtcCircleHost(self, circle, new_leader, new_leader_index, seq):
+        """NtcCircleHost packet.
+
+        ID: 65411000
+        JP: サークルのホスト通知	
+        TR: Circle host notification
+        """
+        unk1 = 0
+        data = struct.pack(">IB", unk1, new_leader_index + 1)
+        data += pati.lp2_string(new_leader.capcom_id)
+        data += pati.lp2_string(new_leader.hunter_name)
+        self.server.circle_broadcast(circle, PatID4.NtcCircleHost, data,
+                                    seq, self.session)
+
     def notify_layer_departure(self):
         if self.session.layer == 2:
             new_host = self.session.try_transfer_city_leadership()
@@ -2416,6 +2468,22 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
             ntc_data = pati.lp2_string(self.session.capcom_id)
             self.server.layer_broadcast(self.session, PatID4.NtcLayerOut,
                                         ntc_data, 0)
+        if self.session.local_info['circle_id'] is not None:
+            self.notify_circle_leave(self.session.local_info['circle_id'] + 1,
+                                     seq=0)
+
+    def notify_circle_leave(self, circle_index, seq):
+        circle = self.session.get_circle()
+        self.sendNtcCircleLeave(circle, circle_index, seq)
+        if circle.leader == self.session:
+            if circle.departed:
+                new_host_index, new_host = self.session.try_transfer_circle_leadership()
+                if new_host:
+                    self.sendNtcCircleHost(circle, new_host, new_host_index, seq)
+            else:
+                self.sendNtcCircleBreak(circle, seq)
+        self.session.leave_circle()
+        self.sendNtcCircleListLayerChange(circle, circle_index, seq)
 
     def finish(self):
         self.finished = True
@@ -2484,6 +2552,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         except Exception as e:
             self.server.error(traceback.format_exc())
             self.send_error("{}: {}".format(type(e).__name__, str(e)))
+
+        circle_index = self.session.local_info['circle_id']
+        if circle_index is not None:
+            # TODO: Address that circle_id is zero-based
+            self.notify_circle_leave(circle_index, seq=0)
 
         try:
             self.notify_layer_departure()
