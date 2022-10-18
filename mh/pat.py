@@ -1708,6 +1708,82 @@ class PatRequestHandler(server.BasicPatHandler):
         self.server.layer_broadcast(self.session, PatID4.NtcLayerChat, data,
                                     seq)
 
+    def recvReqLayerTell(self, packet_id, data, seq):
+        """ReqLayerTell packet.
+
+        ID: 64730100
+        JP: レイヤ相手指定チャット送信
+        TR: Layer specified chat transmission
+        """
+        with pati.Unpacker(data) as unpacker:
+            recipient_id = unpacker.lp2_string()
+            info = unpacker.MessageInfo()
+            message = unpacker.lp2_string()
+        self.server.debug("ReqTell: {}, {!r}, {}".format(
+            recipient_id, info, message))
+        self.sendAnsLayerTell(recipient_id, info, message, seq)
+
+    def sendAnsLayerTell(self, recipient_id, info, message, seq):
+        """AnsLayerTell packet.
+
+        ID: 64730200
+        JP: レイヤ相手指定チャット返信
+        TR: Layer partner specified chat reply
+        """
+        self.send_packet(PatID4.AnsLayerTell, b"", seq)
+        self.sendNtcLayerTell(recipient_id, info, message, seq)
+
+    def sendNtcLayerTell(self, recipient_id, info, message, seq):
+        """NtcLayerTell packet.
+
+        ID: 64731000
+        JP: レイヤ相手指定チャット通知
+        TR: Layer partner specified chat notification
+        """
+        data = pati.lp2_string(recipient_id)
+        info.unk_long_0x02 = pati.Long(20)
+        info.sender_id = pati.String(self.session.capcom_id)
+        info.sender_name = pati.String(self.session.hunter_name)
+        data += info.pack()
+        data += pati.lp2_string(message)
+        self.send_packet(PatID4.NtcLayerTell, data, seq)
+        for _, player in self.session.get_layer_players():
+            if player.capcom_id == recipient_id:
+                handler = self.server.get_pat_handler(player)
+                if handler:
+                    handler.try_send_packet(PatID4.NtcLayerTell, data, seq)
+
+    def recvNtcCircleChat(self, packet_id, data, seq):
+        """NtcCircleChat packet.
+
+        ID: 65721000
+        JP: サークルチャット通知
+        TR: Circle chat notification
+        """
+        with pati.Unpacker(data) as unpacker:
+            info = unpacker.MessageInfo()
+            message = unpacker.lp2_string()
+        self.server.debug("NtcCircleChat: {!r}, {}".format(
+            info, message))
+        self.sendNtcCircleChat(info, message, seq)
+
+    def sendNtcCircleChat(self, info, message, seq):
+        """NtcCircleChat packet.
+
+        ID: 65721000
+        JP: サークルチャット送信
+        TR: Circle chat transmission
+        """
+        info.sender_id = pati.String(self.session.capcom_id)
+        info.sender_name = pati.String(self.session.hunter_name)
+
+        data = info.pack()
+        data += pati.lp2_string(message)
+
+        circle = self.session.get_circle()
+        self.server.circle_broadcast(circle, PatID4.NtcCircleChat, data,
+                                     seq, self.session)
+
     def recvReqTell(self, packet_id, data, seq):
         """ReqTell packet.
 
