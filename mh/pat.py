@@ -1613,14 +1613,9 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         JP: フレンドリスト返答
         TR: Friend list response
 
-        TODO: Investigate why the game throws warning debug messages if the
-        list is empty.
+        TODO: Implement friend list in the database
         """
-        friend = pati.FriendData()
-        friend.index = pati.Long(1)
-        friend.capcom_id = pati.String(OTHER_CAPCOM_ID)
-        friend.hunter_name = pati.String(OTHER_HUNTER_NAME)
-        friends = [friend]
+        friends = []
         unk = 0
         count = len(friends)
         data = struct.pack(">II", unk, count)
