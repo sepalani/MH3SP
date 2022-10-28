@@ -984,12 +984,13 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
                                 mainquest_rewards1, mainquest_rewards2,
                                 sq1_rewards, sq2_rewards,
                                 success_message="Complete the Main Quest."):
+    # TOOO: Remove encode("ascii") and use bytes instead
     data = b""
 
     #- id: name
     #  type: str
     #  size: 44
-    data += pad(name, 40)  # Size 0x28
+    data += pad(name.encode("ascii"), 40)  # Size 0x28
     data += struct.pack(">I", 0x00000000)
 
     #- id: quest_id
@@ -999,7 +1000,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: description
     #  type: str
     #  size: 92
-    data += pad(description, 80)
+    data += pad(description.encode("ascii"), 80)
     data += b'\0' * 0xC  # Padding
 
     #- id: quest_rank
@@ -1015,17 +1016,17 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: sub_quest_1_title
     #  type: str
     #  size: 41
-    data += pad(subquest1_description, 0x29)
+    data += pad(subquest1_description.encode("ascii"), 0x29)
 
     #- id: sub_quest_2_title
     #  type: str
     #  size: 41
-    data += pad(subquest2_description, 0x29)
+    data += pad(subquest2_description.encode("ascii"), 0x29)
 
     #- id: sucess_message
     #  type: str
     #  size: 92
-    data += pad(success_message, 0x5C)
+    data += pad(success_message.encode("ascii"), 0x5C)
 
     #- id: time_limit
     #  type: u2
@@ -1034,7 +1035,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: failure_message
     #  type: str
     #  size: 92
-    data += pad("Reward hits 0, or time" + '\x0A' + "expires.", 0x5C)
+    data += pad(b"Reward hits 0, or time\x0Aexpires.", 0x5C)
 
     #- id: hunter_rank_point_restriction
     #  type: u2
@@ -1043,7 +1044,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: client
     #  type: str
     #  size: 41
-    data += pad(client, 0x29)
+    data += pad(client.encode("ascii"), 0x29)
 
     #- id: unk2
     #  size: 6
@@ -1052,7 +1053,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: details
     #  type: str
     #  size: 256
-    data += pad(details, 0x100)#b'\0' * 0x100
+    data += pad(details.encode("ascii"), 0x100)  #b'\0' * 0x100
 
     #- id: unk1
     #  size: 61
@@ -1097,19 +1098,19 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
         data += make_monster_quest_type(monster_type=monsterType1, boss_id=monsterType1_bossid, enabled=monsterType1_enabled,
                     level=monsterType1_level, min=monsterType1_min, size=monsterType1_size, max=monsterType1_max)  # size: 0x08
     else:
-        data += '\0' * 0x08
+        data += b'\0' * 0x08
 
     if monsterType2 != 0:
         data += make_monster_quest_type(monster_type=monsterType2, boss_id=monsterType2_bossid, enabled=monsterType2_enabled,
                     level=monsterType2_level, min=monsterType2_min, size=monsterType2_size, max=monsterType2_max)  # size: 0x08
     else:
-        data += '\0' * 0x08
+        data += b'\0' * 0x08
 
     if monsterType3 != 0:
         data += make_monster_quest_type(monster_type=monsterType3, boss_id=monsterType3_bossid, enabled=monsterType3_enabled,
                     level=monsterType3_level, min=monsterType3_min, size=monsterType3_size, max=monsterType3_max)  # size: 0x08
     else:
-        data += '\0' * 0x08
+        data += b'\0' * 0x08
 
     
     # SUMMON / (INVADER?)
