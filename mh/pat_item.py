@@ -709,11 +709,12 @@ class CircleInfo(PatData):
                 start_offset = 0x10 * i
                 end_offset = start_offset + 0x10
 
+                # TODO: Shouldn't we use bytes instead?
                 party_members[start_offset:end_offset] = \
                     pad(player.capcom_id.encode('ascii'), 0x10)
 
                 party_members[start_offset+0x40:end_offset+0x40] = \
-                    pad(player.hunter_name.encode('ascii'), 0x10)
+                    pad(player.hunter_name, 0x10)
 
                 party_members[0x80+i] = player.hunter_info.weapon_type()
 
