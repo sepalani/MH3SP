@@ -25,7 +25,7 @@ import socket
 import struct
 import threading
 
-from time_utils import Timer
+from mh.time_utils import Timer
 
 try:
     # Python 3
