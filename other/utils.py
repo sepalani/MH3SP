@@ -26,6 +26,7 @@ import socket
 from collections import namedtuple
 from functools import partial
 from logging.handlers import TimedRotatingFileHandler
+import traceback
 
 try:
     # Python 3
@@ -230,6 +231,7 @@ def get_config(name, config_file=CONFIG_FILE):
         "IP": config.get(name, "IP"),
         "Port": config.getint(name, "Port"),
         "Name": config.get(name, "Name"),
+        "MaxThread": config.getint(name, "MaxThread"),
         "UseSSL": config.getboolean(name, "UseSSL"),
         "LegacySSL": config.getboolean("SSL", "LegacySSL"),
         "SSLCert":
@@ -316,7 +318,7 @@ def argparse_from_config(config):
 
 
 def create_server(server_class, server_handler,
-                  address="0.0.0.0", port=8200, name="Server",
+                  address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
                   log_to_console=True, log_to_window=False, legacy_ssl=False,
@@ -327,7 +329,8 @@ def create_server(server_class, server_handler,
         log_to_file=log_filename if log_to_file else "",
         log_to_console=log_to_console,
         log_to_window=log_to_window)
-    server = server_class((address, port), server_handler, logger, debug_mode)
+    server = server_class((address, port), server_handler, max_thread, logger,
+                          debug_mode)
 
     if use_ssl:
         import ssl
@@ -373,6 +376,7 @@ def create_server_from_base(name, server_class, server_handler, silent=False,
         address=config["IP"],
         port=config["Port"],
         name=config["Name"],
+        max_thread=config["MaxThread"],
         use_ssl=config["UseSSL"],
         legacy_ssl=config["LegacySSL"],
         ssl_cert=config["SSLCert"],
@@ -414,5 +418,8 @@ def server_main(name, server_class, server_handler):
                 ui_update()
     except KeyboardInterrupt:
         server.info("Interrupt key was pressed, closing server...")
-        server.shutdown()
-        server.server_close()
+    except Exception:
+        server.error('Unexpected exception caught...')
+        traceback.print_exc()
+    finally:
+        server.close()

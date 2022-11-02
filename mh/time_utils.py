@@ -20,6 +20,7 @@
 """
 
 import datetime
+import time
 
 
 EPOCH = datetime.datetime(1970, 1, 1)
@@ -84,3 +85,16 @@ def get_jhen_event_times():
     return (int(cycle_start + FOG_START*SECONDS_PER_DAY),  # fog start
             int(cycle_start + JHEN_START*SECONDS_PER_DAY),  # sandstorm start
             int(cycle_start + JHEN_END*SECONDS_PER_DAY))  # sandstorm end
+
+
+class Timer(object):
+    def __init__(self):
+        self.__start = time.time()
+
+    def elapsed(self):
+        """Elapsed seconds since start"""
+        return time.time() - self.__start
+
+    def restart(self):
+        """Reset timer and start again"""
+        self.__start = time.time()

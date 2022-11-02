@@ -20,6 +20,7 @@
 """
 
 import threading
+import traceback
 
 import opn_server as OPN
 import lmp_server as LMP
@@ -80,9 +81,12 @@ def main(args):
             t.join()
     except KeyboardInterrupt:
         print("Interrupt key was pressed, closing server...")
+    except Exception:
+        print('Unexpected exception caught...')
+        traceback.print_exc()
+    finally:
         for server in servers:
-            server.shutdown()
-            server.server_close()
+            server.close()
 
 
 if __name__ == "__main__":
