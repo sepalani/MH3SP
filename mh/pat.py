@@ -19,34 +19,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import select
 import struct
-import time
 import traceback
 from datetime import datetime, timedelta
 
+from other.utils import Logger, get_config, get_ip, hexdump
+
 import mh.pat_item as pati
+import mh.server as server
 import mh.time_utils as time_utils
 from mh.constants import *
 from mh.session import Session
-from other.utils import Logger, get_config, get_ip, hexdump
-
-try:
-    # Python 3
-    import socketserver as SocketServer
-except ImportError:
-    # Python 2
-    import SocketServer
 
 g_circle = None
 g_circle_info_set = None
 
 
-class PatServer(SocketServer.ThreadingTCPServer, Logger):
+class PatServer(server.BasicPatServer, Logger):
     """Generic PAT server class."""
 
-    def __init__(self, address, handler_class, logger=None, debug_mode=False):
-        SocketServer.TCPServer.__init__(self, address, handler_class)
+    def __init__(self, address, handler_class, max_thread_count=0,
+                 logger=None, debug_mode=False):
+        server.BasicPatServer.__init__(self, address, handler_class,
+                                       max_thread_count)
         Logger.__init__(self)
         if logger:
             self.set_logger(logger)
@@ -98,7 +93,7 @@ class PatServer(SocketServer.ThreadingTCPServer, Logger):
                 handler.try_send_packet(packet_id, data, seq)
 
 
-class PatRequestHandler(SocketServer.StreamRequestHandler, object):
+class PatRequestHandler(server.BasicPatHandler):
     """Generic PAT request handler class.
 
     When possible, each packet is described with:
@@ -112,34 +107,13 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
     inaccurate. `unk` stands for `unknown`.
     """
 
-    def setup(self):
-        self.finished = False
-        self.line_check = True
-        super(PatRequestHandler, self).setup()
-
-    def recv_packet(self, header):
-        """Receive PAT packet."""
-        size, seq, packet_id = struct.unpack(">HHI", header)
-        data = self.rfile.read(size)
-        self.server.debug(
-            "RECV %s[ID=%08x; Seq=%04x]\n%s",
-            PAT_NAMES.get(packet_id, "Packet"),
-            packet_id, seq, hexdump(data)
-        )
-        return packet_id, data, seq
-
-    def send_packet(self, packet_id=0, data=b'', seq=0):
-        """Send PAT packet."""
-        self.wfile.write(struct.pack(
-            ">HHI",
-            len(data), seq, packet_id
-        ))
-        self.wfile.write(data)
-        self.server.debug(
-            "SEND %s[ID=%08x; Seq=%04x]\n%s",
-            PAT_NAMES.get(packet_id, "Packet"),
-            packet_id, seq, hexdump(data)
-        )
+    def on_init(self):
+        """Default PAT handler."""
+        self.server.info("Handle client")
+        self.server.add_to_debug(self)
+        self.session = Session(self)
+        self.ping_timer = time_utils.Timer()
+        self.requested_connection = False
 
     def try_send_packet(self, packet_id=0, data=b'', seq=0):
         """Send PAT packet and catch exceptions."""
@@ -208,9 +182,11 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
                 # The game will close the connection and the next messages
                 # won't be received. The except block will be reached if the
                 # message is too long.
-        except Exception as e:
+        except Exception:
             # Probably unreachable and was disconnected
             self.server.warning("Failed to send a complete error message")
+        finally:
+            self.finish()
 
     def recvNtcCollectionLog(self, packet_id, data, seq):
         """NtcCollectionLog packet.
@@ -634,7 +610,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         data = struct.pack(">B", int(has_message))
         data += pati.lp2_string(message[:0x200])
         self.send_packet(PatID4.NtcShut, data, seq)
-        self.finish()
 
     def recvReqChargeInfo(self, packet_id, data, seq):
         """ReqChargeInfo packet.
@@ -2489,17 +2464,42 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         self.session.leave_circle()
         self.sendNtcCircleListLayerChange(circle, circle_index, seq)
 
-    def finish(self):
-        self.finished = True
-        try:
-            super(PatRequestHandler, self).finish()
-        except AttributeError:
-            # Swallow exception caused by a bug?
-            #
-            # File "/usr/lib/python2.7/socket.py", line 286, in close
-            #   self._sock.close()
-            # AttributeError: 'NoneType' object has no attribute 'close'
-            pass
+    def on_exception(self, e):
+        # type: (Exception) -> None
+        self.server.error(traceback.format_exc())
+        self.send_error("{}: {}".format(type(e).__name__, str(e)))
+
+    def on_finish(self):
+        self.notify_layer_departure()
+        self.session.layer_end()
+        self.session.disconnect()
+        self.session.delete()
+
+        self.server.del_from_debug(self)
+        self.server.info("Client finished!")
+
+    def on_packet(self, data):
+        if not data:
+            self.finish()
+            return
+
+        packet_id, data, seq = data
+        self.server.info(
+            "RECV %s[ID=%08x; Seq=%04x]",
+            PAT_NAMES.get(packet_id, "Packet"),
+            packet_id, seq
+        )
+        self.server.debug("%s", hexdump(data))
+        self.dispatch(packet_id, data, seq)
+
+    def send_packet(self, packet_id=0, data=b'', seq=0):
+        super(PatRequestHandler, self).send_packet(packet_id, data, seq)
+        self.server.info(
+            "SEND %s[ID=%08x; Seq=%04x]",
+            PAT_NAMES.get(packet_id, "Packet"),
+            packet_id, seq
+        )
+        self.server.debug("%s", hexdump(data))
 
     def dispatch(self, packet_id, data, seq):
         """Packet dispatcher."""
@@ -2515,60 +2515,16 @@ class PatRequestHandler(SocketServer.StreamRequestHandler, object):
         handler = getattr(self, name)
         return handler(packet_id, data, seq)
 
-    def handle_client(self):
-        """Select handler."""
-        timeout = time.time() + 30
-        while not self.finished:
-            r, w, e = select.select([self.rfile], [self.wfile], [], 0.2123)
-            if r:
-                header = self.rfile.read(8)
-                if not len(header):
-                    break
-                if len(header) < 8:
-                    self.server.error("Invalid header received:\n%s",
-                                      hexdump(header))
-                    break
-                packet_id, data, seq = self.recv_packet(header)
-                self.dispatch(packet_id, data, seq)
-            if w:
-                # Send a ping with 30 seconds interval
-                current_time = time.time()
-                if current_time > timeout:
-                    if not self.server.debug_enabled() and not self.line_check:
-                        raise Exception("Client timed out.")
-                    self.line_check = False
-                    self.sendReqLineCheck()
-                    timeout = current_time + 30
-            if e:
-                self.server.error("Select error: %s", e)
+    def on_tick(self):
+        if not self.requested_connection:
+            # TODO: Investigate why do we need to wait a certain amount of
+            #       seconds before sending the `ReqConnection` packet?
+            if self.ping_timer.elapsed() >= 1.5:
+                self.requested_connection = True
+                self.sendReqConnection()
+            return
 
-    def handle(self):
-        """Default PAT handler."""
-        self.server.info("Handle client")
-        self.server.add_to_debug(self)
-        self.session = Session(self)
-
-        # Temporary workaround for Dolphin bug
-        time.sleep(2)
-        self.sendReqConnection()
-        try:
-            self.handle_client()
-        except Exception as e:
-            self.server.error(traceback.format_exc())
-            self.send_error("{}: {}".format(type(e).__name__, str(e)))
-
-        circle_index = self.session.local_info['circle_id']
-        if circle_index is not None:
-            # TODO: Address that circle_id is zero-based
-            self.notify_circle_leave(circle_index, seq=0)
-
-        try:
-            self.notify_layer_departure()
-        except Exception:
-            pass
-
-        self.session.disconnect()
-        self.session.delete()
-
-        self.server.del_from_debug(self)
-        self.server.info("Client finished!")
+        # Send a ping with 30 seconds interval
+        if self.ping_timer.elapsed() >= 30:
+            self.sendReqLineCheck()
+            self.ping_timer.restart()
