@@ -26,9 +26,62 @@ from mh.pat import PatRequestHandler, PatServer
 from other.utils import hexdump, server_base, server_main
 
 
+def construct_broadcast(text="Hello, World!", text_color=0x00fffff0,
+                    sender_id="000000", sender_name="[MH3SP]"):
+    assert len(text) > 0
+    MAX_CHAR_LENGTH = 30
+    broadcast_segments = []
+    words = text.split(" ")
+
+    mod_words = []
+
+    for word in words:
+        curr_word = word
+        while len(curr_word) > MAX_CHAR_LENGTH:
+            mod_words.append(curr_word[0:MAX_CHAR_LENGTH])
+            curr_word = curr_word[MAX_CHAR_LENGTH:]
+        if len(curr_word) > 0:
+            mod_words.append(curr_word)
+
+    curr_broadcast = mod_words[0]
+    for word in mod_words[1:]:
+        if len(curr_broadcast) + 1 + len(word) <= MAX_CHAR_LENGTH:
+            curr_broadcast += " "
+            curr_broadcast += word
+        else:
+            broadcast_segments.append(curr_broadcast)
+            curr_broadcast = word
+    if len(curr_broadcast) > 0:
+        broadcast_segments.append(curr_broadcast)
+    
+    broadcasts = []
+    for broadcast_text in broadcast_segments:
+        data = struct.pack(">B", 0x01)
+        info = pati.MessageInfo()
+        info.text_color = pati.Long(text_color)
+        info.sender_id = pati.String(sender_id)
+        info.sender_name = pati.String(sender_name)
+        data += info.pack()
+        data += pati.lp2_string(broadcast_text)
+        print("BROADCAST: " + broadcast_text)
+        broadcasts.append((PatID4.NtcLayerChat, data, 0))
+    return broadcasts
+
+
 class FmpServer(PatServer):
     """Basic FMP server class."""
-    pass
+    def broadcast_message(self, text="Hello, World!"):
+        broadcast = construct_broadcast(text)
+        for broadcast_segment in broadcast:
+            self.broadcast_queue.put(broadcast_segment, block=True)
+
+    def event_check(self, timer):
+        # For time-based packet sending; to be implemented per-server
+        if timer.elapsed() >= 30 * 60:
+            self.broadcast_message("Hello, and thank you for playing on our \
+                                    server! If you notice any bugs, please \
+                                    report them in the Discord.")
+            timer.restart()
 
 
 class FmpRequestHandler(PatRequestHandler):

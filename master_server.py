@@ -27,6 +27,13 @@ import lmp_server as LMP
 import fmp_server as FMP
 import rfp_server as RFP
 
+try:
+    # Python 3
+    import queue
+except ImportError:
+    # Python 2
+    import Queue as queue
+
 from other.utils import create_server_from_base
 
 
@@ -47,12 +54,20 @@ def main(args):
     """Master server main function."""
     servers, has_ui = create_servers(silent=args.silent,
                                      debug_mode=args.debug_mode)
+    broadcast_queues = {server.__class__.__name__: queue.Queue() for server in servers}
     threads = [
-        threading.Thread(target=server.serve_forever)
+        threading.Thread(target=server.serve_forever, name=server.__class__.__name__,
+            args=(broadcast_queues[server.__class__.__name__], ))
         for server in servers
     ]
     for thread in threads:
         thread.start()
+
+    def broadcast_message(text):
+        # Function for easier broadcasting in interactive mode.
+        broadcast = FMP.construct_broadcast(text)
+        for broadcast_segment in broadcast:
+            broadcast_queues[FMP.BASE.cls.__name__].put(broadcast_segment, block=True)
 
     def interactive_mode(local=locals()):
         """Run an interactive python interpreter in another thread."""
