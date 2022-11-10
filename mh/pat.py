@@ -114,6 +114,7 @@ class PatRequestHandler(server.BasicPatHandler):
         self.session = Session(self)
         self.ping_timer = time_utils.Timer()
         self.requested_connection = False
+        self.line_check = True
 
     def try_send_packet(self, packet_id=0, data=b'', seq=0):
         """Send PAT packet and catch exceptions."""
@@ -2526,5 +2527,8 @@ class PatRequestHandler(server.BasicPatHandler):
 
         # Send a ping with 30 seconds interval
         if self.ping_timer.elapsed() >= 30:
+            if not self.server.debug_enabled() and not self.line_check:
+                raise Exception("Client timed out.")
+            self.line_check = False
             self.sendReqLineCheck()
             self.ping_timer.restart()
