@@ -239,7 +239,21 @@ SUBTERMS = {
     1: b"""MH3 Server Project - SubTerms.""",
     2: b"-DEBUG- Subterms"
 }
-ANNOUNCE = b"""<BODY><CENTER>MH3 Server Project - Announce.<END>"""
+ANNOUNCE = b"<BR><BODY>".join([
+    b"<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
+    b"<BR><LEFT><SIZE=4>Welcome to the MH3SP Beta Test! We ask that you",
+    b"keep few things in mind while connected in order to",
+    b"make the experience as fun as possible for everyone.",
+    b"No abusing other players, no exploiting bugs, and",
+    b"please report bugs that you find to the server",
+    b"staff/dev team. We thank you for your patience as",
+    b"we prepared this server to be fit for public use,",
+    b"and ask your continued patience in the weeks to",
+    b"come as you may encounter some bugs and errors",
+    b"while playing. Please see the Public Test Server",
+    b"Roadmap for a list of features we are working on.",
+    b"<BR><CENTER><C=2>Welcome to Loc Lac!<END>"
+])
 CHARGE = b"""<BODY><CENTER>MH3 Server Project - No charge.<END>"""
 # VULGARITY_INFO = b"""MH3 Server Project - Vulgarity info (low)."""
 VULGARITY_INFO = b""
