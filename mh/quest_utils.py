@@ -20,6 +20,7 @@
 """
 
 import struct
+import ctypes
 from other.utils import pad
 
 
@@ -1324,6 +1325,13 @@ def read_quest_sm_data(fname):
     with open('event/'+fname) as f:
         data = f.read()
     return bytearray.fromhex(data.replace(" ","").replace("\n",""))
+
+def get_quest_name(quest):
+    """
+    Returns the quest name, which is always a null-terminated
+    string that starts at offset 0.
+    """
+    return ctypes.create_string_buffer(bytes(quest)).value
 
 
 """
