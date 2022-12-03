@@ -21,10 +21,11 @@
 
 import struct
 from other.utils import pad
-from mh.time_utils import current_tick, TICKS_PER_CYCLE, get_jhen_event_times
+from mh.time_utils import current_tick, TICKS_PER_CYCLE, get_jhen_event_times,\
+    is_jhen_active
 from mh.quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
     QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
-    QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS
+    QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS, get_quest_name
 
 
 def make_binary_type_time_events():
@@ -164,13 +165,45 @@ def make_binary_npc_greeters(is_jap=False):
     US_OFFSET = 0x180
     JP_OFFSET = 0x100
     offset = JP_OFFSET if is_jap else US_OFFSET
+
+
+    if is_jhen_active():
+        tool_shop = b"Half-off sale!"
+        material_shop = b"Half-off sale!"
+        event_quests = b"The Festival of Fear\n"
+    else:
+        tool_shop = b"Prices are normal."
+        material_shop = b"Prices are normal."
+        event_quests = b""
+
+    event_quests += b"\n".join([
+        get_quest_name(QUEST_EVENT_JUMP_FOUR_JAGGI),
+        get_quest_name(QUEST_EVENT_BLOOD_SPORT),
+        get_quest_name(QUEST_EVENT_MERCY_MISSION),
+        get_quest_name(QUEST_EVENT_THE_PHANTOM_URAGAAN),
+        get_quest_name(QUEST_EVENT_WORLD_EATER),
+        get_quest_name(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD),
+        get_quest_name(QUEST_EVENT_GREEN_EGGS)
+    ])
+
+    guildmaster_str = (
+        b'To all hunters:\n'
+        b'Loc Lac is in "beta,"\n'
+        b'whatever that means. Also,\n'
+        b'the Arena is currently under\n'
+        b'construction. And now, a:\n'
+        b'haiku: "Patient warriors /\n'    
+        b'returning home at long last /\n'
+        b'now join hands to hunt!"'
+    )
+
     data = b""
-    data += pad(b"Plaza Tool Shop\n\nNot supported yet.", offset)
-    data += pad(b"Material shop unavailable\nyet.", offset)
-    data += pad(b"Trading post closed at\nthe moment.", offset)
-    data += pad(b"No event quests.", offset)
+    data += pad(tool_shop, offset)
+    data += pad(material_shop, offset)
+    data += pad(b"The Trading Post is open!", offset)
+    data += pad(event_quests, offset)
     data += pad(b"No arena quests.", offset)
-    data += pad(b"To all hunters:\n\nThis is a test server.", offset)
+    data += pad(guildmaster_str, offset)
     return data
 
 
@@ -260,7 +293,7 @@ PAT_BINARIES = {
     },
     0x03: {
         "version": 1,
-        "content": make_binary_npc_greeters(is_jap=IS_JAP)
+        "content": lambda: make_binary_npc_greeters(is_jap=IS_JAP)
     },
     0x04: {
         "version": 1,
@@ -322,7 +355,7 @@ PAT_BINARIES = {
     },
     0x12: {  # French
         "version": 1,
-        "content": make_binary_npc_greeters()
+        "content": make_binary_npc_greeters
     },
     0x13: {  # French
         "version": 1,
@@ -382,7 +415,7 @@ PAT_BINARIES = {
     },
     0x21: {  # German
         "version": 1,
-        "content": make_binary_npc_greeters()
+        "content": make_binary_npc_greeters
     },
     0x22: {  # German
         "version": 1,
@@ -442,7 +475,7 @@ PAT_BINARIES = {
     },
     0x30: {  # Italian
         "version": 1,
-        "content": make_binary_npc_greeters()
+        "content": make_binary_npc_greeters
     },
     0x31: {  # Italian
         "version": 1,
@@ -502,7 +535,7 @@ PAT_BINARIES = {
     },
     0x3f: {  # Spanish
         "version": 1,
-        "content": make_binary_npc_greeters()
+        "content": make_binary_npc_greeters
     },
     0x40: {  # Spanish
         "version": 1,

@@ -87,6 +87,11 @@ def get_jhen_event_times():
             int(cycle_start + JHEN_END*SECONDS_PER_DAY))  # sandstorm end
 
 
+def is_jhen_active():
+    day_in_cycle = int(current_server_time()//SECONDS_PER_DAY) % JHEN_EVENT_OFFSET
+    return JHEN_START <= day_in_cycle < JHEN_END
+
+
 class Timer(object):
     def __init__(self):
         self.__start = time.time()
