@@ -172,6 +172,9 @@ class Session(object):
             if not self.request_reconnection:
                 # Server path (executed at gate and higher)
                 self.leave_server()
+        elif not self.request_reconnection and self.local_info["server_id"]:
+            # Server path (executed if exiting from gate list)
+            self.leave_server()
         self.layer = 0
         self.state = SessionState.UNKNOWN
 
