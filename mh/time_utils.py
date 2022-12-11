@@ -37,30 +37,6 @@ def datetime_to_int(dt):
     return int((dt - EPOCH).total_seconds())
 
 
-def current_tick():
-    """
-    This product of this function is based on the assumption that
-    any decreasing integer value is sufficient for tracking the
-    passage of time in Monster Hunter Tri.
-
-    Debugging has shown that the internal time value (initialized
-    via a request to the server which responds using this function)
-    continuously decreases by one per second, and an internal modulus
-    is used to turn the ever-decreasing value into a point in the
-    day/night cycle (with a cycle length specified by the server).
-
-    It is also suspected that, should this value ever reach zero, an
-    integer underflow happens, which disrupts the day/night cycle.
-
-    As a result, to ensure that the underflow never happens, the current
-    implementation uses a reversed epoch time that counts down from
-    UINT_MAX (the game's internal maximum for this value) as the seconds
-    pass. This also has the effect of time "passing" even when the
-    server is shut down.
-    """
-    return 0xFFFFFFFF - datetime_to_int(datetime.datetime.now())
-
-
 def current_server_time():
     return datetime_to_int(datetime.datetime.now())
 

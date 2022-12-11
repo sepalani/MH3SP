@@ -21,7 +21,7 @@
 
 import struct
 from other.utils import pad
-from mh.time_utils import current_tick, TICKS_PER_CYCLE, get_jhen_event_times,\
+from mh.time_utils import current_server_time, TICKS_PER_CYCLE, get_jhen_event_times,\
     is_jhen_active
 from mh.quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
     QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
@@ -56,7 +56,7 @@ def make_binary_server_type_list(is_jap=False):
         data += pad(desc, 112 if is_jap else 168)
 
     data += struct.pack(">I", 0)  # unk
-    data += struct.pack(">I", current_tick())  # Current time tick, counts backwards
+    data += struct.pack(">I", current_server_time())  # Current time at server bootup
     data += struct.pack(">I", TICKS_PER_CYCLE)  # Max Tick Per Cycle, if 0 game defaults to 3000
 
     # Handle city seekings (x32)
@@ -285,7 +285,7 @@ IS_JAP = False
 PAT_BINARIES = {
     0x01: {
         "version": 1,
-        "content": lambda: make_binary_server_type_list(is_jap=IS_JAP)
+        "content": make_binary_server_type_list(is_jap=IS_JAP)
     },
     0x02: {
         "version": 1,
@@ -347,7 +347,7 @@ PAT_BINARIES = {
     },
     0x10: {  # French
         "version": 1,
-        "content": make_binary_server_type_list
+        "content": make_binary_server_type_list()
     },
     0x11: {  # French
         "version": 1,
@@ -407,7 +407,7 @@ PAT_BINARIES = {
     },
     0x1f: {  # German
         "version": 1,
-        "content": make_binary_server_type_list
+        "content": make_binary_server_type_list()
     },
     0x20: {  # German
         "version": 1,
@@ -467,7 +467,7 @@ PAT_BINARIES = {
     },
     0x2e: {  # Italian
         "version": 1,
-        "content": make_binary_server_type_list
+        "content": make_binary_server_type_list()
     },
     0x2f: {  # Italian
         "version": 1,
@@ -527,7 +527,7 @@ PAT_BINARIES = {
     },
     0x3d: {  # Spanish
         "version": 1,
-        "content": make_binary_server_type_list
+        "content": make_binary_server_type_list()
     },
     0x3e: {  # Spanish
         "version": 1,
