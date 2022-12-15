@@ -21,6 +21,7 @@
 
 import random
 import time
+from threading import RLock
 
 CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -51,12 +52,28 @@ class LayerState(object):
     FULL = 2
 
 
-class Players(object):
+class Lockable(object):
+    def __init__(self):
+        self._lock = RLock()
+
+    def lock(self):
+        return self
+
+    def __enter__(self):
+        # Returns True if lock was acquired, False otherwise
+        return self._lock.acquire()
+
+    def __exit__(self, *args):
+        self._lock.release()
+
+
+class Players(Lockable):
     def __init__(self, capacity):
         assert capacity > 0, "Collection capacity can't be zero"
 
         self.slots = [None for _ in range(capacity)]
         self.used = 0
+        super(Players, self).__init__()
 
     def get_used_count(self):
         return self.used
@@ -65,46 +82,48 @@ class Players(object):
         return len(self.slots)
 
     def add(self, item):
-        if self.used >= len(self.slots):
+        with self.lock():
+            if self.used >= len(self.slots):
+                return -1
+
+            item_index = self.index(item)
+            if item_index != -1:
+                return item_index
+
+            for i, v in enumerate(self.slots):
+                if v is not None:
+                    continue
+
+                self.slots[i] = item
+                self.used += 1
+                return i
+
             return -1
-
-        item_index = self.index(item)
-        if item_index != -1:
-            return item_index
-
-        for i, v in enumerate(self.slots):
-            if v is not None:
-                continue
-
-            self.slots[i] = item
-            self.used += 1
-            return i
-
-        return -1
 
     def remove(self, item):
         assert item is not None, "Item != None"
 
-        if self.used < 1:
-            return False
-
-        if isinstance(item, int):
-            if item >= self.get_capacity():
+        with self.lock():
+            if self.used < 1:
                 return False
 
-            self.slots[item] = None
-            self.used -= 1
-            return True
+            if isinstance(item, int):
+                if item >= self.get_capacity():
+                    return False
 
-        for i, v in enumerate(self.slots):
-            if v != item:
-                continue
+                self.slots[item] = None
+                self.used -= 1
+                return True
 
-            self.slots[i] = None
-            self.used -= 1
-            return True
+            for i, v in enumerate(self.slots):
+                if v != item:
+                    continue
 
-        return False
+                self.slots[i] = None
+                self.used -= 1
+                return True
+
+            return False
 
     def index(self, item):
         assert item is not None, "Item != None"
@@ -116,8 +135,9 @@ class Players(object):
         return -1
 
     def clear(self):
-        for i in range(self.get_capacity()):
-            self.slots[i] = None
+        with self.lock():
+            for i in range(self.get_capacity()):
+                self.slots[i] = None
 
     def find_first(self, **kwargs):
         if self.used < 1:
@@ -183,9 +203,12 @@ class Circle(object):
     def has_password(self):
         return self.password is not None
 
+    def reset_players(self, capacity):
+        self.players = Players(capacity)
+
     def reset(self):
         self.leader = None
-        self.players = Players(4)
+        self.reset_players(4)
         self.departed = False
         self.quest_id = 0
         self.embarked = False

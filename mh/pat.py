@@ -2254,14 +2254,15 @@ class PatRequestHandler(server.BasicPatHandler):
             layer_data.assert_fields(self.search_info["layer_fields"])
             data += layer_data.pack()
             data += pati.pack_optional_fields(city.optional_fields)
-            data += struct.pack(">I", len(city.players))
-            for _, player in city.players:
-                layer_user = pati.LayerUserInfo()
-                layer_user.capcom_id = pati.String(player.capcom_id)
-                layer_user.hunter_name = pati.String(player.hunter_name)
-                layer_user.assert_fields(self.search_info["user_fields"])
-                data += layer_user.pack()
-                data += pati.pack_optional_fields(player.get_optional_fields())
+            with city.players.lock():
+                data += struct.pack(">I", len(city.players))
+                for _, player in city.players:
+                    layer_user = pati.LayerUserInfo()
+                    layer_user.capcom_id = pati.String(player.capcom_id)
+                    layer_user.hunter_name = pati.String(player.hunter_name)
+                    layer_user.assert_fields(self.search_info["user_fields"])
+                    data += layer_user.pack()
+                    data += pati.pack_optional_fields(player.get_optional_fields())
         self.send_packet(PatID4.AnsLayerDetailSearchData, data, seq)
 
     def recvReqLayerDetailSearchFoot(self, packet_id, data, seq):
