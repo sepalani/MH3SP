@@ -133,7 +133,7 @@ class BasicPatHandler(object):
 
         try:
             self.on_finish()
-        except Exception:
+        except Exception as e:
             pass
 
         self.finished = True

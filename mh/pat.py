@@ -187,6 +187,7 @@ class PatRequestHandler(server.BasicPatHandler):
             # Probably unreachable and was disconnected
             self.server.warning("Failed to send a complete error message")
         finally:
+            self.session.request_reconnection = False
             self.finish()
 
     def recvNtcCollectionLog(self, packet_id, data, seq):
@@ -598,6 +599,10 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         data = struct.pack(">B", shutdown_type)
         self.send_packet(PatID4.AnsShut, data, seq)
+        if shutdown_type == 1:
+            # Only modify request_reconnection if it's a 1 shutdown_type,
+            # otherwise leave it at what it was before
+            self.session.request_reconnection = False
         self.finish()
 
     def sendNtcShut(self, message, seq):
