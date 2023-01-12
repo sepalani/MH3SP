@@ -20,6 +20,7 @@
 """
 
 import struct
+from threading import RLock
 
 import mh.database as db
 import mh.pat_item as pati
@@ -70,9 +71,14 @@ class Session(object):
         self.binary_setting = b""
         self.search_payload = None
         self.hunter_info = pati.HunterSettings()
+        self._lock = RLock()
 
     def get(self, connection_data):
-        """Return the session associated with the connection data, if any."""
+        """SESSION LOCKING
+
+        Return the session associated with the connection data, if any.
+        """
+        self.lock()
         if hasattr(connection_data, "pat_ticket"):
             self.pat_ticket = to_str(
                 pati.unpack_binary(connection_data.pat_ticket)
@@ -81,9 +87,10 @@ class Session(object):
             self.online_support_code = to_str(
                 pati.unpack_string(connection_data.online_support_code)
             )
+
         session = DB.get_session(self.pat_ticket) or self
         if session != self:
-            assert session.connection is None, "Session is already in use"
+            assert session.connection is None, "Session is already in use"+str(self.unlock())
             session.connection = self.connection
             self.connection = None
 
@@ -93,6 +100,7 @@ class Session(object):
         session.request_reconnection = \
             not ("pat_ticket" in connection_data or
                  "online_support_code" in connection_data)
+        self.unlock()
         return session
 
     def get_support_code(self):
@@ -100,23 +108,29 @@ class Session(object):
         return DB.get_support_code(self)
 
     def disconnect(self):
-        """Disconnect the current session.
+        """SESSION LOCKING
+        Disconnect the current session.
 
         It doesn't purge the session state nor its PAT ticket.
         """
+        self.lock()
         self.layer_end()
         self.connection = None
         DB.disconnect_session(self)
+        self.unlock()
 
     def delete(self):
-        """Delete the current session.
+        """SESSION LOCKING
+        Delete the current session.
 
         TODO:
          - Find a good place to purge old tickets.
          - We should probably create a SessionManager thread per server.
         """
+        self.lock()
         if not self.request_reconnection:
             DB.delete_session(self)
+        self.unlock()
 
     def is_jap(self):
         """TODO: Heuristic using the connection data to detect region."""
@@ -136,30 +150,42 @@ class Session(object):
         return DB.get_servers()
 
     def get_server(self):
-        assert self.local_info['server_id'] is not None
-        return DB.get_server(self.local_info['server_id'])
+        server_id = self.local_info['server_id']
+        assert server_id is not None
+        return DB.get_server(server_id)
 
     def get_gate(self):
-        assert self.local_info['gate_id'] is not None
-        return DB.get_gate(self.local_info['server_id'],
-                           self.local_info['gate_id'])
+        server_id = self.local_info['server_id']
+        gate_id = self.local_info['gate_id']
+        assert server_id is not None and gate_id is not None
+        return DB.get_gate(server_id,
+                           gate_id)
 
     def get_city(self):
-        assert self.local_info['city_id'] is not None
-        return DB.get_city(self.local_info['server_id'],
-                           self.local_info['gate_id'],
-                           self.local_info['city_id'])
+        server_id = self.local_info['server_id']
+        gate_id = self.local_info['gate_id']
+        city_id = self.local_info['city_id']
+        assert server_id is not None and gate_id is not None and city_id is not None
+        return DB.get_city(server_id,
+                           gate_id,
+                           city_id)
 
     def get_circle(self):
-        assert self.local_info['circle_id'] is not None
-        return self.get_city().circles[self.local_info['circle_id']]
+        circle_id = self.local_info['circle_id']
+        assert circle_id is not None
+        return self.get_city().circles[circle_id]
 
     def layer_start(self):
+        """SESSION LOCKING"""
+        self.lock()
         self.layer = 0
         self.state = SessionState.LOG_IN
+        self.unlock()
         return pati.getDummyLayerData()
 
     def layer_end(self):
+        """SESSION LOCKING"""
+        self.lock()
         if self.layer > 1:
             # City path
             if self.local_info['circle_id'] is not None:
@@ -177,15 +203,20 @@ class Session(object):
             self.leave_server()
         self.layer = 0
         self.state = SessionState.UNKNOWN
+        self.unlock()
 
     def layer_down(self, layer_id):
+        """SESSION LOCKING"""
+        self.lock()
         if self.layer == 0:
             self.join_gate(layer_id)
         elif self.layer == 1:
             self.join_city(layer_id)
         else:
+            self.unlock()
             assert False, "Can't go down a layer"
         self.layer += 1
+        self.unlock()
 
     def layer_create(self, layer_id, settings, optional_fields):
         if self.layer == 1:
@@ -196,13 +227,17 @@ class Session(object):
         self.layer_down(layer_id)
 
     def layer_up(self):
+        """SESSION LOCKING"""
+        self.lock()
         if self.layer == 1:
             self.leave_gate()
         elif self.layer == 2:
             self.leave_city()
         else:
+            self.unlock()
             assert False, "Can't go up a layer"
         self.layer -= 1
+        self.unlock()
 
     def layer_detail_search(self, detailed_fields):
         server_type = self.get_server().server_type
@@ -216,16 +251,18 @@ class Session(object):
         return DB.join_server(self, server_id)
 
     def get_layer_children(self):
-        if self.layer == 0:
+        layer = self.layer
+        if layer == 0:
             return self.get_gates()
-        elif self.layer == 1:
+        elif layer == 1:
             return self.get_cities()
         assert False, "Unsupported layer to get children"
 
     def get_layer_sibling(self):
-        if self.layer == 1:
+        layer = self.layer
+        if layer == 1:
             return self.get_gates()
-        elif self.layer == 2:
+        elif layer == 2:
             return self.get_cities()
         assert False, "Unsupported layer to get sibling"
 
@@ -254,12 +291,18 @@ class Session(object):
         return DB.get_gates(self.local_info["server_id"])
 
     def join_gate(self, gate_id):
+        """SESSION LOCKING"""
+        self.lock()
         DB.join_gate(self, self.local_info["server_id"], gate_id)
         self.state = SessionState.GATE
+        self.unlock()
 
     def leave_gate(self):
+        """SESSION LOCKING"""
+        self.lock()
         DB.leave_gate(self)
         self.state = SessionState.LOG_IN
+        self.unlock()
 
     def get_cities(self):
         return DB.get_cities(self.local_info["server_id"],
@@ -278,15 +321,21 @@ class Session(object):
                               city_id, settings, optional_fields)
 
     def join_city(self, city_id):
+        """SESSION LOCKING"""
+        self.lock()
         DB.join_city(self,
                      self.local_info["server_id"],
                      self.local_info["gate_id"],
                      city_id)
         self.state = SessionState.CITY
+        self.unlock()
 
     def leave_city(self):
+        """SESSION LOCKING"""
+        self.lock()
         DB.leave_city(self)
         self.state = SessionState.GATE
+        self.unlock()
 
     def try_transfer_city_leadership(self):
         if self.local_info['city_id'] is None:
@@ -320,9 +369,12 @@ class Session(object):
         return None, None
 
     def join_circle(self, circle_id):
+        """SESSION LOCKING"""
         # TODO: Move this to the database
+        self.lock()
         self.local_info['circle_id'] = circle_id
         self.state = SessionState.CIRCLE
+        self.unlock()
 
     def set_circle_standby(self, val):
         assert self.state == SessionState.CIRCLE or \
@@ -342,10 +394,13 @@ class Session(object):
         self.state = SessionState.QUEST
 
     def leave_circle(self):
+        """SESSION LOCKING"""
         # TODO: Move this to the database
+        self.lock()
         circle = self.get_circle()
         self.local_info['circle_id'] = None
         self.state = SessionState.CITY
+        self.unlock()
 
         if circle.leader == self:
             circle.reset()
@@ -353,13 +408,14 @@ class Session(object):
             circle.players.remove(self)
 
     def get_layer_players(self):
-        if self.layer == 0:
+        layer = self.layer
+        if layer == 0:
             server = self.get_server()
             return server.players
-        elif self.layer == 1:
+        elif layer == 1:
             gate = self.get_gate()
             return gate.players
-        elif self.layer == 2:
+        elif layer == 2:
             city = self.get_city()
             return city.players
         else:
@@ -383,3 +439,9 @@ class Session(object):
                 (1, (weapon_type << 24) | location),
                 (2, hunter_rank << 16)
         ]
+    
+    def lock(self):
+        self._lock.acquire()
+    
+    def unlock(self):
+        self._lock.release()

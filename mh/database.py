@@ -360,7 +360,11 @@ class TempDatabase(object):
         self.servers = new_servers()
 
     def get_support_code(self, session):
-        """Get the online support code or create one."""
+        """SESSION LOCKING
+        
+        Get the online support code or create one.
+        """
+        session.lock()
         support_code = session.online_support_code
         if support_code is None:
             while True:
@@ -368,6 +372,7 @@ class TempDatabase(object):
                 if support_code not in self.consoles:
                     session.online_support_code = support_code
                     break
+        session.unlock()
 
         # Create some default users
         if support_code not in self.consoles:
@@ -378,12 +383,17 @@ class TempDatabase(object):
         return support_code
 
     def new_pat_ticket(self, session):
-        """Generates a new PAT ticket for the session."""
+        """SESSION LOCKING
+        
+        Generates a new PAT ticket for the session.
+        """
+        session.lock()
         while True:
             session.pat_ticket = new_random_str(11)
             if session.pat_ticket not in self.sessions:
                 break
         self.sessions[session.pat_ticket] = session
+        session.unlock()
         return session.pat_ticket
 
     def use_capcom_id(self, session, capcom_id, name=None):
@@ -398,9 +408,13 @@ class TempDatabase(object):
         return name
 
     def use_user(self, session, index, name):
-        """Use User from the slot or create one if empty"""
+        """SESSION LOCKING
+        
+        Use User from the slot or create one if empty.
+        """
         assert 1 <= index <= 6, "Invalid Capcom ID slot"
         index -= 1
+        session.lock()
         users = self.consoles[session.online_support_code]
         while users[index] == "******":
             capcom_id = new_random_str(6)
@@ -413,6 +427,7 @@ class TempDatabase(object):
         name = self.use_capcom_id(session, capcom_id, name)
         session.capcom_id = capcom_id
         session.hunter_name = name
+        session.unlock()
 
     def get_session(self, pat_ticket):
         """Returns existing PAT session or None."""
@@ -451,18 +466,24 @@ class TempDatabase(object):
         return capcom_ids
 
     def join_server(self, session, index):
+        """SESSION LOCKING"""
+        session.lock()
         if session.local_info["server_id"] is not None:
             self.leave_server(session, session.local_info["server_id"])
         server = self.get_server(index)
         server.players.add(session)
         session.local_info["server_id"] = index
         session.local_info["server_name"] = server.name
+        session.unlock()
         return server
 
     def leave_server(self, session, index):
+        """SESSION LOCKING"""
+        session.lock()
         self.get_server(index).players.remove(session)
         session.local_info["server_id"] = None
         session.local_info["server_name"] = None
+        session.unlock()
 
     def get_server_time(self):
         pass
@@ -486,20 +507,26 @@ class TempDatabase(object):
         return gates[index - 1]
 
     def join_gate(self, session, server_id, index):
+        """SESSION LOCKING"""
+        session.lock()
         gate = self.get_gate(server_id, index)
         gate.parent.players.remove(session)
         gate.players.add(session)
         session.local_info["gate_id"] = index
         session.local_info["gate_name"] = gate.name
+        session.unlock()
         return gate
 
     def leave_gate(self, session):
+        """SESSION LOCKING"""
+        session.lock()
         gate = self.get_gate(session.local_info["server_id"],
                              session.local_info["gate_id"])
         gate.parent.players.add(session)
         gate.players.remove(session)
         session.local_info["gate_id"] = None
         session.local_info["gate_name"] = None
+        session.unlock()
 
     def get_cities(self, server_id, gate_id):
         return self.get_gate(server_id, gate_id).cities
@@ -557,14 +584,19 @@ class TempDatabase(object):
         return city
 
     def join_city(self, session, server_id, gate_id, index):
+        """SESSION LOCKING"""
+        session.lock()
         city = self.get_city(server_id, gate_id, index)
         city.parent.players.remove(session)
         city.players.add(session)
         session.local_info["city_id"] = index
         session.local_info["city_name"] = city.name
+        session.unlock()
         return city
 
     def leave_city(self, session):
+        """SESSION LOCKING"""
+        session.lock()
         city = self.get_city(session.local_info["server_id"],
                              session.local_info["gate_id"],
                              session.local_info["city_id"])
@@ -574,6 +606,7 @@ class TempDatabase(object):
             city.clear_circles()
         session.local_info["city_id"] = None
         session.local_info["city_name"] = None
+        session.unlock()
 
     def layer_detail_search(self, server_type, fields):
         cities = []
