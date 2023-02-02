@@ -84,13 +84,14 @@ class PatServer(server.BasicPatServer, Logger):
 
     def circle_broadcast(self, circle, packet_id, data, seq,
                          session=None):
-        for _, player in circle.players:
-            if session and player == session:
-                continue
+        with circle.lock():
+            for _, player in circle.players:
+                if session and player == session:
+                    continue
 
-            handler = self.get_pat_handler(player)
-            if handler:
-                handler.try_send_packet(packet_id, data, seq)
+                handler = self.get_pat_handler(player)
+                if handler:
+                    handler.try_send_packet(packet_id, data, seq)
 
 
 class PatRequestHandler(server.BasicPatHandler):
@@ -2534,18 +2535,19 @@ class PatRequestHandler(server.BasicPatHandler):
 
     def notify_circle_leave(self, circle_index, seq):
         circle = self.session.get_circle()
-        self.sendNtcCircleLeave(circle, circle_index, seq)
-        if circle.leader == self.session:
-            if circle.departed:
-                new_host_index, new_host = \
-                    self.session.try_transfer_circle_leadership()
-                if new_host:
-                    self.sendNtcCircleHost(circle, new_host, new_host_index,
-                                           seq)
-            else:
-                self.sendNtcCircleBreak(circle, seq)
-        self.session.leave_circle()
-        self.sendNtcCircleListLayerChange(circle, circle_index, seq)
+        with circle.lock():
+            self.sendNtcCircleLeave(circle, circle_index, seq)
+            if circle.leader == self.session:
+                if circle.departed:
+                    new_host_index, new_host = \
+                        self.session.try_transfer_circle_leadership()
+                    if new_host:
+                        self.sendNtcCircleHost(circle, new_host, new_host_index,
+                                               seq)
+                else:
+                    self.sendNtcCircleBreak(circle, seq)
+            self.session.leave_circle()
+            self.sendNtcCircleListLayerChange(circle, circle_index, seq)
 
     def on_exception(self, e):
         # type: (Exception) -> None

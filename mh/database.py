@@ -172,7 +172,7 @@ class Players(Lockable):
             yield i, v
 
 
-class Circle(object):
+class Circle(Lockable):
     def __init__(self, parent):
         self.parent = parent
         self.leader = None
@@ -184,6 +184,7 @@ class Circle(object):
         self.remarks = None
 
         self.unk_byte_0x0e = 0
+        super(Circle, self).__init__()
 
     def get_population(self):
         return len(self.players)
@@ -204,18 +205,20 @@ class Circle(object):
         return self.password is not None
 
     def reset_players(self, capacity):
-        self.players = Players(capacity)
+        with self.lock():
+            self.players = Players(capacity)
 
     def reset(self):
-        self.leader = None
-        self.reset_players(4)
-        self.departed = False
-        self.quest_id = 0
-        self.embarked = False
-        self.password = None
-        self.remarks = None
+        with self.lock():
+            self.leader = None
+            self.reset_players(4)
+            self.departed = False
+            self.quest_id = 0
+            self.embarked = False
+            self.password = None
+            self.remarks = None
 
-        self.unk_byte_0x0e = 0
+            self.unk_byte_0x0e = 0
 
 
 class City(object):
