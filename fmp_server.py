@@ -139,16 +139,17 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Layer sync user list response
         """
         players = self.session.get_layer_players()
-        count = len(players)
-        data = struct.pack(">I", count)
+        with players.lock():
+            count = len(players)
+            data = struct.pack(">I", count)
 
-        for _, player in players:
-            user = pati.LayerUserInfo()
-            user.capcom_id = pati.String(player.capcom_id)
-            user.hunter_name = pati.String(player.hunter_name)
-            user.stats = pati.Binary(player.hunter_info.pack())
-            # TODO: Other fields?
-            data += user.pack()
+            for _, player in players:
+                user = pati.LayerUserInfo()
+                user.capcom_id = pati.String(player.capcom_id)
+                user.hunter_name = pati.String(player.hunter_name)
+                user.stats = pati.Binary(player.hunter_info.pack())
+                # TODO: Other fields?
+                data += user.pack()
         self.send_packet(PatID4.AnsLayerUserList, data, seq)
 
     def recvReqLayerHost(self, packet_id, data, seq):
@@ -407,7 +408,7 @@ class FmpRequestHandler(PatRequestHandler):
         if "unk_byte_0x0e" in circle_info:
             circle.unk_byte_0x0e = pati.unpack_byte(circle_info.unk_byte_0x0e)
 
-        circle.players = Players(pati.unpack_long(circle_info.capacity))
+        circle.reset_players(pati.unpack_long(circle_info.capacity))
         circle.players.add(self.session)
 
         self.session.join_circle(circle_index)
