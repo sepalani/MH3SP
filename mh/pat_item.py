@@ -665,9 +665,9 @@ class LayerSet(PatData):
 
 class MediationListItem(PatData):
     FIELDS = (
-        (0x01, "name"),
-        (0x02, "unk_byte_0x02"),
-        (0x03, "unk_byte_0x03"),
+        (0x01, "name"),  # name or owner?
+        (0x02, "index"),
+        (0x03, "is_locked"),  # 1 - locked, unlocked otherwise
     )
 
 

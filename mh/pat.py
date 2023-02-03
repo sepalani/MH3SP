@@ -2401,16 +2401,17 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 64820200
         JP: レイヤ調停データリスト取得返答
         TR: Get layer mediation list response
+
+        TODO: Store the item list and its state in the city.
         """
         unk = 0
-        count = 1
-        item = pati.MediationListItem()
-        item.name = pati.String(b"Test")
-        item.unk_byte_0x02 = pati.Byte(0)
-        item.unk_byte_0x03 = pati.Byte(0)
+        count = 14
         data = struct.pack(">BB", unk, count)
-        items = [item]
-        for item in items:
+        for i in range(1, count+1):
+            item = pati.MediationListItem()
+            item.name = pati.String(b"Test")
+            item.index = pati.Byte(i)
+            item.is_locked = pati.Byte(0)
             data += item.pack()
         self.send_packet(PatID4.AnsLayerMediationList, data, seq)
 
@@ -2439,11 +2440,25 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ調停データ確保返答
         TR: Layer mediation data lock response
 
-        TODO: Implement this properly.
+        TODO: Enable notifications and handle player disconnection.
         """
         success = 1
         data = struct.pack(">B", success)
+        # self.sendNtcLayerMediationLock(index, mediation_data, seq)
         self.send_packet(PatID4.AnsLayerMediationLock, data, seq)
+
+    def sendNtcLayerMediationLock(self, index, mediation_data, seq):
+        """NtcLayerMediationLock packet.
+
+        ID: 64801000
+        JP: レイヤ調停データ確保通知
+        TR: Layer mediation data lock notification
+        """
+        data = pati.lp2_string(self.session.capcom_id)
+        data += struct.pack(">B", index)
+        data += mediation_data.pack()
+        self.server.layer_broadcast(self.session,
+                                    PatID4.NtcLayerMediationLock, data, seq)
 
     def recvReqLayerMediationUnlock(self, packet_id, data, seq):
         """ReqLayerMediationUnlock packet.
@@ -2451,8 +2466,6 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 64810100
         JP: レイヤ調停データ開放要求
         TR: Layer mediation data unlock request
-
-        The game doesn't seem to care about this packet.
         """
         index, = struct.unpack_from(">B", data)
         mediation_data = pati.MediationListItem.unpack(data, 1)
@@ -2467,11 +2480,25 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ調停データ開放要求
         TR: Layer mediation data unlock response
 
-        TODO: Implement this properly.
+        TODO: Enable notifications and handle player disconnection.
         """
         success = 1
         data = struct.pack(">B", success)
+        # self.sendNtcLayerMediationUnlock(index, mediation_data, seq)
         self.send_packet(PatID4.AnsLayerMediationUnlock, data, seq)
+
+    def sendNtcLayerMediationUnlock(self, index, mediation_data, seq):
+        """NtcLayerMediationUnlock packet.
+
+        ID: 64811000
+        JP: レイヤ調停データ開放通知
+        TR: Layer mediation data unlock notification
+        """
+        data = pati.lp2_string(self.session.capcom_id)
+        data += struct.pack(">B", index)
+        data += mediation_data.pack()
+        self.server.layer_broadcast(self.session,
+                                    PatID4.NtcLayerMediationUnlock, data, seq)
 
     def sendNtcLayerHost(self, new_leader, seq):
         """NtcLayerHost packet.
