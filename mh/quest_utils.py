@@ -888,7 +888,6 @@ class QuestRestrictionType:
     RESTRICTION_35_JOIN = 25
     RESTRICTION_46_JOIN = 26
 
-
 def make_monster_quest_type(monster_type, boss_id, enabled, level, min, size, max):
     data = b""
     #- id: monster_type
@@ -969,83 +968,181 @@ def generate_rewards(rewards):
     return data
 
 
-def make_binary_event_quest(quest_id, name, client, description, flags,
-                                monsterType1, monsterType1_bossid, monsterType1_enabled, monsterType1_level, monsterType1_size, monsterType1_min, monsterType1_max,
-                                monsterType2, monsterType2_bossid, monsterType2_enabled, monsterType2_level, monsterType2_size, monsterType2_min, monsterType2_max,
-                                monsterType3, monsterType3_bossid, monsterType3_enabled, monsterType3_level, monsterType3_size, monsterType3_min, monsterType3_max,
-                                main_reward, sub_quest_1_reward, sub_quest_2_reward, penalty_per_cart, quest_fee, time_limit, main_monster1, main_monster2,
-                                location, quest_rank, hunter_rank_points, hrp_restriction, resources, supply_set_number,
-                                mainquest_type, mainquest_objectivetype, mainquest_objectivenum,
-                                subquest1_description, subquest1_type, subquest1_objectivetype, subquest1_objectivenum,
-                                subquest2_description, subquest2_type, subquest2_objectivetype, subquest2_objectivenum,
-                                details,
-                                starting_position, general_enemy_level, unk_12, subquest1_hrp, subquest2_hrp, unk_4, unk_5, unk_6, unk_7,
-                                unk_9, unk_10, unk_11, summon,
-                                smallmonster_data,
-                                mainquest_rewards1, mainquest_rewards2,
-                                sq1_rewards, sq2_rewards,
-                                success_message="Complete the Main Quest."):
+def make_binary_event_quest(quest_data):
+    """
+    'quest_info': {
+        'quest_id': quest_id,
+        'name': name,
+        'client': client,
+        'description': description,
+        'details': details,
+        'success_message' success_message,  # usually "Complete the Main Quest."
+        'flags': flags,
+        'penalty_per_cart': penalty_per_cart,
+        'quest_fee': quest_fee,
+        'time_limit': time_limit,
+        'main_monster_1': main_monster1,
+        'main_monster_2': main_monster2,
+        'location': location,
+        'quest_rank': quest_rank,
+        'hrp_restriction': hrp_restriction,
+        'resources': resources,
+        'supply_set_number': supply_set_number,
+        'starting_position': starting_position, 
+        'general_enemy_level': general_enemy_level,
+        'summon': summon,
+        'smallmonster_data_file': smallmonster_data,
+    },
+    """
+    quest_info = quest_data['quest_info']
+
+    """
+    'large_monsters': {
+        'monster_1': {
+            'type': monsterType1,
+            'boss_id': monsterType1_bossid,
+            'enabled': monsterType1_enabled,
+            'level': monsterType1_level,  # 0x01 through 0x3c
+            'size': monsterType1_size,
+            'hp_spread': monsterType1_min, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': monsterType1_max  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': monsterType2,
+            'boss_id': monsterType2_bossid,
+            'enabled': monsterType2_enabled,
+            'level': monsterType2_level,  # 0x01 through 0x3c
+            'size': monsterType2_size,
+            'hp_spread': monsterType2_min, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': monsterType2_max  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': monsterType3,
+            'boss_id': monsterType3_bossid,
+            'enabled': monsterType3_enabled,
+            'level': monsterType3_level,  # 0x01 through 0x3c
+            'size': monsterType3_size,
+            'hp_spread': monsterType3_min, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': monsterType3_max  # controls the spread of size but details unknown
+        }
+    },
+    """
+    large_monsters = quest_data['large_monsters']
+    monster_1 = large_monsters['monster_1']
+    monster_2 = large_monsters['monster_2']
+    monster_3 = large_monsters['monster_3']
+
+    """
+    'objective_details': {
+        'main_quest': {
+            'type': mainquest_type,
+            'objective_type': mainquest_objectivetype,
+            'objective_num': mainquest_objectivenum,
+            'zenny_reward': main_reward,
+            'hrp_reward': hunter_rank_points,
+            'rewards_row_1': mainquest_rewards1,
+            'rewards_row_2': mainquest_rewards2,
+        }
+        'subquest_1': {
+            'description': subquest1_description,
+            'type': subquest1_type,
+            'objective_type': subquest1_objectivetype,
+            'objective_num': subquest1_objectivenum,
+            'zenny_reward': sub_quest_1_reward,
+            'hrp_reward': subquest1_hrp,
+            'rewards_row_1': sq1_rewards,
+        }
+        'subquest_2': {
+            'description': subquest2_description,
+            'type': subquest2_type,
+            'objective_type': subquest2_objectivetype,
+            'objective_num': subquest2_objectivenum,
+            'zenny_reward': sub_quest_2_reward,
+            'hrp_reward': subquest2_hrp,
+            'rewards_row_1': sq2_rewards,
+        }
+    },
+    """
+    objective_details = quest_data['objective_details']
+    main_quest = objective_details['main_quest']
+    subquest_1 = objective_details['subquest_1']
+    subquest_2 = objective_details['subquest_2']
+
+    """
+    'unknown': {
+        'unk_12': unk_12,
+        'unk_4': unk_4,
+        'unk_5': unk_5,
+        'unk_6': unk_6,
+        'unk_7': unk_7,
+        'unk_9': unk_9,
+        'unk_10': unk_10,
+        'unk_11': unk_11,
+    }
+    """
+    unknown = quest_data['unknown']
+
     # TOOO: Remove encode("ascii") and use bytes instead
     data = b""
 
     #- id: name
     #  type: str
     #  size: 44
-    data += pad(name.encode("ascii"), 40)  # Size 0x28
+    data += pad(quest_info['name'].encode("ascii"), 40)  # Size 0x28
     data += struct.pack(">I", 0x00000000)
 
     #- id: quest_id
     #  type: u2
-    data += struct.pack(">H", quest_id)
+    data += struct.pack(">H", quest_info['quest_id'])
 
     #- id: description
     #  type: str
     #  size: 92
-    data += pad(description.encode("ascii"), 80)
+    data += pad(quest_info['description'].encode("ascii"), 80)
     data += b'\0' * 0xC  # Padding
 
     #- id: quest_rank
     #  type: u1
     #  enum: QuestRankType
-    data += struct.pack(">B", quest_rank)
+    data += struct.pack(">B", quest_info['quest_rank'])
 
     #- id: location
     #  type: u1
     #  enum: LocationType
-    data += struct.pack(">B", location)  # Offset 0x8C
+    data += struct.pack(">B", quest_info['location'])  # Offset 0x8C
 
     #- id: sub_quest_1_title
     #  type: str
     #  size: 41
-    data += pad(subquest1_description.encode("ascii"), 0x29)
+    data += pad(objective_details['subquest_1']['description'].encode("ascii"), 0x29)
 
     #- id: sub_quest_2_title
     #  type: str
     #  size: 41
-    data += pad(subquest2_description.encode("ascii"), 0x29)
+    data += pad(objective_details['subquest_2']['description'].encode("ascii"), 0x29)
 
     #- id: sucess_message
     #  type: str
     #  size: 92
-    data += pad(success_message.encode("ascii"), 0x5C)
+    data += pad(quest_info['success_message'].encode("ascii"), 0x5C)
 
     #- id: time_limit
     #  type: u2
-    data += struct.pack(">h", time_limit)  # Offset 0x13A
+    data += struct.pack(">h", quest_info['time_limit'])  # Offset 0x13A
 
     #- id: failure_message
     #  type: str
     #  size: 92
-    data += pad(b"Reward hits 0, or time\x0Aexpires.", 0x5C)
+    data += pad(b"Reward hits 0, or time\x0Aexpires.", 0x5C)  # Presently hardcoded
 
     #- id: hunter_rank_point_restriction
     #  type: u2
-    data += struct.pack(">h", hrp_restriction)
+    data += struct.pack(">h", quest_info['hrp_restriction'])
 
     #- id: client
     #  type: str
     #  size: 41
-    data += pad(client.encode("ascii"), 0x29)
+    data += pad(quest_info['client'].encode("ascii"), 0x29)
 
     #- id: unk2
     #  size: 6
@@ -1054,7 +1151,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: details
     #  type: str
     #  size: 256
-    data += pad(details.encode("ascii"), 0x100)  #b'\0' * 0x100
+    data += pad(quest_info['details'].encode("ascii"), 0x100)  #b'\0' * 0x100
 
     #- id: unk1
     #  size: 61
@@ -1071,12 +1168,12 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     #- id: monster_1
     #  type: u1
     #  enum: Monster
-    data += struct.pack(">B", main_monster1)  # Offset 0x30C ("Main monsters" 1)
+    data += struct.pack(">B", quest_info['main_monster_1'])  # Offset 0x30C ("Main monsters" 1)
 
     #- id: monster_2
     #  type: u1
     #  enum: Monster
-    data += struct.pack(">B", main_monster2)  # Offset 0x30D ("Main monsters" 2)
+    data += struct.pack(">B", quest_info['main_monster_2'])  # Offset 0x30D ("Main monsters" 2)
 
     #- id: unk3
     #  size: 2
@@ -1084,40 +1181,51 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
 
     #- id: flags
     #  type: u4
-    data += struct.pack(">I", flags)  # Offset 0x310
+    data += struct.pack(">I", quest_info['flags'])  # Offset 0x310
 
     #- id: monsters
     #  type: monster_quest_type
     #  repeat: expr
     #  repeat-expr: 3
 
-    # Hunt a Great Jaggi (Low Rank 1*):
-    # monster 1, great jaggi: 0c000001 17016403
-    #           monster_type: 0x0c,  boss_id: 0x0000,  enabled=0x01,  level=0x17,  min=0x01, size=0x64, max=0x03
-
-    if monsterType1 != 0:
-        data += make_monster_quest_type(monster_type=monsterType1, boss_id=monsterType1_bossid, enabled=monsterType1_enabled,
-                    level=monsterType1_level, min=monsterType1_min, size=monsterType1_size, max=monsterType1_max)  # size: 0x08
+    if monster_1['type'] != 0:
+        data += make_monster_quest_type(monster_type=monster_1['type'],
+                                        boss_id=monster_1['boss_id'],
+                                        enabled=monster_1['enabled'],
+                                        level=monster_1['level'],
+                                        min=monster_1['hp_spread'],
+                                        size=monster_1['size'],
+                                        max=monster_1['size_spread'])  # size: 0x08
     else:
         data += b'\0' * 0x08
 
-    if monsterType2 != 0:
-        data += make_monster_quest_type(monster_type=monsterType2, boss_id=monsterType2_bossid, enabled=monsterType2_enabled,
-                    level=monsterType2_level, min=monsterType2_min, size=monsterType2_size, max=monsterType2_max)  # size: 0x08
+    if monster_2['type'] != 0:
+        data += make_monster_quest_type(monster_type=monster_2['type'],
+                                        boss_id=monster_2['boss_id'],
+                                        enabled=monster_2['enabled'],
+                                        level=monster_2['level'],
+                                        min=monster_2['hp_spread'],
+                                        size=monster_2['size'],
+                                        max=monster_2['size_spread'])  # size: 0x08
     else:
         data += b'\0' * 0x08
 
-    if monsterType3 != 0:
-        data += make_monster_quest_type(monster_type=monsterType3, boss_id=monsterType3_bossid, enabled=monsterType3_enabled,
-                    level=monsterType3_level, min=monsterType3_min, size=monsterType3_size, max=monsterType3_max)  # size: 0x08
+    if monster_3['type'] != 0:
+        data += make_monster_quest_type(monster_type=monster_3['type'],
+                                        boss_id=monster_3['boss_id'],
+                                        enabled=monster_3['enabled'],
+                                        level=monster_3['level'],
+                                        min=monster_3['hp_spread'],
+                                        size=monster_3['size'],
+                                        max=monster_3['size_spread'])  # size: 0x08
     else:
         data += b'\0' * 0x08
 
-    
+
     # SUMMON / (INVADER?)
     #- id: unk5
     #  type: u4
-    data += struct.pack(">I", summon)
+    data += struct.pack(">I", quest_info['summon'])
 
     #- id: quests_properties
     #  type: quest_properties_type
@@ -1131,41 +1239,47 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
     # "Wound Great Jaggi's Head:"   quest_type = 0x00000204, quest_objectivetype=0x000c, quest_objectivecount=0x0001
     # "Stun Great Jaggi:"           quest_type = 0x00001000, quest_objectivetype=0x000c, quest_objectivecount=0x0003
 
-    data += make_quest_properties_type(mainquest_type, mainquest_objectivetype, mainquest_objectivenum)  # Main quest
+    data += make_quest_properties_type(main_quest['type'],
+                                       main_quest['objective_type'],
+                                       main_quest['objective_num'])  # Main quest
 
-    if subquest1_type is not None:
-        data += make_quest_properties_type(subquest1_type, subquest1_objectivetype, subquest1_objectivenum)  # Subquest 1
+    if subquest_1['type'] is not None:
+        data += make_quest_properties_type(subquest_1['type'],
+                                           subquest_1['objective_type'],
+                                           subquest_1['objective_num'])  # Subquest 1
     else:
         data += b"\0" * 0x08
 
-    if subquest2_type is not None:
-        data += make_quest_properties_type(subquest2_type, subquest2_objectivetype, subquest2_objectivenum)  # Subquest 2
+    if subquest_2['type'] is not None:
+        data += make_quest_properties_type(subquest_2['type'],
+                                           subquest_2['objective_type'],
+                                           subquest_2['objective_num'])  # Subquest 2
     else:
         data += b"\0" * 0x08
 
     #- id: contract_fee
     #  type: u4
-    data += struct.pack(">I", quest_fee)  # Offset 0x348
+    data += struct.pack(">I", quest_info['quest_fee'])  # Offset 0x348
 
     #- id: main_objective_reward
     #  type: u4
-    data += struct.pack(">I", main_reward)
+    data += struct.pack(">I", main_quest['zenny_reward'])
 
     #- id: sub_objective_a_reward
     #  type: u4
-    data += struct.pack(">I", sub_quest_1_reward)
+    data += struct.pack(">I", subquest_1['zenny_reward'])
 
     #- id: sub_objective_b_reward
     #  type: u4
-    data += struct.pack(">I", sub_quest_2_reward)
+    data += struct.pack(">I", subquest_2['zenny_reward'])
 
     #- id: death_reduction
     #  type: u4
-    data += struct.pack(">I", penalty_per_cart)
+    data += struct.pack(">I", quest_info['penalty_per_cart'])
 
     #- id: hunter_rank_points
     #  type: u4
-    data += struct.pack(">I", hunter_rank_points)
+    data += struct.pack(">I", main_quest['hrp_reward'])
 
     #- id: unk7
     #  type: u4
@@ -1185,34 +1299,34 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
 
     #- id: unk10
     #  type: u1
-    data += struct.pack(">B", subquest1_hrp)
+    data += struct.pack(">B", subquest_1['hrp_reward'])
 
     #- id: supply_set (wrong)
     #  type: u4
-    data += struct.pack(">I", subquest2_hrp)
+    data += struct.pack(">I", subquest_2['hrp_reward'])
 
     #- id: Unknown 4
     #  type: u1
-    data += struct.pack(">B", unk_4)
+    data += struct.pack(">B", unknown['unk_4'])
 
     #- id: supply_type (0x00: low rank, 0x01: high rank, 0x02: arena)
     #  type: u1
-    data += struct.pack(">B", resources)
+    data += struct.pack(">B", quest_info['resources'])
     
     #- id: unk11
     #  size: 2
     #  type: u1
-    data += struct.pack(">B", unk_5)
+    data += struct.pack(">B", unknown['unk_5'])
     #  type: u1
-    data += struct.pack(">B", unk_6)
+    data += struct.pack(">B", unknown['unk_6'])
 
     #- id: start_pos (SUPPLY SET NUMBER)
     #  type: u4
-    data += struct.pack(">I", supply_set_number)  # 0x00000011 for the great jaggi quest
+    data += struct.pack(">I", quest_info['supply_set_number'])  # 0x00000011 for the great jaggi quest
 
     #- id: unk12
     #  type: u4
-    data += struct.pack(">I", unk_7)
+    data += struct.pack(">I", unknown['unk_7'])
 
     #- id: unk13
     #  type: u2
@@ -1220,7 +1334,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
 
     #- id: type_flag (STARTING POSITION, 0x0000: basecamp, 0x0001: random, 0x0002: shrine)
     #  type: u2
-    data += struct.pack(">h", starting_position)
+    data += struct.pack(">h", quest_info['starting_position'])
     
     # UNK
     data += b'\0' * 0x02
@@ -1235,47 +1349,53 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
 
     #- id: general_enemy_level
     #  type: u2
-    data += struct.pack(">h", general_enemy_level)
+    data += struct.pack(">h", quest_info['general_enemy_level'])
 
     #- id: unk14
     #  type: u4
-    data += struct.pack(">I", unk_9)
+    data += struct.pack(">I", unknown['unk_9'])
 
     #- id: unk15
     #  type: u4
-    data += struct.pack(">I", unk_10)
+    data += struct.pack(">I", unknown['unk_10'])
 
     #- id: unk16
     #  size: 16
-    data += struct.pack(">I", unk_11)
-    data += struct.pack(">I", unk_12)  # Unknown 12 (0x00000002 for large monster hunting quests, 0x00000003 for small monster & gathering quests, 0x00000005 for Jhen & Alatreon)
-    data += make_quest_properties_type(mainquest_type, mainquest_objectivetype, mainquest_objectivenum)
+    data += struct.pack(">I", unknown['unk_11'])
+    data += struct.pack(">I", unknown['unk_12'])  # Unknown 12 (0x00000002 for large monster hunting quests, 0x00000003 for small monster & gathering quests, 0x00000005 for Jhen & Alatreon)
+    data += make_quest_properties_type(main_quest['type'],
+                                       main_quest['objective_type'],
+                                       main_quest['objective_num'])
 
     #- id: main_objective_rewards
     #  type: reward_type
     #  repeat: expr
     #  repeat-expr: 11
-    data += generate_rewards(mainquest_rewards1)
+    data += generate_rewards(main_quest['rewards_row_1'])
 
     #- id: main_objective_additional_rewards
     #  type: reward_type
     #  repeat: expr
     #  repeat-expr: 11
-    data += generate_rewards(mainquest_rewards2)
+    data += generate_rewards(main_quest['rewards_row_2'])
 
     # SUBQUEST 1 REWARDS
-    if subquest1_type is not None:
-        data += make_quest_properties_type(subquest1_type, subquest1_objectivetype, subquest1_objectivenum)
-        data += generate_rewards(sq1_rewards)
+    if subquest_1['type'] is not None:
+        data += make_quest_properties_type(subquest_1['type'],
+                                           subquest_1['objective_type'],
+                                           subquest_1['objective_num'])
+        data += generate_rewards(subquest_1['rewards_row_1'])
     else:
         data += b"\0" * 0x08
         data += b'\0' * (4 * 11)
     data += b'\0' * (4 * 11)
 
     # SUBQUEST 2 REWARDS
-    if subquest2_type is not None:
-        data += make_quest_properties_type(subquest2_type, subquest2_objectivetype, subquest2_objectivenum)
-        data += generate_rewards(sq2_rewards)
+    if subquest_2['type'] is not None:
+        data += make_quest_properties_type(subquest_2['type'],
+                                           subquest_2['objective_type'],
+                                           subquest_2['objective_num'])
+        data += generate_rewards(subquest_2['rewards_row_1'])
     else:
         data += b"\0" * 0x08
         data += b'\0' * (4 * 11)
@@ -1283,7 +1403,7 @@ def make_binary_event_quest(quest_id, name, client, description, flags,
 
     assert len(data) == 0x4B4
     try:
-        data += read_quest_sm_data(smallmonster_data)
+        data += read_quest_sm_data(quest_info['smallmonster_data_file'])
     except Exception as e:
         pass
 
@@ -1326,13 +1446,6 @@ def read_quest_sm_data(fname):
         data = f.read()
     return bytearray.fromhex(data.replace(" ","").replace("\n",""))
 
-def get_quest_name(quest):
-    """
-    Returns the quest name, which is always a null-terminated
-    string that starts at offset 0.
-    """
-    return ctypes.create_string_buffer(bytes(quest)).value
-
 
 """
 EVENT QUEST 1: Jump Four Jaggi
@@ -1340,146 +1453,542 @@ EVENT QUEST 1: Jump Four Jaggi
 Quest description/rewards/etc from https://www.youtube.com/watch?v=qyQt2Xmpt0g
 Quest requirements altered to make it possible to win.
 """
-QUEST_EVENT_JUMP_FOUR_JAGGI = make_binary_event_quest(61001, "Jump Three Jaggi", "Guild Subcontractor", "Hunt 3 Great Jaggi", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,1,1)),  # quest id, name, client, description, flags
-    Monster.great_jaggi, 0x0000, True, 0x17, 0x64, 0x01, 0x03,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.great_jaggi, 0x0001, True, 0x17, 0x64, 0x01, 0x03,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.great_jaggi, 0x0002, True, 0x17, 0x64, 0x01, 0x03,  # monster 3:  type, boss id, enabled, level, size, min, max
-    4000, 4000, 0, 1400, 400, 50, Monster.bnahabra2, Monster.melynx,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_SANDY_PLAINS, QuestRankType.star_1, 440, QuestRestrictionType.RESTRICTION_NONE, ResourcesType.low_rank, 19,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000001, Monster.great_jaggi, 0x03,  # Main quest: type, target, number
-    "Hunt 2 Great Jaggi", 0x00000001, Monster.great_jaggi, 0x02,  # Subquest 1: Description, type, target, number
-    "None.", 0, Monster.none, 0,  # Subquest 2: Description, type, target, number
-    "I'm gonna get so fired for" + '\x0A' + "this... The Great Jaggi some" + '\x0A' +
-        "hunter brought in just" + '\x0A' + "escaped. Mind going after" + '\x0A' +
-        "them? You better hurry," + '\x0A' + "though. Bet they've got some" + '\x0A' +
-        "incredible materials, too.",  # Quest details
-    StartingPositionType.camp, 0x0017, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000050, 0x00000064, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x0002018B, 0x00010000, 0x00000000, 0x64050219,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_jumpfourjaggi.dat', # Small monster data
-    [(ItemsType.great_jagi_claw, 1, 3), (ItemsType.great_jagi_hide, 1, 12), (ItemsType.jagi_scale, 1, 10), (ItemsType.screamer, 1, 20),
-        (ItemsType.kings_frill, 1, 12), (ItemsType.bone_husk_s, 8, 18), (ItemsType.great_jagi_head, 1, 25)],
-    [(ItemsType.mystery_charm, 1, 1), (ItemsType.aquaglow_jewel, 1, 1), (ItemsType.shining_charm, 1, 1), (ItemsType.armor_sphere, 1, 1),
-        (ItemsType.armor_sphere_plus, 1, 1)],
-    [(ItemsType.great_jagi_claw, 1, 1), (ItemsType.great_jagi_hide, 1, 1), (ItemsType.jagi_scale, 1, 1),
-        (ItemsType.screamer, 1, 1), (ItemsType.kings_frill, 1, 1), (ItemsType.bone_husk_s, 8, 1),
-        (ItemsType.great_jagi_head, 1, 1)],
-    [])
+QUEST_EVENT_JUMP_FOUR_JAGGI = {
+    'quest_info': {
+        'quest_id': 61001,
+        'name': "Jump Three Jaggi",
+        'client': "Guild Subcontractor",
+        'description': "Hunt 3 Great Jaggi",
+        'details': "I'm gonna get so fired for" + '\x0A' + "this... The Great Jaggi some" + '\x0A' +
+            "hunter brought in just" + '\x0A' + "escaped. Mind going after" + '\x0A' +
+            "them? You better hurry," + '\x0A' + "though. Bet they've got some" + '\x0A' +
+            "incredible materials, too.",
+        'success_message': "Complete the Main Quest.",
+        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,1,1)),
+        'penalty_per_cart': 1400,
+        'quest_fee': 400,
+        'time_limit': 50,
+        'main_monster_1': Monster.bnahabra2,
+        'main_monster_2': Monster.melynx,
+        'location': LocationType.QUEST_LOCATION_SANDY_PLAINS,
+        'quest_rank': QuestRankType.star_1,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_NONE,
+        'resources': ResourcesType.low_rank,
+        'supply_set_number': 19,
+        'starting_position': StartingPositionType.camp, 
+        'general_enemy_level': 0x0017,
+        'summon': 0x64050219,
+        'smallmonster_data_file': 'sm_jumpfourjaggi.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.great_jaggi,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x17,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.great_jaggi,
+            'boss_id': 0x0001,
+            'enabled': True,
+            'level': 0x17,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.great_jaggi,
+            'boss_id': 0x0002,
+            'enabled': True,
+            'level': 0x17,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000001,
+            'objective_type': Monster.great_jaggi,
+            'objective_num': 0x03,
+            'zenny_reward': 4000,
+            'hrp_reward': 440,
+            'rewards_row_1': [(ItemsType.great_jagi_claw, 1, 3), (ItemsType.great_jagi_hide, 1, 12),
+                              (ItemsType.jagi_scale, 1, 10), (ItemsType.screamer, 1, 20),
+                              (ItemsType.kings_frill, 1, 12), (ItemsType.bone_husk_s, 8, 18),
+                              (ItemsType.great_jagi_head, 1, 25)],
+            'rewards_row_2': [(ItemsType.mystery_charm, 1, 1), (ItemsType.aquaglow_jewel, 1, 1),
+                              (ItemsType.shining_charm, 1, 1), (ItemsType.armor_sphere, 1, 1),
+                              (ItemsType.armor_sphere_plus, 1, 1)],
+        },
+        'subquest_1': {
+            'description': "Hunt 2 Great Jaggi",
+            'type': 0x00000001,
+            'objective_type': Monster.great_jaggi,
+            'objective_num': 0x02,
+            'zenny_reward': 4000,
+            'hrp_reward': 220,
+            'rewards_row_1': [(ItemsType.great_jagi_claw, 1, 1), (ItemsType.great_jagi_hide, 1, 1),
+                              (ItemsType.jagi_scale, 1, 1), (ItemsType.screamer, 1, 1),
+                              (ItemsType.kings_frill, 1, 1), (ItemsType.bone_husk_s, 8, 1),
+                              (ItemsType.great_jagi_head, 1, 1)],
+        },
+        'subquest_2': {
+            'description': "None",
+            'type': 0,
+            'objective_type': Monster.none,
+            'objective_num': 0,
+            'zenny_reward': 0,
+            'hrp_reward': 0,
+            'rewards_row_1': [],
+        }
+    },
+    'unknown': {
+        'unk_12': 0x00000002,  # (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x0002018B,
+        'unk_10': 0x00010000,
+        'unk_11': 0x00000000,
+    }
+}
 
 """
 EVENT QUEST 7: The Phantom Uragaan
 Quest description from https://www.youtube.com/watch?v=Py5PkCXhf6w
 """
-QUEST_EVENT_THE_PHANTOM_URAGAAN = make_binary_event_quest(61007, "The Phantom Uragaan", "Spoiled Princess", "Hunt an Uragaan", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,1,0,0,0,0),(1,0,1,0,0,0,1,1)),  # quest id, name, client, description, flags
-    Monster.uragaan, 0x0000, True, 0x1D, 0x13, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    8800, 0, 0, 3000, 850, 50, Monster.uroktor, Monster.aptonoth,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_VOLCANO, QuestRankType.star_3, 1100, QuestRestrictionType.RESTRICTION_18_INITJOIN, ResourcesType.low_rank, 15,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000001, Monster.uragaan, 0x01,  # Main quest: type, target, number
-    "None.", 0x00000000, Monster.none, 0x00,  # Subquest 1: Description, type, target, number
-    "None.", 0x00000000, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "Oooh, I just heard they've" + '\x0A' + "spotted the cutest, tiniest," + '\x0A' +
-        "most adorable little Uragaan" + '\x0A' + "on the Volcano. Hunt me one" + '\x0A' +
-        "this instant or I will get" + '\x0A' + "very angry. And if I'm angry," + '\x0A' +
-        "Daddy's angry. Now go!",  # Quest details
-    StartingPositionType.camp, 0x1D, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x00000000, 0x00000000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_phantomuragaan.dat', # Small monster data
-    [(ItemsType.mystery_charm, 1, 1), (ItemsType.uragaan_shell, 1, 16), (ItemsType.uragaan_scale, 1, 20), (ItemsType.uragaan_marrow, 1, 10),
-        (ItemsType.monster_bone_l, 1, 10), (ItemsType.bone_husk_l, 15, 13), (ItemsType.shining_charm, 1, 5), (ItemsType.rustshard, 1, 25)],
-    [(ItemsType.mystery_charm, 1, 1), (ItemsType.uragaan_shell, 1, 16), (ItemsType.uragaan_scale, 1, 20), (ItemsType.uragaan_marrow, 1, 10),
-        (ItemsType.monster_bone_l, 1, 10), (ItemsType.bone_husk_l, 15, 13), (ItemsType.shining_charm, 1, 5), (ItemsType.rustshard, 1, 25)],
-    [],
-    [])
+QUEST_EVENT_THE_PHANTOM_URAGAAN = {
+    'quest_info': {
+        'quest_id': 61007,
+        'name': "The Phantom Uragaan",
+        'client': "Spoiled Princess",
+        'description': "Hunt an Uragaan",
+        'details': "Oooh, I just heard they've" + '\x0A' + "spotted the cutest, tiniest," + '\x0A' +
+            "most adorable little Uragaan" + '\x0A' + "on the Volcano. Hunt me one" + '\x0A' +
+            "this instant or I will get" + '\x0A' + "very angry. And if I'm angry," + '\x0A' +
+            "Daddy's angry. Now go!",
+        'success_message': "Complete the Main Quest.",
+        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,1,0,0,0,0),(1,0,1,0,0,0,1,1)),
+        'penalty_per_cart': 3000,
+        'quest_fee': 850,
+        'time_limit': 50,
+        'main_monster_1': Monster.uroktor,
+        'main_monster_2': Monster.aptonoth,
+        'location': LocationType.QUEST_LOCATION_VOLCANO,
+        'quest_rank': QuestRankType.star_3,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_18_INITJOIN,
+        'resources': ResourcesType.low_rank,
+        'supply_set_number': 15,
+        'starting_position': StartingPositionType.camp, 
+        'general_enemy_level': 0x1D,
+        'summon': 0x00000000,
+        'smallmonster_data_file': 'sm_phantomuragaan.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.uragaan,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x1D,  # 0x01 through 0x3c
+            'size': 0x13,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000001,
+            'objective_type': Monster.uragaan,
+            'objective_num': 0x01,
+            'zenny_reward': 8800,
+            'hrp_reward': 1100,
+            'rewards_row_1': [(ItemsType.mystery_charm, 1, 1), (ItemsType.uragaan_shell, 1, 16),
+                              (ItemsType.uragaan_scale, 1, 20), (ItemsType.uragaan_marrow, 1, 10),
+                              (ItemsType.monster_bone_l, 1, 10), (ItemsType.bone_husk_l, 15, 13),
+                              (ItemsType.shining_charm, 1, 5), (ItemsType.rustshard, 1, 25)],
+            'rewards_row_2': [(ItemsType.mystery_charm, 1, 1), (ItemsType.uragaan_shell, 1, 16),
+                              (ItemsType.uragaan_scale, 1, 20), (ItemsType.uragaan_marrow, 1, 10),
+                              (ItemsType.monster_bone_l, 1, 10), (ItemsType.bone_husk_l, 15, 13),
+                              (ItemsType.shining_charm, 1, 5), (ItemsType.rustshard, 1, 25)],
+        },
+        'subquest_1': {
+            'description': "None",
+            'type': 0x00000000,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+        'subquest_2': {
+            'description': "None",
+            'type': 0x00000000,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+    },
+    'unknown': {
+        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x00000000,
+        'unk_10': 0x00000000,
+        'unk_11': 0x00000000,
+    }
+}
 
 """
 EVENT QUEST 8: Blood Sport
 Quest description from https://www.youtube.com/watch?v=tuRSdC_mlO4
 """
-QUEST_EVENT_BLOOD_SPORT = make_binary_event_quest(61008, "Blood Sport", "Spoiled Princess", "Hunt an Uragaan" + '\x0A' + "and a Diablos", generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),  # quest id, name, client, description, flags
-    Monster.uragaan, 0x0000, True, 0x1D, 0x64, 0x01, 0x03,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.diablos, 0x0001, True, 0x1D, 0x64, 0x01, 0x03,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    17600, 0, 0, 6000, 1750, 50, Monster.uragaan, Monster.diablos,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_LAND_ARENA_1, QuestRankType.star_3, 1760, QuestRestrictionType.RESTRICTION_18_INITJOIN, ResourcesType.low_rank, 43,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000001, Monster.uragaan, 0x01,  # Main quest: type, target, number
-    "None.", 0x00000001, Monster.diablos, 0x01,  # Subquest 1: Description, type, target, number
-    "None.", 0, Monster.none, 0,  # Subquest 2: Description, type, target, number
-    "Oh, boo! I'm tired of watching" + '\x0A' + "run-of-the-mill hunts. The" + '\x0A' +
-        "Diablos and the Uragaan are" + '\x0A' + "supposed to be the ultimate" + '\x0A' +
-        "monster duo. I'd love to watch" + '\x0A' + "them maim some foolish hunter!" + '\x0A' +
-        "Do put on a good show...",  # Quest details
-    StartingPositionType.camp, 0x001D, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x00000000, 0x00010000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_bloodsport.dat', # Small monster data
-    [(ItemsType.uragaan_scale, 1, 1), (ItemsType.diablos_ridge, 1, 14), (ItemsType.uragaan_shell, 1, 10), (ItemsType.diablos_shell, 1, 20),
-        (ItemsType.twisted_horn, 1, 12), (ItemsType.diablos_marrow, 8, 9), (ItemsType.uragaan_marrow, 1, 9), (ItemsType.incomplete_plans, 1, 25)],
-    [(ItemsType.uragaan_scale, 1, 1), (ItemsType.diablos_ridge, 1, 14), (ItemsType.uragaan_shell, 1, 10), (ItemsType.diablos_shell, 1, 20),
-        (ItemsType.twisted_horn, 1, 12), (ItemsType.diablos_marrow, 1, 9), (ItemsType.uragaan_marrow, 1, 9), (ItemsType.incomplete_plans, 1, 25)],
-    [],
-    [])
+QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
+    'quest_info': {
+        'quest_id': 61008,
+        'name': "Blood Sport",
+        'client': "Spoiled Princess",
+        'description': "Hunt an Uragaan" + '\x0A' + "and a Diablos",
+        'details': "Oh, boo! I'm tired of watching" + '\x0A' + "run-of-the-mill hunts. The" + '\x0A' +
+            "Diablos and the Uragaan are" + '\x0A' + "supposed to be the ultimate" + '\x0A' +
+            "monster duo. I'd love to watch" + '\x0A' + "them maim some foolish hunter!" + '\x0A' +
+            "Do put on a good show...",
+        'success_message': "Complete the Main Quest.",
+        'flags': generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),
+        'penalty_per_cart': 6000,
+        'quest_fee': 1750,
+        'time_limit': 50,
+        'main_monster_1': Monster.uragaan,
+        'main_monster_2': Monster.diablos,
+        'location': LocationType.QUEST_LOCATION_LAND_ARENA_1,
+        'quest_rank': QuestRankType.star_3,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_18_INITJOIN,
+        'resources': ResourcesType.low_rank,
+        'supply_set_number': 43,
+        'starting_position': StartingPositionType.camp, 
+        'general_enemy_level': 0x001D,
+        'summon': 0x00000000,
+        'smallmonster_data_file': 'sm_bloodsport.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.uragaan,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x1D,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.diablos,
+            'boss_id': 0x0001,
+            'enabled': True,
+            'level': 0x1D,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000001,
+            'objective_type': Monster.uragaan,
+            'objective_num': 0x01,
+            'zenny_reward': 17600,
+            'hrp_reward': 1760,
+            'rewards_row_1': [(ItemsType.uragaan_scale, 1, 1), (ItemsType.diablos_ridge, 1, 14),
+                              (ItemsType.uragaan_shell, 1, 10), (ItemsType.diablos_shell, 1, 20),
+                              (ItemsType.twisted_horn, 1, 12), (ItemsType.diablos_marrow, 8, 9),
+                              (ItemsType.uragaan_marrow, 1, 9), (ItemsType.incomplete_plans, 1, 25)],
+            'rewards_row_2': [(ItemsType.uragaan_scale, 1, 1), (ItemsType.diablos_ridge, 1, 14),
+                              (ItemsType.uragaan_shell, 1, 10), (ItemsType.diablos_shell, 1, 20),
+                              (ItemsType.twisted_horn, 1, 12), (ItemsType.diablos_marrow, 1, 9),
+                              (ItemsType.uragaan_marrow, 1, 9), (ItemsType.incomplete_plans, 1, 25)],
+        },
+        'subquest_1': {
+            'description': "None",
+            'type': 0x00000001,
+            'objective_type': Monster.diablos,
+            'objective_num': 0x01,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+        'subquest_2': {
+            'description': "None",
+            'type': 0,
+            'objective_type': Monster.none,
+            'objective_num': 0,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+    },
+    'unknown': {
+        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x00000000,
+        'unk_10': 0x00010000,
+        'unk_11': 0x00000000,
+    }
+}
 
 """
 EVENT QUEST 2: Mercy Mission
-(INCOMPLETE) Invading monster not guaranteed to be Royal Ludroth.
+(INCOMPLETE) Invading monster is "faked" by hardcoding a Royal Ludroth from the start.
 """
-QUEST_EVENT_MERCY_MISSION = make_binary_event_quest(61002, "Mercy Mission", "MH3SP Dev Team", "Deliver 10 Monster Guts", generate_flags((0,0,0,0,0,0,0,0),(1,1,1,0,0,0,0,0),(0,0,0,0,0,0,0,0),(0,1,0,0,0,0,0,0)),  # quest id, name, client, description, flags
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    1500, 1200, 2000, 600, 150, 15, Monster.ludroth, Monster.epioth,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_D_ISLAND, QuestRankType.star_1, 70, QuestRestrictionType.RESTRICTION_NONE, ResourcesType.low_rank, 35,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000002, ItemsType.monster_guts, 0x0A,  # Main quest: type, target, number
-    "Deliver 12 Red Coral Stones", 0x00000002, ItemsType.red_coral_stone, 0x0C,  # Subquest 1: Description, type, target, number
-    "Deliver 3 Goldenfish", 0x00000002, ItemsType.goldenfish, 0x03,  # Subquest 2: Description, type, target, number
-    "Wanted:" + '\x0A' + "The description for this" + '\x0A' +
-        "quest! If you can find" + '\x0A' + "it, please let us know!" + '\x0A' +
-        "Thanks!",  # Quest details
-    StartingPositionType.camp, 0x0017, 0x00000003,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    55, 70, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x00000000, 0x00010000, 0x00000000, 0x64030303,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_mercymission.dat', # Small monster data
-    [(ItemsType.mystery_charm, 1, 8), (ItemsType.black_pearl, 1, 20), (ItemsType.honey, 2, 20), (ItemsType.armor_sphere, 1, 18),
-        (ItemsType.small_goldenfish, 1, 8), (ItemsType.machalite_ore, 8, 14), (ItemsType.steel_eg, 1, 12)],
-    [(ItemsType.mystery_charm, 1, 35), (ItemsType.aquaglow_jewel, 1, 5), (ItemsType.shining_charm, 1, 15), (ItemsType.armor_sphere, 1, 20),
-        (ItemsType.armor_sphere_plus, 1, 25)],
-    [(ItemsType.mystery_charm, 1, 8), (ItemsType.black_pearl, 1, 20), (ItemsType.honey, 2, 20), (ItemsType.armor_sphere, 1, 18),
-        (ItemsType.small_goldenfish, 1, 8), (ItemsType.machalite_ore, 1, 14), (ItemsType.steel_eg, 1, 12)],
-    [(ItemsType.mystery_charm, 1, 35), (ItemsType.aquaglow_jewel, 1, 5), (ItemsType.shining_charm, 1, 15), (ItemsType.armor_sphere, 1, 20),
-        (ItemsType.armor_sphere_plus, 1, 25)],
-    success_message="Complete the Main Quest"+'\x0A'+"and both Subquests.")
+QUEST_EVENT_MERCY_MISSION = {
+    'quest_info': {
+        'quest_id': 61002,
+        'name': "Mercy Mission",
+        'client': "MH3SP Dev Team",
+        'description': "Deliver 10 Monster Guts",
+        'details': "Wanted:" + '\x0A' + "The description for this" + '\x0A' +
+            "quest! If you can find" + '\x0A' + "it, please let us know!" + '\x0A' +
+            "Thanks!",
+        'success_message': "Complete the Main Quest"+'\x0A'+"and both Subquests.",
+        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,1,0,0,0,0,0),(0,0,0,0,0,0,0,0),(0,1,0,0,0,0,0,0)),
+        'penalty_per_cart': 600,
+        'quest_fee': 150,
+        'time_limit': 15,
+        'main_monster_1': Monster.ludroth,
+        'main_monster_2': Monster.epioth,
+        'location': LocationType.QUEST_LOCATION_D_ISLAND,
+        'quest_rank': QuestRankType.star_1,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_NONE,
+        'resources': ResourcesType.low_rank,
+        'supply_set_number': 35,
+        'starting_position': StartingPositionType.camp, 
+        'general_enemy_level': 0x0017,
+        'summon': 0x64030303,
+        'smallmonster_data_file': 'sm_mercymission.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.royal_ludroth,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x17,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000002,
+            'objective_type': ItemsType.monster_guts,
+            'objective_num': 0x0A,
+            'zenny_reward': 1500,
+            'hrp_reward': 70,
+            'rewards_row_1': [(ItemsType.mystery_charm, 1, 8), (ItemsType.black_pearl, 1, 20),
+                              (ItemsType.honey, 2, 20), (ItemsType.armor_sphere, 1, 18),
+                              (ItemsType.small_goldenfish, 1, 8), (ItemsType.machalite_ore, 8, 14),
+                              (ItemsType.steel_eg, 1, 12)],
+            'rewards_row_2': [(ItemsType.mystery_charm, 1, 35), (ItemsType.aquaglow_jewel, 1, 5),
+                              (ItemsType.shining_charm, 1, 15), (ItemsType.armor_sphere, 1, 20),
+                              (ItemsType.armor_sphere_plus, 1, 25)],
+        },
+        'subquest_1': {
+            'description': "Deliver 12 Red Coral Stones",
+            'type': 0x00000002,
+            'objective_type': ItemsType.red_coral_stone,
+            'objective_num': 0x0C,
+            'zenny_reward': 1200,
+            'hrp_reward': 55,
+            'rewards_row_1': [(ItemsType.mystery_charm, 1, 8), (ItemsType.black_pearl, 1, 20),
+                              (ItemsType.honey, 2, 20), (ItemsType.armor_sphere, 1, 18),
+                              (ItemsType.small_goldenfish, 1, 8), (ItemsType.machalite_ore, 1, 14),
+                              (ItemsType.steel_eg, 1, 12)],
+        },
+        'subquest_2': {
+            'description': "Deliver 3 Goldenfish",
+            'type': 0x00000002,
+            'objective_type': ItemsType.goldenfish,
+            'objective_num': 0x03,
+            'zenny_reward': 2000,
+            'hrp_reward': 70,
+            'rewards_row_1': [(ItemsType.mystery_charm, 1, 35), (ItemsType.aquaglow_jewel, 1, 5),
+                              (ItemsType.shining_charm, 1, 15), (ItemsType.armor_sphere, 1, 20),
+                              (ItemsType.armor_sphere_plus, 1, 25)],
+        },
+    },
+    'unknown': {
+        'unk_12': 0x00000003,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x00000000,
+        'unk_10': 0x00010000,
+        'unk_11': 0x00000000,
+    }
+}
 
 """
 EVENT QUEST 20: World Eater
 Quest description/rewards/etc from https://www.youtube.com/watch?v=Z6joazT8J78
 (INCOMPLETE) Needs invading queropeco
 """
-QUEST_EVENT_WORLD_EATER = make_binary_event_quest(61020, "World Eater", "Guildmaster", "Hunt a Deviljho", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,1,1)),  # quest id, name, client, description, flags
-    Monster.deviljho, 0x0000, True, 0x40, 0xC8, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    18000, 0, 0, 6000, 1800, 50, Monster.jaggi, Monster.jaggia,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_D_ISLAND, QuestRankType.urgent, 1800, QuestRestrictionType.RESTRICTION_51_INITJOIN, ResourcesType.high_rank, 31,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000001, Monster.deviljho, 0x01,  # Main quest: type, target, number
-    "None.", 0x00000000, Monster.none, 0x00,  # Subquest 1: Description, type, target, number
-    "None.", 0x00000000, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "Emergency! A huge Deviljho has" + '\x0A' + "appeared. It's twice as big as" + '\x0A' +
-        "a normal one and it's eating" + '\x0A' + "everything in sight! Go get" + '\x0A' +
-        "it! And now, a haiku: A huge" + '\x0A' + "Deviljho/with no food in its" + '\x0A' +
-        "stomach/eats the whole island.",  # Quest details
-    StartingPositionType.random, 0x0040, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x00000000, 0x00000000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_worldeater.dat', # Small monster data
-    [(ItemsType.timeworn_charm, 1, 33), (ItemsType.deviljho_gem, 1, 4), (ItemsType.deviljho_scalp, 1, 8), (ItemsType.deviljho_hide, 1, 17),
-        (ItemsType.hvy_armor_sphere, 1, 11), (ItemsType.shining_charm, 1, 19), (ItemsType.deviljho_fang, 1, 8)],
-    [(ItemsType.deviljho_scalp, 1, 20), (ItemsType.timeworn_charm, 1, 34), (ItemsType.deviljho_fang, 1, 6), (ItemsType.deviljho_hide, 1, 17),
-        (ItemsType.deviljho_gem, 1, 3), (ItemsType.shining_charm, 1, 11), (ItemsType.hvy_armor_sphere, 1, 9)],
-    [],
-    [])
+QUEST_EVENT_WORLD_EATER = {
+    'quest_info': {
+        'quest_id': 61020,
+        'name': "World Eater",
+        'client': "Guildmaster",
+        'description': "Hunt a Deviljho",
+        'details': "Emergency! A huge Deviljho has" + '\x0A' + "appeared. It's twice as big as" + '\x0A' +
+            "a normal one and it's eating" + '\x0A' + "everything in sight! Go get" + '\x0A' +
+            "it! And now, a haiku: A huge" + '\x0A' + "Deviljho/with no food in its" + '\x0A' +
+            "stomach/eats the whole island.",
+        'success_message': "Complete the Main Quest.",
+        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,1,1)),
+        'penalty_per_cart': 6000,
+        'quest_fee': 1800,
+        'time_limit': 50,
+        'main_monster_1': Monster.jaggi,
+        'main_monster_2': Monster.jaggia,
+        'location': LocationType.QUEST_LOCATION_D_ISLAND,
+        'quest_rank': QuestRankType.urgent,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_51_INITJOIN,
+        'resources': ResourcesType.high_rank,
+        'supply_set_number': 31,
+        'starting_position': StartingPositionType.random, 
+        'general_enemy_level': 0x0040,
+        'summon': 0x00000000,
+        'smallmonster_data_file': 'sm_worldeater.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.deviljho,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x40,  # 0x01 through 0x3c
+            'size': 0xC8,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000001,
+            'objective_type': Monster.deviljho,
+            'objective_num': 0x01,
+            'zenny_reward': 18000,
+            'hrp_reward': 1800,
+            'rewards_row_1': [(ItemsType.timeworn_charm, 1, 33), (ItemsType.deviljho_gem, 1, 4),
+                              (ItemsType.deviljho_scalp, 1, 8), (ItemsType.deviljho_hide, 1, 17),
+                              (ItemsType.hvy_armor_sphere, 1, 11), (ItemsType.shining_charm, 1, 19),
+                              (ItemsType.deviljho_fang, 1, 8)],
+            'rewards_row_2': [(ItemsType.deviljho_scalp, 1, 20), (ItemsType.timeworn_charm, 1, 34),
+                              (ItemsType.deviljho_fang, 1, 6), (ItemsType.deviljho_hide, 1, 17),
+                              (ItemsType.deviljho_gem, 1, 3), (ItemsType.shining_charm, 1, 11),
+                              (ItemsType.hvy_armor_sphere, 1, 9)],
+        },
+        'subquest_1': {
+            'description': "None",
+            'type': 0x00000000,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+        'subquest_2': {
+            'description': "None",
+            'type': 0x00000000,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+    },
+    'unknown': {
+        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x00000000,
+        'unk_10': 0x00000000,
+        'unk_11': 0x00000000,
+    }
+}
 
 """
 EVENT QUEST 20: Where Gods Fear To Tread
@@ -1487,96 +1996,207 @@ Quest description from https://www.youtube.com/watch?v=mQHTdPRlD1w,
     thanks to "soulmizute, emperor of the abyss#5094"
     and "El Matiah#8904"
 """
-QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = make_binary_event_quest(61021, "Where Gods Fear to Tread", "Scarlet Mystery Man", "Slay the Alatreon", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,0,0,0,0,1,0)),  # quest id, name, client, description, flags
-    Monster.alatreon, 0x0000, True, 0x40, 0x7D, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    42000, 0, 0, 14000, 4200, 50, Monster.none, Monster.none,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_SACRED_LAND, QuestRankType.urgent, 4200, QuestRestrictionType.RESTRICTION_51_INITJOIN, ResourcesType.high_rank, 0,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000101, Monster.alatreon, 0x01,  # Main quest: type, target, number
-    "None", 0x00000000, Monster.none, 0x00,  # Subquest 1: Description, type, target, number
-    "None", 0x00000000, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "I've been waiting, hunter. Now" + '\x0A' + "comes your final challenge:" + '\x0A' +
-        "Alatreon, a dragon of darkness" + '\x0A' + "and light. Can mere mortals" + '\x0A' +
-        "fell an elder dragon feared" + '\x0A' + "even by the gods? Don't even" + '\x0A' +
-        "bother saying your prayers...",  # Quest details
-    StartingPositionType.shrine, 0x0040, 0x00000005,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x00000000, 0x00000000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_wheregodsfeartotread.dat', # Small monster data
-    [(ItemsType.alatreon_scute, 1, 40), (ItemsType.brkn_skypiercer, 1, 30), (ItemsType.alatreon_talon, 1, 10), (ItemsType.alatreon_plate, 1, 10),
-        (ItemsType.skypiercer, 1, 5), (ItemsType.azure_dragongem, 1, 5)],
-    [(ItemsType.alatreon_plate, 1, 11), (ItemsType.brkn_skypiercer, 1, 34), (ItemsType.alatreon_talon, 1, 39), (ItemsType.elderdragonblood, 1, 6),
-        (ItemsType.skypiercer, 1, 5), (ItemsType.azure_dragongem, 1, 5)],
-    [],
-    [])
+QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
+    'quest_info': {
+        'quest_id': 61021,
+        'name': "Where Gods Fear to Tread",
+        'client': "Scarlet Mystery Man",
+        'description': "Slay the Alatreon",
+        'details': "I've been waiting, hunter. Now" + '\x0A' + "comes your final challenge:" + '\x0A' +
+            "Alatreon, a dragon of darkness" + '\x0A' + "and light. Can mere mortals" + '\x0A' +
+            "fell an elder dragon feared" + '\x0A' + "even by the gods? Don't even" + '\x0A' +
+            "bother saying your prayers...",
+        'success_message': "Complete the Main Quest.",
+        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,0,0,0,0,1,0)),
+        'penalty_per_cart': 14000,
+        'quest_fee': 4200,
+        'time_limit': 50,
+        'main_monster_1': Monster.none,
+        'main_monster_2': Monster.none,
+        'location': LocationType.QUEST_LOCATION_SACRED_LAND,
+        'quest_rank': QuestRankType.urgent,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_51_INITJOIN,
+        'resources': ResourcesType.high_rank,
+        'supply_set_number': 0,
+        'starting_position': StartingPositionType.shrine, 
+        'general_enemy_level': 0x0040,
+        'summon': 0x00000000,
+        'smallmonster_data_file': 'sm_wheregodsfeartotread.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.alatreon,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x40,  # 0x01 through 0x3c
+            'size': 0x7D,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.none,
+            'boss_id': 0x0000,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000101,
+            'objective_type': Monster.alatreon,
+            'objective_num': 0x01,
+            'zenny_reward': 42000,
+            'hrp_reward': 4200,
+            'rewards_row_1': [(ItemsType.alatreon_scute, 1, 40), (ItemsType.brkn_skypiercer, 1, 30),
+                              (ItemsType.alatreon_talon, 1, 10), (ItemsType.alatreon_plate, 1, 10),
+                              (ItemsType.skypiercer, 1, 5), (ItemsType.azure_dragongem, 1, 5)],
+            'rewards_row_2': [(ItemsType.alatreon_plate, 1, 11), (ItemsType.brkn_skypiercer, 1, 34),
+                              (ItemsType.alatreon_talon, 1, 39), (ItemsType.elderdragonblood, 1, 6),
+                              (ItemsType.skypiercer, 1, 5), (ItemsType.azure_dragongem, 1, 5)],
+        },
+        'subquest_1': {
+            'description': "None",
+            'type': 0x00000000,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+        'subquest_2': {
+            'description': "None",
+            'type': 0x00000000,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+    },
+    'unknown': {
+        'unk_12': 0x00000005,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x00000000,
+        'unk_10': 0x00000000,
+        'unk_11': 0x00000000,
+    }
+}
 
-QUEST_EVENT_GREEN_EGGS = make_binary_event_quest(61050, "[MH3SP] Green Eggs and...", "Ze SpyRo", "Hunt a Gigginox" + '\x0A' + "and an Agnaktor", generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),  # quest id, name, client, description, flags
-    Monster.gigginox, 0x0000, True, 0x1B, 0x64, 0x00, 0x03,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.agnaktor, 0x0001, True, 0x1B, 0x64, 0x00, 0x03,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0002, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    7000, 5, 0, 2400, 200, 50, Monster.gigginox, Monster.agnaktor,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_LAND_ARENA_1, QuestRankType.star_3, 950, QuestRestrictionType.RESTRICTION_18_INITJOIN, ResourcesType.low_rank, 43,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000001, Monster.gigginox, 0x01,  # Main quest: type, target, number
-    "None", 0x00000001, Monster.agnaktor, 0x01,  # Subquest 1: Description, type, target, number
-    "None", None, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "Why do we live, only to suffer?" + '\x0A' + "Only slayers of pig meat know" + '\x0A' +
-        "these things. Take care, Hunter," + '\x0A' + "for those who look to antidote" + '\x0A' +
-        "herbs may find their breath" + '\x0A' + "stolen away.",  # Quest details
-    StartingPositionType.camp, 0x001B, 0x00000002,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000000, 0x00000000, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x00000000, 0x00000000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_emptylandarena.dat', # Small monster data
-    [(ItemsType.flabby_hide, 1, 18), (ItemsType.uncanny_hide, 1, 6), (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 15),
-        (ItemsType.agnaktor_shell, 1, 10), (ItemsType.agnaktor_scale, 1, 16), (ItemsType.agnaktor_hide, 1, 13), (ItemsType.agnaktor_fin, 1, 6),
-        (ItemsType.agnaktor_beak, 1, 5)],
-    [(ItemsType.flabby_hide, 1, 13), (ItemsType.uncanny_hide, 1, 6), (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 10),
-        (ItemsType.agnaktor_shell, 1, 9), (ItemsType.agnaktor_scale, 1, 10), (ItemsType.agnaktor_hide, 1, 10), (ItemsType.agnaktor_fin, 1, 6),
-        (ItemsType.agnaktor_beak, 1, 5), (ItemsType.commendation, 1, 20)],
-    [],
-    [])
-
-QUEST_EVENT_DESERT_BUS = make_binary_event_quest(61051, "Desert Bus", "Ze SpyRo", "Deliver 100 Herbivore Eggs", generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(0,1,0,0,0,0,1,1)),  # quest id, name, client, description, flags
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    7000, 5, 0, 2400, 200, 180, Monster.none, Monster.none,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_SANDY_PLAINS, QuestRankType.star_1, 550, QuestRestrictionType.RESTRICTION_NO_ARMOR, ResourcesType.low_rank, 0x0000002C,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000002, 395, 0x64,  # Main quest: type, target, number
-    "Deliver 1 Herbivore Egg", 0x00000002, 395, 0x01,  # Subquest 1: Description, type, target, number
-    "None", None, Monster.none, 0x00,  # Subquest 2: Description, type, target, number
-    "Death." + '\x0A' + "Death, and taxes." + '\x0A' +
-        "Death, taxes, and Herbivore Eggs." + '\x0A' + "Look to your sins, Hunter.",  # Quest details
-    StartingPositionType.camp, 0x0019, 0x00000003,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000050, 0x00000064, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x0002018B, 0x00010000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_desertbus.dat', # Small monster data
-    [(ItemsType.dung, 4, 50), (ItemsType.garbage, 3, 50)],
-    [(ItemsType.dung, 1, 50), (ItemsType.garbage, 1, 50)],
-    [(ItemsType.garbage, 1, 100)],
-    [])
-
-QUEST_EVENT_DEBUG = make_binary_event_quest(61052, "Potion Bus", "Ze SpyRo", "Deliver 1 Potion", generate_flags((0,0,1,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(0,1,0,0,0,0,0,0)),  # quest id, name, client, description, flags
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 1:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 2:  type, boss id, enabled, level, size, min, max
-    Monster.none, 0x0000, False, 0x00, 0x00, 0x00, 0x00,  # monster 3:  type, boss id, enabled, level, size, min, max
-    3, 0, 0, 1, 5, 55, Monster.none, Monster.none,  # main reward, sub1 reward, sub2 reward, cart penalty, quest fee, time limit, mainmonst1, mainmonst2
-    LocationType.QUEST_LOCATION_SANDY_PLAINS, QuestRankType.star_2, 10, QuestRestrictionType.RESTRICTION_9_INITJOIN, ResourcesType.low_rank, 0x0000002C,  # location, quest rank, hrp reward, rank requirement, resources type, supply set number
-    0x00000002, ItemsType.potion, 0x01,  # Main quest: type, target, number
-    "Deliver 1 Herb", 0x00000002, ItemsType.herb, 0x01,  # Subquest 1: Description, type, target, number
-    "Deliver 1 Whetstone", 0x00000002, ItemsType.whetstone, 0x01,  # Subquest 2: Description, type, target, number
-    "Debug debug debug!!!!",  # Quest details
-    StartingPositionType.camp, 0x0019, 0x00000003,  # Start position, general enemy level, unk_12 (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
-    0x00000050, 0x00000064, 0x00, 0x00, 0x00, 0x00000000,  # Subquest1 HRP, Subquest2 HRP, Unknown 4, Unknown 5, Unknown 6, Unknown 7
-    0x0002018B, 0x00010000, 0x00000000, 0x00000000,  # Unknown 9, Unknown 10, Unknown 11, Summon
-    'sm_desertbus.dat', # Small monster data
-    [(ItemsType.earth_crystal, 4, 50), (ItemsType.machalite_ore, 3, 25), (ItemsType.iron_ore, 2, 15), (ItemsType.stone, 4, 3),
-        (ItemsType.garbage, 2, 2), (ItemsType.iron_pickaxe, 2, 1), (ItemsType.jagi_scale, 2, 1), (ItemsType.jagi_hide, 2, 1),
-        (ItemsType.potion, 2, 1), (ItemsType.raw_meat, 2, 1)],
-    [(ItemsType.earth_crystal, 4, 50), (ItemsType.machalite_ore, 3, 25), (ItemsType.iron_ore, 2, 15), (ItemsType.stone, 4, 3),
-        (ItemsType.garbage, 2, 1), (ItemsType.iron_pickaxe, 2, 1), (ItemsType.jagi_scale, 2, 1), (ItemsType.jagi_hide, 2, 1),
-        (ItemsType.potion, 2, 1), (ItemsType.raw_meat, 2, 1), (ItemsType.monster_bone_s, 2, 1)],
-    [(ItemsType.earth_crystal, 4, 50), (ItemsType.machalite_ore, 3, 25), (ItemsType.iron_ore, 2, 15), (ItemsType.stone, 4, 3),
-        (ItemsType.garbage, 2, 1), (ItemsType.iron_pickaxe, 2, 1), (ItemsType.jagi_scale, 2, 1), (ItemsType.jagi_hide, 2, 1),
-        (ItemsType.potion, 2, 1), (ItemsType.raw_meat, 2, 1), (ItemsType.monster_bone_s, 2, 1)],
-    [])
+QUEST_EVENT_GREEN_EGGS = {
+    'quest_info': {
+        'quest_id': 61050,
+        'name': "[MH3SP] Green Eggs and...",
+        'client': "Ze SpyRo",
+        'description': "Hunt a Gigginox" + '\x0A' + "and an Agnaktor",
+        'details': "Why do we live, only to suffer?" + '\x0A' + "Only slayers of pig meat know" + '\x0A' +
+            "these things. Take care, Hunter," + '\x0A' + "for those who look to antidote" + '\x0A' +
+            "herbs may find their breath" + '\x0A' + "stolen away.",
+        'success_message': "Complete the Main Quest.",
+        'flags': generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),
+        'penalty_per_cart': 2400,
+        'quest_fee': 200,
+        'time_limit': 50,
+        'main_monster_1': Monster.gigginox,
+        'main_monster_2': Monster.agnaktor,
+        'location': LocationType.QUEST_LOCATION_LAND_ARENA_1,
+        'quest_rank': QuestRankType.star_3,
+        'hrp_restriction': QuestRestrictionType.RESTRICTION_18_INITJOIN,
+        'resources': ResourcesType.low_rank,
+        'supply_set_number': 43,
+        'starting_position': StartingPositionType.camp, 
+        'general_enemy_level': 0x001B,
+        'summon': 0x00000000,
+        'smallmonster_data_file': 'sm_emptylandarena.dat',
+    },
+    'large_monsters': {
+        'monster_1': {
+            'type': Monster.gigginox,
+            'boss_id': 0x0000,
+            'enabled': True,
+            'level': 0x1B,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_2': {
+            'type': Monster.agnaktor,
+            'boss_id': 0x0001,
+            'enabled': True,
+            'level': 0x1B,  # 0x01 through 0x3c
+            'size': 0x64,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03  # controls the spread of size but details unknown
+        },
+        'monster_3': {
+            'type': Monster.none,
+            'boss_id': 0x0002,
+            'enabled': False,
+            'level': 0x00,  # 0x01 through 0x3c
+            'size': 0x00,
+            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00  # controls the spread of size but details unknown
+        }
+    },
+    'objective_details': {
+        'main_quest': {
+            'type': 0x00000001,
+            'objective_type': Monster.gigginox,
+            'objective_num': 0x01,
+            'zenny_reward': 7000,
+            'hrp_reward': 950,
+            'rewards_row_1': [(ItemsType.flabby_hide, 1, 18), (ItemsType.uncanny_hide, 1, 6),
+                              (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 15),
+                              (ItemsType.agnaktor_shell, 1, 10), (ItemsType.agnaktor_scale, 1, 16),
+                              (ItemsType.agnaktor_hide, 1, 13), (ItemsType.agnaktor_fin, 1, 6),
+                              (ItemsType.agnaktor_beak, 1, 5)],
+            'rewards_row_2': [(ItemsType.flabby_hide, 1, 13), (ItemsType.uncanny_hide, 1, 6),
+                              (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 10),
+                              (ItemsType.agnaktor_shell, 1, 9), (ItemsType.agnaktor_scale, 1, 10),
+                              (ItemsType.agnaktor_hide, 1, 10), (ItemsType.agnaktor_fin, 1, 6),
+                              (ItemsType.agnaktor_beak, 1, 5), (ItemsType.commendation, 1, 20)],
+        },
+        'subquest_1': {
+            'description': "None",
+            'type': 0x00000001,
+            'objective_type': Monster.agnaktor,
+            'objective_num': 0x01,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+        'subquest_2': {
+            'description': "None",
+            'type': 0,
+            'objective_type': Monster.none,
+            'objective_num': 0x00,
+            'zenny_reward': 0,
+            'hrp_reward': 0x00000000,
+            'rewards_row_1': [],
+        },
+    },
+    'unknown': {
+        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_4': 0x00,
+        'unk_5': 0x00,
+        'unk_6': 0x00,
+        'unk_7': 0x00000000,
+        'unk_9': 0x00000000,
+        'unk_10': 0x00000000,
+        'unk_11': 0x00000000,
+    }
+}
