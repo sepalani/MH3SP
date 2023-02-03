@@ -453,7 +453,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチングオプション設定返答
         TR: Match option settings response
         """
-
         is_standby = 'is_standby' in options and \
             pati.unpack_byte(options.is_standby) == 1
 
@@ -489,7 +488,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルデータ取得返答
         TR: Circle data acquisition reply
         """
-
         city = self.session.get_city()
 
         # TODO: Verify circle index
@@ -743,7 +741,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークル解散通知
         TR: Circle dissolution notice
         """
-
         # Unknown field but it doesn't matter because the client ignores it
         unk1 = 0
 
@@ -758,7 +755,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルからキック通知
         TR: Kick notification from the circle
         """
-
         # Unknown field but it doesn't matter because the client ignores them
         unk1 = 0
         unk2 = b""
@@ -836,7 +832,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング開始通知
         TR: Matching start notification
         """
-
         circle = self.session.get_circle()
         circle.departed = True
 
@@ -878,7 +873,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング終了要求
         TR: Matching end request
         """
-
         unk, = struct.unpack_from(">B", data)
         # unk is a bolean, but is unknown what it represent
 
@@ -891,17 +885,19 @@ class FmpRequestHandler(PatRequestHandler):
         JP: マッチング終了返答
         TR: Matching end reply
         """
-
         self.send_packet(PatID4.AnsCircleMatchEnd, b"", seq)
 
     def sendNtcCircleListLayerDelete(self, circle, seq):
-        """NtcCircleMatchStart packet.
+        """NtcCircleListLayerDelete packet.
 
         ID: 65831000
         JP: サークル削除通知 (レイヤ)
         TR: Circle deletion notification (layer)
-        """
 
+        It can be sent when leaving a circle (alongside AnsCircleLeave).
+
+        TODO: Use it. This function is currently implemented but unused.
+        """
         circle_index = circle.parent.circles.index(circle) + 1
         ntc_data = struct.pack(">I", circle_index)
         self.server.layer_broadcast(self.session,
@@ -915,7 +911,6 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークル変更通知 (レイヤ)
         TR: Circle change notification (layer)
         """
-
         ntc_data = struct.pack(">I", circle_index)
         ntc_data += pati.CircleInfo.pack_from(circle, circle_index)
 
