@@ -19,12 +19,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from os import path
 import struct
 import ctypes
 from other.utils import pad
+from mh.equipment_utils import create_arena_equipment_set
 
 
-# LocationType enum
 class LocationType:
     QUEST_LOCATION_NONE = 0
     QUEST_LOCATION_D_ISLAND = 1
@@ -39,6 +40,7 @@ class LocationType:
     QUEST_LOCATION_WATER_ARENA_1 = 10
     QUEST_LOCATION_SACRED_LAND = 11
     QUEST_LOCATION_WATER_ARENA_2 = 12
+
 
 class Monster:
     none = 0
@@ -91,6 +93,7 @@ class Monster:
     nptron = 47
     fish = 48
 
+
 class QuestRankType:
     none = 0
     star_1 = 1
@@ -99,6 +102,7 @@ class QuestRankType:
     star_4 = 4
     star_5 = 5
     urgent = 6
+
 
 class ItemsType:
     none = 0
@@ -849,15 +853,18 @@ class ItemsType:
     dung_jewel = 745
     torchlight_jewel = 746
 
+
 class ResourcesType:
     low_rank = 0x0000
     high_rank = 0x0001
     arena = 0x0002
 
+
 class StartingPositionType:
     camp = 0x00
     random = 0x01
     shrine = 0x02
+
 
 class QuestRestrictionType:
     RESTRICTION_NONE = 0
@@ -887,6 +894,7 @@ class QuestRestrictionType:
     RESTRICTION_27_JOIN = 24
     RESTRICTION_35_JOIN = 25
     RESTRICTION_46_JOIN = 26
+
 
 def make_monster_quest_type(monster_type, boss_id, enabled, level, min, size, max):
     data = b""
@@ -924,6 +932,7 @@ def make_monster_quest_type(monster_type, boss_id, enabled, level, min, size, ma
 
     return data
 
+
 def make_quest_properties_type(type, objective_type, objective_count):
     data = b""
     #- id: type
@@ -939,6 +948,7 @@ def make_quest_properties_type(type, objective_type, objective_count):
     data += struct.pack(">h", objective_count)
 
     return data
+
 
 def make_reward_type(item, amount, percent):
     data = b""
@@ -956,6 +966,7 @@ def make_reward_type(item, amount, percent):
     data += struct.pack(">B", percent)
 
     return data
+
 
 def generate_rewards(rewards):
     data = b""
@@ -1402,10 +1413,24 @@ def make_binary_event_quest(quest_data):
     data += b'\0' * (4 * 11)
 
     assert len(data) == 0x4B4
-    try:
-        data += read_quest_sm_data(quest_info['smallmonster_data_file'])
-    except Exception as e:
-        pass
+
+    # Add 2-byte tail between the main quest info and the small monster data that
+    # describes how many bytes total the quest takes up before the optional
+    # arena equipment data
+    tail = 0x4B4 + 4
+    sm_data = read_quest_sm_data(quest_info['smallmonster_data_file'])
+    if sm_data is not None:
+        tail += len(sm_data) - 4
+        data += struct.pack(">I", tail)
+        data += sm_data[4:]
+    else:
+        data += struct.pack(">I", tail)
+
+    # If there is arena equipment data, add it to the end of the quest binary
+    if 'arena_equipment' in quest_data:
+        assert 0xEA60 <= quest_info['quest_id'] <= 0xEA6B, \
+               "Invalid arena quest ID: {:#x}".format(quest_info['quest_id'])
+        data += create_arena_equipment_set(quest_data['arena_equipment'])
 
     return data
 
@@ -1415,7 +1440,7 @@ def make_binary_event_quest(quest_data):
 # byte 1: Boss Order 1 (+1: Unknown1  +2: All At Once(CombineSubquestsRequireMQAndFirstSubquest)  +4: Marathon (CombineSubquestsRequireMQAndBothSubquests) +8: Unknown4  +16: Unknown5  +32: Unknown6  +64: Unknown7  +128: CombineMainAndSubquests)
 # byte 2: Boss Order 2 (+1: Unknown1  +2: Unknown2  +4: RequireMQAndBothSubquests  +8: Unknown4  +16: QualifyingTime  +32: DontAnnounceSubquestCompletion  +64: Unknown7  +128: ElderDragonLeftWounded)
 # byte 3: Boss Order 3 (+1: 2Mon_NoSubs_ReqSub1_Unstable  +2: Unknown2  +4: Unknown3  +8: BanjoMusic  +16: Unknown5  +32: Unknown6  +64: Unknown7  +128: Unknown8)
-# byte 4: Quest Flags (+1: Slay  +2: Deliver  +4: Capture  +8: Defend  +16: Unknown1  +32: Unknown2  +64: Repel(EndAtMainQuest)  +128: Unknown3)
+# byte 4: Quest Flags (+1: Slay  +2: Deliver  +4: Capture  +8: Defend  +16: ArenaQuest  +32: Unknown2  +64: Repel(EndAtMainQuest)  +128: Unknown3)
 def generate_flags(byte1, byte2, byte3, byte4):
     res = 0x00000000
 
@@ -1441,8 +1466,12 @@ def generate_flags(byte1, byte2, byte3, byte4):
 
     return res
 
+
 def read_quest_sm_data(fname):
-    with open('event/'+fname) as f:
+    data_path = path.join("event", fname)
+    if not path.exists(data_path):
+        return None
+    with open(data_path, 'r') as f:
         data = f.read()
     return bytearray.fromhex(data.replace(" ","").replace("\n",""))
 
