@@ -693,61 +693,62 @@ class CircleInfo(PatData):
 
     @staticmethod
     def pack_from(circle, circle_index):
-        circle_info = CircleInfo()
-        circle_info.index = Long(circle_index)
+        with circle.lock():
+            circle_info = CircleInfo()
+            circle_info.index = Long(circle_index)
 
-        if not circle.is_empty():
+            if not circle.is_empty():
 
-            # circle_info.unk_string_0x02 = pati.String("192.168.23.1")
+                # circle_info.unk_string_0x02 = pati.String("192.168.23.1")
 
-            if circle.has_password():
-                circle_info.has_password = Byte(1)
-                circle_info.password = String(circle.password)
+                if circle.has_password():
+                    circle_info.has_password = Byte(1)
+                    circle_info.password = String(circle.password)
 
-            party_members = bytearray(0x88)
-            for i, player in circle.players:
-                start_offset = 0x10 * i
-                end_offset = start_offset + 0x10
+                party_members = bytearray(0x88)
+                for i, player in circle.players:
+                    start_offset = 0x10 * i
+                    end_offset = start_offset + 0x10
 
-                # TODO: Shouldn't we use bytes instead?
-                party_members[start_offset:end_offset] = \
-                    pad(player.capcom_id.encode('ascii'), 0x10)
+                    # TODO: Shouldn't we use bytes instead?
+                    party_members[start_offset:end_offset] = \
+                        pad(player.capcom_id.encode('ascii'), 0x10)
 
-                party_members[start_offset+0x40:end_offset+0x40] = \
-                    pad(player.hunter_name, 0x10)
+                    party_members[start_offset+0x40:end_offset+0x40] = \
+                        pad(player.hunter_name, 0x10)
 
-                party_members[0x80+i] = player.hunter_info.weapon_type()
+                    party_members[0x80+i] = player.hunter_info.weapon_type()
 
-                # TODO: Discover flag meaning?
-                party_members[0x84+i] = 0xff
+                    # TODO: Discover flag meaning?
+                    party_members[0x84+i] = 0xff
 
-            circle_info.party_members = Binary(party_members)
+                circle_info.party_members = Binary(party_members)
 
-            if circle.remarks is not None:
-                circle_info.remarks = String(circle.remarks)
+                if circle.remarks is not None:
+                    circle_info.remarks = String(circle.remarks)
 
-            # Number of players currently in the quest
-            circle_info.player_count = Long(len(circle.players))
+                # Number of players currently in the quest
+                circle_info.player_count = Long(len(circle.players))
 
-            # circle_info.unk_long_0x08 = Long(3)
+                # circle_info.unk_long_0x08 = Long(3)
 
-            circle_info.capacity = Long(circle.get_capacity())
+                circle_info.capacity = Long(circle.get_capacity())
 
-            # circle_info.unk_long_0x0a = Long(5)
-            # circle_info.unk_long_0x0b = Long(6)
-            circle_info.index2 = Long(circle_index)  # TODO: Verify this
+                # circle_info.unk_long_0x0a = Long(5)
+                # circle_info.unk_long_0x0b = Long(6)
+                circle_info.index2 = Long(circle_index)  # TODO: Verify this
 
-            circle_info.leader_capcom_id = String(circle.leader.capcom_id)
+                circle_info.leader_capcom_id = String(circle.leader.capcom_id)
 
-            circle_info.unk_byte_0x0e = Byte(circle.unk_byte_0x0e)
-            circle_info.not_joinable = Byte(int(not circle.is_joinable()))
-            # circle_info.unk_byte_0x10 = pati.Byte(1)
+                circle_info.unk_byte_0x0e = Byte(circle.unk_byte_0x0e)
+                circle_info.not_joinable = Byte(int(not circle.is_joinable()))
+                # circle_info.unk_byte_0x10 = pati.Byte(1)
 
-        # TODO: Other optional fields
-        optional_fields = [
-            (1, circle.get_capacity()),
-            (2, circle.quest_id)
-        ]
+            # TODO: Other optional fields
+            optional_fields = [
+                (1, circle.get_capacity()),
+                (2, circle.quest_id)
+            ]
 
         return circle_info.pack() + pack_optional_fields(optional_fields)
 

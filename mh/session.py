@@ -309,15 +309,15 @@ class Session(object):
             return None, None
 
         circle = self.get_circle()
-        if circle.leader != self or circle.get_population() <= 1 or not circle.departed:
+        with circle.lock(), circle.players.lock():
+            if circle.leader != self or circle.get_population() <= 1 or not circle.departed:
+                return None, None
+            for i, player in circle.players:
+                if player == self:
+                    continue
+                circle.leader = player
+                return i, player
             return None, None
-
-        for i, player in circle.players:
-            if player == self:
-                continue
-            circle.leader = player
-            return i, player
-        return None, None
 
     def join_circle(self, circle_id):
         # TODO: Move this to the database
@@ -344,13 +344,14 @@ class Session(object):
     def leave_circle(self):
         # TODO: Move this to the database
         circle = self.get_circle()
-        self.local_info['circle_id'] = None
-        self.state = SessionState.CITY
+        with circle.lock():
+            self.local_info['circle_id'] = None
+            self.state = SessionState.CITY
 
-        if circle.leader == self:
-            circle.reset()
-        else:
-            circle.players.remove(self)
+            if circle.leader == self:
+                circle.reset()
+            else:
+                circle.players.remove(self)
 
     def get_layer_players(self):
         if self.layer == 0:
