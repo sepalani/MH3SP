@@ -25,7 +25,7 @@ from mh.time_utils import current_server_time, TICKS_PER_CYCLE, get_jhen_event_t
     is_jhen_active
 from mh.quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
     QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
-    QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS, get_quest_name
+    QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS, make_binary_event_quest
 
 
 def make_binary_type_time_events():
@@ -176,14 +176,19 @@ def make_binary_npc_greeters(is_jap=False):
         material_shop = b"Prices are normal."
         event_quests = b""
 
+    QUEST_LIST = (
+        QUEST_EVENT_JUMP_FOUR_JAGGI,
+        QUEST_EVENT_BLOOD_SPORT,
+        QUEST_EVENT_MERCY_MISSION,
+        QUEST_EVENT_THE_PHANTOM_URAGAAN,
+        QUEST_EVENT_WORLD_EATER,
+        QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD,
+        QUEST_EVENT_GREEN_EGGS
+    )
+
     event_quests += b"\n".join([
-        get_quest_name(QUEST_EVENT_JUMP_FOUR_JAGGI),
-        get_quest_name(QUEST_EVENT_BLOOD_SPORT),
-        get_quest_name(QUEST_EVENT_MERCY_MISSION),
-        get_quest_name(QUEST_EVENT_THE_PHANTOM_URAGAAN),
-        get_quest_name(QUEST_EVENT_WORLD_EATER),
-        get_quest_name(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD),
-        get_quest_name(QUEST_EVENT_GREEN_EGGS)
+        quest['quest_info']['name'].encode("ascii")
+        for quest in QUEST_LIST
     ])
 
     guildmaster_str = (
@@ -321,31 +326,31 @@ PAT_BINARIES = {
     },
     0x06: {  # English
         "version": 1,
-        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
+        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
     },
     0x07: {  # English
         "version": 1,
-        "content": QUEST_EVENT_BLOOD_SPORT
+        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
     },
     0x08: {  # English
         "version": 1,
-        "content": QUEST_EVENT_MERCY_MISSION
+        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
     },
     0x09: {  # English
         "version": 1,
-        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
+        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
     },
     0x0a: {  # Japanese(?)English
         "version": 1,
-        "content": QUEST_EVENT_WORLD_EATER
+        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
     },
     0x0b: {  # Japanese(?)English
         "version": 1,
-        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
     },
     0x0c: {  # Japanese(?)English
         "version": 1,
-        "content": QUEST_EVENT_GREEN_EGGS
+        "content": make_binary_event_quest(QUEST_EVENT_GREEN_EGGS)
     },
     0x0d: {  # Japanese(?)English
         "version": 1,
@@ -381,31 +386,31 @@ PAT_BINARIES = {
     },
     0x15: {  # French
         "version": 1,
-        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
+        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
     },
     0x16: {  # French
         "version": 1,
-        "content": QUEST_EVENT_BLOOD_SPORT
+        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
     },
     0x17: {  # French
         "version": 1,
-        "content": QUEST_EVENT_MERCY_MISSION
+        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
     },
     0x18: {  # French
         "version": 1,
-        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
+        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
     },
     0x19: {  # French
         "version": 1,
-        "content": QUEST_EVENT_WORLD_EATER
+        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
     },
     0x1a: {  # French
         "version": 1,
-        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
     },
     0x1b: {  # French
         "version": 1,
-        "content": QUEST_EVENT_GREEN_EGGS
+        "content": make_binary_event_quest(QUEST_EVENT_GREEN_EGGS)
     },
     0x1c: {  # French
         "version": 1,
@@ -441,31 +446,31 @@ PAT_BINARIES = {
     },
     0x24: {  # German
         "version": 1,
-        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
+        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
     },
     0x25: {  # German
         "version": 1,
-        "content": QUEST_EVENT_BLOOD_SPORT
+        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
     },
     0x26: {  # German
         "version": 1,
-        "content": QUEST_EVENT_MERCY_MISSION
+        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
     },
     0x27: {  # German
         "version": 1,
-        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
+        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
     },
     0x28: {  # German
         "version": 1,
-        "content": QUEST_EVENT_WORLD_EATER
+        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
     },
     0x29: {  # German
         "version": 1,
-        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
     },
     0x2a: {  # German
         "version": 1,
-        "content": QUEST_EVENT_GREEN_EGGS
+        "content": make_binary_event_quest(QUEST_EVENT_GREEN_EGGS)
     },
     0x2b: {  # German
         "version": 1,
@@ -501,31 +506,31 @@ PAT_BINARIES = {
     },
     0x33: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
+        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
     },
     0x34: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_BLOOD_SPORT
+        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
     },
     0x35: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_MERCY_MISSION
+        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
     },
     0x36: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
+        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
     },
     0x37: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_WORLD_EATER
+        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
     },
     0x38: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
     },
     0x39: {  # Italian
         "version": 1,
-        "content": QUEST_EVENT_GREEN_EGGS
+        "content": make_binary_event_quest(QUEST_EVENT_GREEN_EGGS)
     },
     0x3a: {  # Italian
         "version": 1,
@@ -561,31 +566,31 @@ PAT_BINARIES = {
     },
     0x42: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_JUMP_FOUR_JAGGI
+        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
     },
     0x43: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_BLOOD_SPORT
+        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
     },
     0x44: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_MERCY_MISSION
+        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
     },
     0x45: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_THE_PHANTOM_URAGAAN
+        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
     },
     0x46: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_WORLD_EATER
+        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
     },
     0x47: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
     },
     0x48: {  # Spanish
         "version": 1,
-        "content": QUEST_EVENT_GREEN_EGGS
+        "content": make_binary_event_quest(QUEST_EVENT_GREEN_EGGS)
     },
     0x49: {  # Spanish
         "version": 1,
