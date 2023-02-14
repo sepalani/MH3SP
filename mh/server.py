@@ -108,7 +108,8 @@ class BasicPatHandler(object):
             ">HHI",
             len(data), seq, packet_id
         ))
-        self.wfile.write(data)
+        if data:
+            self.wfile.write(data)
 
     def on_tick(self):
         """Called every time the server tick
