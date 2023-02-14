@@ -84,14 +84,17 @@ class PatServer(server.BasicPatServer, Logger):
 
     def circle_broadcast(self, circle, packet_id, data, seq,
                          session=None):
-        with circle.lock():
+        handlers = []
+        with circle.lock(), circle.players.lock():
             for _, player in circle.players:
                 if session and player == session:
                     continue
 
                 handler = self.get_pat_handler(player)
                 if handler:
-                    handler.try_send_packet(packet_id, data, seq)
+                    handlers.append(handler)
+        for handler in handlers:
+            handler.try_send_packet(packet_id, data, seq)
 
 
 class PatRequestHandler(server.BasicPatHandler):
@@ -2239,32 +2242,33 @@ class PatRequestHandler(server.BasicPatHandler):
         cities = self.search_data
         data = struct.pack(">II", 0, len(cities))
         for i, city in enumerate(cities):
-            layer_data = pati.LayerData()
-            layer_data.unk_long_0x01 = pati.Long(i)
-            layer_data.layer_host = pati.Binary(
-                city.leader.get_layer_host_data()
-            )
-            layer_data.name = pati.String(city.name)
-            layer_data.size = pati.Long(city.get_population())
-            layer_data.size2 = pati.Long(city.get_population())
-            layer_data.capacity = pati.Long(city.get_capacity())
-            layer_data.in_quest_players = pati.Long(city.in_quest_players())
-            layer_data.unk_long_0x0c = pati.Long(0xc)     # TODO: Reverse
-            layer_data.state = pati.Byte(city.get_state())
-            layer_data.layer_depth = pati.Byte(city.LAYER_DEPTH)
-            layer_data.layer_pathname = pati.String(city.get_pathname())
-            layer_data.assert_fields(self.search_info["layer_fields"])
-            data += layer_data.pack()
-            data += pati.pack_optional_fields(city.optional_fields)
-            with city.players.lock():
-                data += struct.pack(">I", len(city.players))
-                for _, player in city.players:
-                    layer_user = pati.LayerUserInfo()
-                    layer_user.capcom_id = pati.String(player.capcom_id)
-                    layer_user.hunter_name = pati.String(player.hunter_name)
-                    layer_user.assert_fields(self.search_info["user_fields"])
-                    data += layer_user.pack()
-                    data += pati.pack_optional_fields(player.get_optional_fields())
+            with city.lock():
+                layer_data = pati.LayerData()
+                layer_data.unk_long_0x01 = pati.Long(i)
+                layer_data.layer_host = pati.Binary(
+                    city.leader.get_layer_host_data()
+                )
+                layer_data.name = pati.String(city.name)
+                layer_data.size = pati.Long(city.get_population())
+                layer_data.size2 = pati.Long(city.get_population())
+                layer_data.capacity = pati.Long(city.get_capacity())
+                layer_data.in_quest_players = pati.Long(city.in_quest_players())
+                layer_data.unk_long_0x0c = pati.Long(0xc)     # TODO: Reverse
+                layer_data.state = pati.Byte(city.get_state())
+                layer_data.layer_depth = pati.Byte(city.LAYER_DEPTH)
+                layer_data.layer_pathname = pati.String(city.get_pathname())
+                layer_data.assert_fields(self.search_info["layer_fields"])
+                data += layer_data.pack()
+                data += pati.pack_optional_fields(city.optional_fields)
+                with city.players.lock():
+                    data += struct.pack(">I", len(city.players))
+                    for _, player in city.players:
+                        layer_user = pati.LayerUserInfo()
+                        layer_user.capcom_id = pati.String(player.capcom_id)
+                        layer_user.hunter_name = pati.String(player.hunter_name)
+                        layer_user.assert_fields(self.search_info["user_fields"])
+                        data += layer_user.pack()
+                        data += pati.pack_optional_fields(player.get_optional_fields())
         self.send_packet(PatID4.AnsLayerDetailSearchData, data, seq)
 
     def recvReqLayerDetailSearchFoot(self, packet_id, data, seq):

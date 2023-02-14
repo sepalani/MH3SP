@@ -221,7 +221,7 @@ class Circle(Lockable):
             self.unk_byte_0x0e = 0
 
 
-class City(object):
+class City(Lockable):
     LAYER_DEPTH = 3
 
     def __init__(self, name, parent):
@@ -236,6 +236,7 @@ class City(object):
             # One circle per player
             Circle(self) for _ in range(self.get_capacity())
         ]
+        super(City, self).__init__()
 
     def get_population(self):
         return len(self.players)
@@ -264,26 +265,30 @@ class City(object):
         return pathname
 
     def get_first_empty_circle(self):
-        for index, circle in enumerate(self.circles):
-            if circle.is_empty():
-                return circle, index
+        with self.lock():
+            for index, circle in enumerate(self.circles):
+                if circle.is_empty():
+                    return circle, index
         return None, None
 
     def get_circle_for(self, leader_session):
-        for index, circle in enumerate(self.circles):
-            if circle.leader == leader_session:
-                return circle, index
+        with self.lock():
+            for index, circle in enumerate(self.circles):
+                if circle.leader == leader_session:
+                    return circle, index
         return None, None
 
     def clear_circles(self):
-        for circle in self.circles:
-            circle.reset()
+        with self.lock():
+            for circle in self.circles:
+                circle.reset()
 
     def reserve(self, reserve):
-        if reserve:
-            self.reserved = time.time()
-        else:
-            self.reserved = None
+        with self.lock():
+            if reserve:
+                self.reserved = time.time()
+            else:
+                self.reserved = None
 
 
 class Gate(object):
@@ -537,11 +542,12 @@ class TempDatabase(object):
 
     def reserve_city(self, server_id, gate_id, index, reserve):
         city = self.get_city(server_id, gate_id, index)
-        reserved_time = city.reserved
-        if reserve and reserved_time and \
-           time.time()-reserved_time < RESERVE_DC_TIMEOUT:
-            return False
-        city.reserve(reserve)
+        with city.lock():
+            reserved_time = city.reserved
+            if reserve and reserved_time and \
+               time.time()-reserved_time < RESERVE_DC_TIMEOUT:
+                return False
+            city.reserve(reserve)
         return True
 
     def get_all_users(self, server_id, gate_id, city_id):
@@ -579,25 +585,29 @@ class TempDatabase(object):
     def create_city(self, session, server_id, gate_id, index,
                     settings, optional_fields):
         city = self.get_city(server_id, gate_id, index)
-        city.optional_fields = optional_fields
+        with city.lock():
+            city.optional_fields = optional_fields
+            city.leader = session
         return city
 
     def join_city(self, session, server_id, gate_id, index):
         city = self.get_city(server_id, gate_id, index)
-        city.parent.players.remove(session)
-        city.players.add(session)
+        with city.lock():
+            city.parent.players.remove(session)
+            city.players.add(session)
+            session.local_info["city_name"] = city.name
         session.local_info["city_id"] = index
-        session.local_info["city_name"] = city.name
         return city
 
     def leave_city(self, session):
         city = self.get_city(session.local_info["server_id"],
                              session.local_info["gate_id"],
                              session.local_info["city_id"])
-        city.parent.players.add(session)
-        city.players.remove(session)
-        if not city.get_population():
-            city.clear_circles()
+        with city.lock():
+            city.parent.players.add(session)
+            city.players.remove(session)
+            if not city.get_population():
+                city.clear_circles()
         session.local_info["city_id"] = None
         session.local_info["city_name"] = None
 
@@ -605,10 +615,11 @@ class TempDatabase(object):
         cities = []
 
         def match_city(city, fields):
-            return all((
-                field in city.optional_fields
-                for field in fields
-            ))
+            with city.lock():
+                return all((
+                    field in city.optional_fields
+                    for field in fields
+                ))
 
         for server in self.servers:
             if server.server_type != server_type:
