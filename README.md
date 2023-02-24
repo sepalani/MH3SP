@@ -3,7 +3,7 @@
 The goal of this project is to reverse the game in order to make private servers and custom event/arena quests.
 
 ## Current Status
-The project is kinda functionnal, multiplayer isn't supported yet.
+The project is kinda functional, multiplayer isn't supported yet.
 
 ![Progress](https://user-images.githubusercontent.com/7890055/132406076-baad3f30-5bce-4417-bd2b-9b32a7873380.png)
 
