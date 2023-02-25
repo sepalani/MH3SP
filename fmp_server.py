@@ -93,33 +93,6 @@ class FmpRequestHandler(PatRequestHandler):
         """
         self.send_packet(PatID4.AnsUserBinarySet, b"", seq)
 
-    def recvReqUserBinaryNotice(self, packet_id, data, seq):
-        """ReqUserBinaryNotice packet.
-
-        ID: 66320100
-        JP: ユーザ表示用バイナリ通知要求
-        TR: Binary notification request for user display
-        """
-        unk1, = struct.unpack_from(">B", data)
-        capcom_id = pati.unpack_lp2_string(data, 1)
-        offset, length = struct.unpack_from(">II", data, 3+len(capcom_id))
-        self.sendAnsUserBinaryNotice(unk1, capcom_id, offset, length, seq)
-
-    def sendAnsUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
-        """AnsUserBinaryNotice packet.
-
-        ID: 66320200
-        JP: ユーザ表示用バイナリ通知返答
-        TR: Binary notification reply for user display
-        """
-        data = struct.pack(">B", unk1)
-        data += pati.lp2_string(self.session.capcom_id)
-        data += struct.pack(">I", 0)
-        data += pati.lp2_string(self.session.hunter_info.pack())
-        self.server.layer_broadcast(self.session, PatID4.NtcUserBinaryNotice,
-                                    data, seq)
-        self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
-
     def recvReqLayerUserList(self, packet_id, data, seq):
         """ReqLayerUserList packet.
 
