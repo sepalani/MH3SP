@@ -1271,8 +1271,10 @@ class PatRequestHandler(server.BasicPatHandler):
         ]))
         user_info.unk_byte_0x0b = pati.Byte(1)
         user_info.unk_string_0x0c = pati.String("StrC")
-        user_info.city_capacity = pati.Long(4)
-        user_info.city_size = pati.Long(3)
+        if user.is_in_city():
+            city = user.get_city()
+            user_info.city_capacity = pati.Long(city.get_capacity())
+            user_info.city_size = pati.Long(city.get_population())
 
         # This fields are used to identify a user.
         # Specifically when a client is deserializing data from the packets

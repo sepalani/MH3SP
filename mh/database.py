@@ -290,6 +290,12 @@ class City(Lockable):
             else:
                 self.reserved = None
 
+    def is_full(self):
+        return self.get_population() >= self.get_capacity()
+
+    def is_empty(self):
+        return self.get_population() == 0
+
 
 class Gate(object):
     LAYER_DEPTH = 2
@@ -323,6 +329,9 @@ class Gate(object):
         else:
             return LayerState.FULL
 
+    def is_full(self):
+        return self.get_population() >= self.get_capacity()
+
 
 class Server(object):
     LAYER_DEPTH = 1
@@ -347,6 +356,9 @@ class Server(object):
 
     def get_capacity(self):
         return self.players.get_capacity()
+
+    def is_full(self):
+        return self.get_population() >= self.get_capacity()
 
 
 def new_servers():
