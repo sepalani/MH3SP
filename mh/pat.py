@@ -2141,24 +2141,23 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: ユーザ表示用バイナリ通知要求
         TR: User display binary notification request
         """
-        unk1, str_size, = struct.unpack_from(">BH", data)
-        str_data = data[3:3+str_size]
-        unk2, unk3 = struct.unpack_from(">II", data, 3+str_size)
-        self.server.debug("UserBinaryNotice: %s, %s, %s, %s",
-                          unk1, str_data, unk2, unk3)
-        self.sendAnsUserBinaryNotice(unk1, str_data, unk2, unk3, seq)
+        with pati.Unpacker(data) as unpacker:
+            unk1, = unpacker.struct(">B")
+            capcom_id = unpacker.lp2_string()
+            offset, length = unpacker.struct(">II")
+        self.sendAnsUserBinaryNotice(unk1, capcom_id, offset, length, seq)
 
-    def sendAnsUserBinaryNotice(self, unk1, str_data, unk2, unk3, seq):
+    def sendAnsUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
         """AnsUserBinaryNotice packet.
 
         ID: 66320200
         JP: ユーザ表示用バイナリ通知返答
         TR: User display binary notification response
         """
-        # self.sendNtcUserBinaryNotice(unk1, str_data, unk2, unk3, seq)
+        self.sendNtcUserBinaryNotice(unk1, capcom_id, offset, length, seq)
         self.send_packet(PatID4.AnsUserBinaryNotice, b"", seq)
 
-    def sendNtcUserBinaryNotice(self, unk1, str_data, unk2, unk3, seq):
+    def sendNtcUserBinaryNotice(self, unk1, capcom_id, offset, length, seq):
         """NtcUserBinaryNotice packet.
 
         ID: 66321000
@@ -2166,10 +2165,12 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: User display binary notification notice
         """
         data = struct.pack(">B", unk1)
-        data += pati.lp2_string(str_data)
-        data += struct.pack(">I", unk2)  # What about unk3?
-        data += pati.lp2_string(b"")
-        self.send_packet(PatID4.NtcUserBinaryNotice, data, seq)
+        data += pati.lp2_string(self.session.capcom_id)
+        data += struct.pack(">I", offset)
+        data += pati.lp2_string(self.session.hunter_info.pack()[offset:
+                                                                offset+length])
+        self.server.layer_broadcast(self.session, PatID4.NtcUserBinaryNotice,
+                                    data, seq)
 
     def recvReqLayerDetailSearchHead(self, packet_id, data, seq):
         """ReqLayerDetailSearchHead packet.

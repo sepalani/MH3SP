@@ -824,6 +824,14 @@ class Unpacker(GenericUnpacker):
 
 
 class HunterSettings(object):
+    """Helper for hunter settings.
+
+    The game's recvNtcUserBinaryNotice function suggests that the maximum size
+    is 0x100. However, some parts of the code suggest otherwise due to a
+    `< 0x100` check.
+
+    See the dispatched packet, case 0x8071, 0x803edc64 (RMHE08).
+    """
     SIZE = 0x100
 
     def __init__(self):
