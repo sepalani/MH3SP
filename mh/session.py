@@ -22,11 +22,13 @@
 import struct
 
 import mh.database as db
+import mh.state as state
 import mh.pat_item as pati
 
 from other.utils import to_bytearray, to_str
 
 DB = db.get_instance()
+STATE = state.get_instance()
 
 
 class SessionState:
@@ -81,7 +83,7 @@ class Session(object):
             self.online_support_code = to_str(
                 pati.unpack_string(connection_data.online_support_code)
             )
-        session = DB.get_session(self.pat_ticket) or self
+        session = STATE.get_session(self.pat_ticket) or self
         if session != self:
             assert session.connection is None, "Session is already in use"
             session.connection = self.connection
@@ -106,7 +108,7 @@ class Session(object):
         """
         self.layer_end()
         self.connection = None
-        DB.disconnect_session(self)
+        STATE.disconnect_session(self)
 
     def delete(self):
         """Delete the current session.
@@ -116,37 +118,37 @@ class Session(object):
          - We should probably create a SessionManager thread per server.
         """
         if not self.request_reconnection:
-            DB.delete_session(self)
+            STATE.delete_session(self)
 
     def is_jap(self):
         """TODO: Heuristic using the connection data to detect region."""
         pass
 
     def new_pat_ticket(self):
-        DB.new_pat_ticket(self)
+        STATE.new_pat_ticket(self)
         return to_bytearray(self.pat_ticket)
 
     def get_users(self, first_index, count):
-        return DB.get_users(self, first_index, count)
+        return STATE.get_users(self, first_index, count)
 
     def use_user(self, index, name):
-        DB.use_user(self, index, name)
+        STATE.use_user(self, index, name)
 
     def get_servers(self):
-        return DB.get_servers()
+        return STATE.get_servers()
 
     def get_server(self):
         assert self.local_info['server_id'] is not None
-        return DB.get_server(self.local_info['server_id'])
+        return STATE.get_server(self.local_info['server_id'])
 
     def get_gate(self):
         assert self.local_info['gate_id'] is not None
-        return DB.get_gate(self.local_info['server_id'],
+        return STATE.get_gate(self.local_info['server_id'],
                            self.local_info['gate_id'])
 
     def get_city(self):
         assert self.local_info['city_id'] is not None
-        return DB.get_city(self.local_info['server_id'],
+        return STATE.get_city(self.local_info['server_id'],
                            self.local_info['gate_id'],
                            self.local_info['city_id'])
 
@@ -209,10 +211,10 @@ class Session(object):
             (field_id, value)
             for field_id, field_type, value in detailed_fields
         ]  # Convert detailed to simple optional fields
-        return DB.layer_detail_search(server_type, fields)
+        return STATE.layer_detail_search(server_type, fields)
 
     def join_server(self, server_id):
-        return DB.join_server(self, server_id)
+        return STATE.join_server(self, server_id)
 
     def get_layer_children(self):
         if self.layer == 0:
@@ -231,60 +233,60 @@ class Session(object):
     def find_users_by_layer(self, server_id, gate_id, city_id,
                             first_index, count, recursive=False):
         if recursive:
-            players = DB.get_all_users(server_id, gate_id, city_id)
+            players = STATE.get_all_users(server_id, gate_id, city_id)
         else:
             layer = \
-                DB.get_city(server_id, gate_id, city_id) if city_id else \
-                DB.get_gate(server_id, gate_id) if gate_id else \
-                DB.get_server(server_id)
+                STATE.get_city(server_id, gate_id, city_id) if city_id else \
+                STATE.get_gate(server_id, gate_id) if gate_id else \
+                STATE.get_server(server_id)
             players = list(layer.players)
         start = first_index - 1
         return players[start:start+count]
 
     def find_users(self, capcom_id, hunter_name, first_index, count):
-        users = DB.find_users(capcom_id, hunter_name)
+        users = STATE.find_users(capcom_id, hunter_name)
         start = first_index - 1
         return users[start:start+count]
 
     def leave_server(self):
-        DB.leave_server(self, self.local_info["server_id"])
+        STATE.leave_server(self, self.local_info["server_id"])
 
     def get_gates(self):
-        return DB.get_gates(self.local_info["server_id"])
+        return STATE.get_gates(self.local_info["server_id"])
 
     def join_gate(self, gate_id):
-        DB.join_gate(self, self.local_info["server_id"], gate_id)
+        STATE.join_gate(self, self.local_info["server_id"], gate_id)
         self.state = SessionState.GATE
 
     def leave_gate(self):
-        DB.leave_gate(self)
+        STATE.leave_gate(self)
         self.state = SessionState.LOG_IN
 
     def get_cities(self):
-        return DB.get_cities(self.local_info["server_id"],
+        return STATE.get_cities(self.local_info["server_id"],
                              self.local_info["gate_id"])
 
     def is_city_empty(self, city_id):
-        return DB.get_city(self.local_info["server_id"], self.local_info["gate_id"], city_id).get_state() == db.LayerState.EMPTY
+        return STATE.get_city(self.local_info["server_id"], self.local_info["gate_id"], city_id).get_state() == state.LayerState.EMPTY
 
     def reserve_city(self, city_id, reserve):
-        return DB.reserve_city(self.local_info["server_id"], self.local_info["gate_id"], city_id, reserve)
+        return STATE.reserve_city(self.local_info["server_id"], self.local_info["gate_id"], city_id, reserve)
 
     def create_city(self, city_id, settings, optional_fields):
-        return DB.create_city(self,
+        return STATE.create_city(self,
                               self.local_info["server_id"],
                               self.local_info["gate_id"],
                               city_id, settings, optional_fields)
 
     def join_city(self, city_id):
-        DB.join_city(self,
+        STATE.join_city(self,
                      self.local_info["server_id"],
                      self.local_info["gate_id"],
                      city_id)
         self.state = SessionState.CITY
 
     def leave_city(self):
-        DB.leave_city(self)
+        STATE.leave_city(self)
         self.state = SessionState.GATE
 
     def try_transfer_city_leadership(self):
