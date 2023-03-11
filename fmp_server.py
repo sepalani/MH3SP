@@ -245,7 +245,8 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Binary transmission for layer users (specify the other party)
         """
         city = self.session.get_city()
-        partner_session = city.players.find_by_capcom_id(partner)
+        with city.lock():
+            partner_session = city.players.find_by_capcom_id(partner)
         if partner_session is None:
             return
 
@@ -331,17 +332,17 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Circle sync list response (layer)
         """
 
-        city = self.session.get_city()
-
         unk = 0
         count = 0
-
         data = b''
-        for i, circle in enumerate(city.circles):
-            with circle.lock():
-                if not circle.is_empty():
-                    data += pati.CircleInfo.pack_from(circle, i+1)
-                    count += 1
+
+        city = self.session.get_city()
+        with city.lock():
+            for i, circle in enumerate(city.circles):
+                with circle.lock():
+                    if not circle.is_empty():
+                        data += pati.CircleInfo.pack_from(circle, i+1)
+                        count += 1
 
         data = struct.pack(">II", unk, count) + data
 
@@ -464,7 +465,6 @@ class FmpRequestHandler(PatRequestHandler):
         TR: Circle data acquisition reply
         """
         city = self.session.get_city()
-
         # TODO: Verify circle index
         circle = city.circles[circle_index-1]
 
@@ -487,16 +487,16 @@ class FmpRequestHandler(PatRequestHandler):
         circle_info = pati.CircleInfo.unpack(data, 4)
 
         city = self.session.get_city()
+        with city.lock():
+            if circle_index-1 >= len(city.circles):
+                self.sendAnsAlert(
+                    PatID4.AnsCircleJoin,
+                    "<LF=8><BODY><CENTER>Invalid Quest Slot<END>",
+                    seq
+                )
+                return
 
-        if circle_index-1 >= len(city.circles):
-            self.sendAnsAlert(
-                PatID4.AnsCircleJoin,
-                "<LF=8><BODY><CENTER>Invalid Quest Slot<END>",
-                seq
-            )
-            return
-
-        circle = city.circles[circle_index-1]
+            circle = city.circles[circle_index-1]
         with circle.lock():
             if circle.has_password() and ("password" not in circle_info or
                                           pati.unpack_string(circle_info.password)
@@ -527,6 +527,8 @@ class FmpRequestHandler(PatRequestHandler):
         self.send_packet(PatID4.AnsCircleJoin, data, seq)
 
         city = self.session.get_city()
+        circle = city.circles[circle_index-1]
+
         ntc_data = struct.pack(">I", circle_index)
         ntc_data += pati.lp2_string(self.session.capcom_id)
         ntc_data += pati.lp2_string(self.session.hunter_name)
@@ -535,7 +537,6 @@ class FmpRequestHandler(PatRequestHandler):
         state = 0
 
         ntc_data += struct.pack(">BB", player_index, state)
-        circle = city.circles[circle_index-1]
         self.server.circle_broadcast(circle, PatID4.NtcCircleJoin, ntc_data,
                                      seq, self.session)
 

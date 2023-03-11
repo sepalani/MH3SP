@@ -190,7 +190,6 @@ class Session(object):
     def layer_create(self, layer_id, settings, optional_fields):
         if self.layer == 1:
             city = self.create_city(layer_id, settings, optional_fields)
-            city.leader = self
         else:
             assert False, "Can't create a layer from L{}".format(self.layer)
         self.layer_down(layer_id)
@@ -293,14 +292,15 @@ class Session(object):
             return None
 
         city = self.get_city()
-        if city.leader != self:
-            return None
+        with city.lock():
+            if city.leader != self:
+                return None
 
-        for _, player in city.players:
-            if player == self:
-                continue
-            city.leader = player
-            return player
+            for _, player in city.players:
+                if player == self:
+                    continue
+                city.leader = player
+                return player
         return None
 
     def try_transfer_circle_leadership(self):
