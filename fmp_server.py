@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from mh.database import Players
+from mh.state import Players
 import mh.pat_item as pati
 from mh.constants import *
 from mh.pat import PatRequestHandler, PatServer
