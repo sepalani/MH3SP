@@ -376,6 +376,8 @@ class TempDatabase(object):
     TODO:
      - Finish the implementation
      - Make this thread-safe
+     - [Feature request] Send unread friend requests on next login
+       * Imply saving the message info along the Capcom ID
     """
 
     def __init__(self):
@@ -386,7 +388,14 @@ class TempDatabase(object):
             # PAT Ticket => Owner's session
         }
         self.capcom_ids = {
-            # Capcom ID => Owner's session
+            # Capcom ID => Owner's name and session
+        }
+        self.friend_requests = {
+            # Capcom ID => List of friend requests from Capcom IDs
+        }
+        self.friend_lists = {
+            # Capcom ID => List of Capcom IDs
+            # TODO: May need stable index, see Players class
         }
         self.servers = new_servers()
 
@@ -426,6 +435,13 @@ class TempDatabase(object):
 
         name = name or self.capcom_ids[capcom_id]["name"]
         self.capcom_ids[capcom_id] = {"name": name, "session": session}
+
+        # TODO: Check if stable index is required
+        if capcom_id not in self.friend_lists:
+            self.friend_lists[capcom_id] = []
+        if capcom_id not in self.friend_requests:
+            self.friend_requests[capcom_id] = []
+
         return name
 
     def use_user(self, session, index, name):
@@ -582,6 +598,11 @@ class TempDatabase(object):
             users.append(session)
         return users
 
+    def get_user_name(self, capcom_id):
+        if capcom_id not in self.capcom_ids:
+            return ""
+        return self.capcom_ids[capcom_id]["name"]
+
     def create_city(self, session, server_id, gate_id, index,
                     settings, optional_fields):
         city = self.get_city(server_id, gate_id, index)
@@ -633,6 +654,45 @@ class TempDatabase(object):
                     if match_city(city, fields)
                 ])
         return cities
+
+    def add_friend_request(self, sender_id, recipient_id):
+        # Friend invite can be sent to arbitrary Capcom ID
+        if any(cid not in self.capcom_ids
+               for cid in (sender_id, recipient_id)):
+            return False
+        if sender_id not in self.friend_requests[recipient_id]:
+            self.friend_requests[recipient_id].append(sender_id)
+        return True
+
+    def accept_friend(self, capcom_id, friend_id, accepted):
+        assert capcom_id in self.capcom_ids and friend_id in self.capcom_ids
+        # Prevent duplicate if requests were sent both ways
+        if accepted and friend_id not in self.friend_lists[capcom_id]:
+            self.friend_lists[capcom_id].append(friend_id)
+            self.friend_lists[friend_id].append(capcom_id)
+        if capcom_id in self.friend_requests[friend_id]:
+            self.friend_requests[friend_id].remove(capcom_id)
+        if friend_id in self.friend_requests[capcom_id]:
+            self.friend_requests[capcom_id].remove(friend_id)
+        return True
+
+    def delete_friend(self, capcom_id, friend_id):
+        assert capcom_id in self.capcom_ids and friend_id in self.capcom_ids
+        self.friend_lists[capcom_id].remove(friend_id)
+        # TODO: find footage to see if it's removed in the other friend list
+        #  i.e. self.friend_lists[friend_id].remove(capcom_id)
+        #  AFAICT, there is no NtcFriendDelete packet
+        return True
+
+    def get_friends(self, capcom_id, first_index=None, count=None):
+        assert capcom_id in self.capcom_ids
+        begin = 0 if first_index is None else (first_index - 1)
+        end = count if count is None else (begin + count)
+        return [
+            (k, self.capcom_ids[k]["name"])
+            for k in self.friend_lists[capcom_id]
+            if k in self.capcom_ids  # Skip unknown Capcom IDs
+        ][begin:end]
 
 
 CURRENT_DB = TempDatabase()

@@ -23,7 +23,7 @@ import struct
 import traceback
 from datetime import datetime, timedelta
 
-from other.utils import Logger, get_config, get_ip, hexdump
+from other.utils import Logger, get_config, get_ip, hexdump, to_str
 
 import mh.pat_item as pati
 import mh.server as server
@@ -130,6 +130,17 @@ class PatRequestHandler(server.BasicPatHandler):
                 PAT_NAMES.get(packet_id, "Packet"),
                 packet_id, seq, traceback.format_exc(), hexdump(data)
             )
+
+    def try_send_packet_to(self, capcom_id, packet_id=0, data=b'', seq=0):
+        """Send PAT packet to specific Capcom ID and catch exceptions."""
+        session = self.session.find_user_by_capcom_id(capcom_id)
+        if not session:
+            self.server.warning("Failed to send packet to %s: user not found",
+                                capcom_id)
+            return
+        handler = self.server.get_pat_handler(session)
+        if handler:
+            handler.try_send_packet(packet_id, data, seq)
 
     def sendAnsNg(self, packet_id, message, seq):
         unk1 = 1  # If value is 0, the message is not rendered
@@ -1240,7 +1251,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: User search data request
         """
         with pati.Unpacker(data) as unpacker:
-            capcom_id = unpacker.lp2_string()
+            capcom_id = to_str(unpacker.lp2_string())
             search_info = unpacker.UserSearchInfo()
         self.server.debug("SearchInfo: {}, {!r}".format(capcom_id,
                                                         search_info))
@@ -1587,24 +1598,29 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: フレンドリスト要求
         TR: Friend list request
         """
-        unk1, unk2 = struct.unpack_from(">II", data)  # 1st/last index?
-        unk3 = data[8:]  # PAT fields filter? (1,2,3)?
-        self.sendAnsFriendList(unk1, unk2, unk3, seq)
+        with pati.Unpacker(data) as unpacker:
+            first_index, count = unpacker.struct(">II")
+            fields = unpacker.bytes()
+        self.sendAnsFriendList(first_index, count, fields, seq)
 
-    def sendAnsFriendList(self, unk1, unk2, unk3, seq):
+    def sendAnsFriendList(self, first_index, count, fields, seq):
         """AnsFriendList packet.
 
         ID: 66540200
         JP: フレンドリスト返答
         TR: Friend list response
-
-        TODO: Implement friend list in the database
         """
-        friends = []
         unk = 0
+        friends = self.session.get_friends(first_index, count)
         count = len(friends)
         data = struct.pack(">II", unk, count)
-        data += b"".join([item.pack() for item in friends])
+        for index, (capcom_id, hunter_name) in enumerate(friends, 1):
+            friend = pati.FriendData()
+            friend.index = pati.Long(index)
+            friend.capcom_id = pati.String(capcom_id)
+            friend.hunter_name = pati.String(hunter_name)
+            friend.assert_fields(fields)
+            data += friend.pack()
         self.send_packet(PatID4.AnsFriendList, data, seq)
 
     def recvReqBlackAdd(self, packet_id, data, seq):
@@ -1613,6 +1629,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 66600100
         JP: ブラックデータ登録要求
         TR: Black data registration request
+
+        TODO: Implement it properly
         """
         with pati.Unpacker(data) as unpacker:
             capcom_id = unpacker.lp2_string()
@@ -1653,6 +1671,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 66620100
         JP: ブラックリスト要求
         TR: Blacklist request
+
+        TODO: Implement it properly
         """
         unk1, unk2 = struct.unpack_from(">II", data)  # 1st/last index?
         unk3 = data[8:]  # PAT fields filter? (1,2,3)?
@@ -1842,7 +1862,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TODO: Merge this with ReqTell?
         """
         with pati.Unpacker(data) as unpacker:
-            recipient_id = unpacker.lp2_string()
+            recipient_id = to_str(unpacker.lp2_string())
             info = unpacker.MessageInfo()
             message = unpacker.lp2_string()
         self.server.debug("ReqFriendAdd: {}, {!r}, {}".format(
@@ -1856,8 +1876,12 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: フレンド登録返答
         TR: Friend registration response
         """
+        if not self.session.add_friend_request(recipient_id):
+            self.sendAnsAlert(PatID4.AnsFriendAdd,
+                              "<LF=8><BODY><CENTER>Unknown Capcom ID.<END>",
+                              seq)
+            return
         self.send_packet(PatID4.AnsFriendAdd, b"", seq)
-        # Send a dummy friend request
         self.sendNtcFriendAccept(recipient_id, info, message, seq)
 
     def sendNtcFriendAdd(self, recipient_id, accepted, seq):
@@ -1869,12 +1893,25 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         if not accepted:
             return
+
+        # Send notification to friend
         data = b""
         data += pati.lp2_string(recipient_id)
         friend = pati.FriendData()
-        friend.index = pati.Long(2)
+        friend.index = pati.Long(1)  # TODO: Reverse-engineer this field
+        friend.capcom_id = pati.String(self.session.capcom_id)
+        friend.hunter_name = pati.String(self.session.hunter_name)
+        data += friend.pack()
+        data += struct.pack(">B", accepted)
+        self.try_send_packet_to(recipient_id, PatID4.NtcFriendAdd, data, seq)
+
+        # Send notification to self
+        data = pati.lp2_string(self.session.capcom_id)
+        friend = pati.FriendData()
+        friend.index = pati.Long(1)   # TODO: Reverse-engineer this field
         friend.capcom_id = pati.String(recipient_id)
-        friend.hunter_name = pati.String("Cid")
+        friend.hunter_name = pati.String(
+            self.session.get_user_name(recipient_id))
         data += friend.pack()
         data += struct.pack(">B", accepted)
         self.send_packet(PatID4.NtcFriendAdd, data, seq)
@@ -1886,8 +1923,9 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: フレンド登録依頼返答要求
         TR: Friend registration accept request
         """
-        recipient_id = pati.unpack_lp2_string(data)
-        accepted, = struct.unpack_from(">B", data, -1)
+        with pati.Unpacker(data) as unpacker:
+            recipient_id = to_str(unpacker.lp2_string())
+            accepted, = unpacker.struct(">B")
         self.sendAnsFriendAccept(recipient_id, accepted, seq)
         self.sendNtcFriendAdd(recipient_id, accepted, seq)
 
@@ -1898,6 +1936,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: フレンド登録依頼返答返答
         TR: Friend registration accept response
         """
+        self.session.accept_friend(recipient_id, accepted)
         self.send_packet(PatID4.AnsFriendAccept, b"", seq)
 
     def sendNtcFriendAccept(self, recipient_id, info, message, seq):
@@ -1912,9 +1951,12 @@ class PatRequestHandler(server.BasicPatHandler):
         data = b""
         data += pati.lp2_string(recipient_id)
         info.unk_long_0x02 = pati.Long(20)
+        info.sender_id = pati.String(self.session.capcom_id)
+        info.sender_name = pati.String(self.session.hunter_name)
         data += info.pack()
         data += pati.lp2_string(message)
-        self.send_packet(PatID4.NtcFriendAccept, data, seq)
+        self.try_send_packet_to(recipient_id, PatID4.NtcFriendAccept, data,
+                                seq)
 
     def recvReqFriendDelete(self, packet_id, data, seq):
         """ReqFriendDelete packet.
@@ -1923,7 +1965,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: フレンドデータ削除要求
         TR: Friend data deletion request
         """
-        capcom_id = pati.unpack_lp2_string(data)
+        capcom_id = to_str(pati.unpack_lp2_string(data))
         self.sendAnsFriendDelete(capcom_id, seq)
 
     def sendAnsFriendDelete(self, capcom_id, seq):
@@ -1933,6 +1975,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: フレンドデータ削除返答
         TR: Friend data deletion response
         """
+        self.session.delete_friend(capcom_id)
         self.send_packet(PatID4.AnsFriendDelete, b"", seq)
 
     def recvReqLayerChildListHead(self, packet_id, data, seq):
