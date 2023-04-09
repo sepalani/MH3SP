@@ -1827,7 +1827,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: Send partner message
         """
         with pati.Unpacker(data) as unpacker:
-            recipient_id = unpacker.lp2_string()
+            recipient_id = to_str(unpacker.lp2_string())
             info = unpacker.MessageInfo()
             message = unpacker.lp2_string()
         self.server.debug("ReqTell: {}, {!r}, {}".format(
@@ -1854,9 +1854,11 @@ class PatRequestHandler(server.BasicPatHandler):
         data = b""
         data += pati.lp2_string(recipient_id)
         info.unk_long_0x02 = pati.Long(20)
+        info.sender_id = pati.String(self.session.capcom_id)
+        info.sender_name = pati.String(self.session.hunter_name)
         data += info.pack()
         data += pati.lp2_string(message)
-        self.send_packet(PatID4.NtcTell, data, seq)
+        self.try_send_packet_to(recipient_id, PatID4.NtcTell, data, seq)
 
     def recvReqFriendAdd(self, packet_id, data, seq):
         """ReqFriendAdd packet.
