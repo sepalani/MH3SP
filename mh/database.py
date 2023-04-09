@@ -695,6 +695,63 @@ class TempDatabase(object):
         ][begin:end]
 
 
+class DebugDatabase(TempDatabase):
+    """For testing purpose."""
+    def __init__(self, *args, **kwargs):
+        TempDatabase.__init__(self, *args, **kwargs)
+        self.consoles = {
+            # To use it, replace with a real support code
+            "TEST_CONSOLE_1": [
+                "AAAAAA", "BBBBBB", "CCCCCC", "DDDDDD", "EEEEEE", "FFFFFF"
+            ],
+            "TEST_CONSOLE_2": [
+                "111111", "222222", "333333", "444444", "555555", "666666"
+            ],
+        }
+        self.capcom_ids = {
+            "AAAAAA": {"name": b"Hunt A", "session": None},
+            "BBBBBB": {"name": b"Hunt B", "session": None},
+            "CCCCCC": {"name": b"Hunt C", "session": None},
+            "DDDDDD": {"name": b"Hunt D", "session": None},
+            "EEEEEE": {"name": b"Hunt E", "session": None},
+            "FFFFFF": {"name": b"Hunt F", "session": None},
+            "111111": {"name": b"Hunt 1", "session": None},
+            "222222": {"name": b"Hunt 2", "session": None},
+            "333333": {"name": b"Hunt 3", "session": None},
+            "444444": {"name": b"Hunt 4", "session": None},
+            "555555": {"name": b"Hunt 5", "session": None},
+            "666666": {"name": b"Hunt 6", "session": None},
+        }
+        self.friend_requests = {
+            "AAAAAA": [],
+            "BBBBBB": [],
+            "CCCCCC": [],
+            "DDDDDD": [],
+            "EEEEEE": [],
+            "FFFFFF": [],
+            "111111": [],
+            "222222": [],
+            "333333": [],
+            "444444": [],
+            "555555": [],
+            "666666": [],
+        }
+        self.friend_lists = {
+            "AAAAAA": [],
+            "BBBBBB": [],
+            "CCCCCC": [],
+            "DDDDDD": [],
+            "EEEEEE": [],
+            "FFFFFF": [],
+            "111111": [],
+            "222222": [],
+            "333333": [],
+            "444444": [],
+            "555555": [],
+            "666666": [],
+        }
+
+
 CURRENT_DB = TempDatabase()
 
 
