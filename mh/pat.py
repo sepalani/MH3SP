@@ -1163,7 +1163,7 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         with pati.Unpacker(data) as unpacker:
             self.search_info = {
-                "capcom_id": unpacker.lp2_string(),
+                "capcom_id": to_str(unpacker.lp2_string()),
                 "hunter_name": unpacker.lp2_string(),
                 "search": unpacker.detailed_optional_fields(),
                 "offset": unpacker.struct(">I")[0],
@@ -1507,7 +1507,7 @@ class PatRequestHandler(server.BasicPatHandler):
             self.search_info = {
                 "unk": unpacker.struct(">B")[0],
                 "layer": unpacker.lp2_string(),
-                "capcom_id": unpacker.lp2_string(),
+                "capcom_id": to_str(unpacker.lp2_string()),
                 "hunter_name": unpacker.lp2_string(),
                 "search": unpacker.detailed_optional_fields(),
                 "offset": unpacker.struct(">I")[0],
@@ -1633,7 +1633,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TODO: Implement it properly
         """
         with pati.Unpacker(data) as unpacker:
-            capcom_id = unpacker.lp2_string()
+            capcom_id = to_str(unpacker.lp2_string())
             black_data = unpacker.BlackListUserData()
         self.sendAnsBlackAdd(capcom_id, black_data, seq)
 
@@ -1653,7 +1653,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: ブラックデータ削除要求
         TR: Black data deletion request
         """
-        capcom_id = pati.unpack_lp2_string(data)
+        capcom_id = to_str(pati.unpack_lp2_string(data))
         self.sendAnsBlackDelete(capcom_id, seq)
 
     def sendAnsBlackDelete(self, capcom_id, seq):
@@ -1745,7 +1745,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: Layer specified chat transmission
         """
         with pati.Unpacker(data) as unpacker:
-            recipient_id = unpacker.lp2_string()
+            recipient_id = to_str(unpacker.lp2_string())
             info = unpacker.MessageInfo()
             message = unpacker.lp2_string()
         self.server.debug("ReqTell: {}, {!r}, {}".format(
@@ -2189,7 +2189,7 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         with pati.Unpacker(data) as unpacker:
             unk1, = unpacker.struct(">B")
-            capcom_id = unpacker.lp2_string()
+            capcom_id = to_str(unpacker.lp2_string())
             offset, length = unpacker.struct(">II")
         self.sendAnsUserBinaryNotice(unk1, capcom_id, offset, length, seq)
 
