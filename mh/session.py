@@ -241,10 +241,19 @@ class Session(object):
         start = first_index - 1
         return players[start:start+count]
 
+    def find_user_by_capcom_id(self, capcom_id):
+        sessions = DB.find_users(capcom_id=capcom_id)
+        if sessions:
+            return sessions[0]
+        return None
+
     def find_users(self, capcom_id, hunter_name, first_index, count):
         users = DB.find_users(capcom_id, hunter_name)
         start = first_index - 1
         return users[start:start+count]
+
+    def get_user_name(self, capcom_id):
+        return DB.get_user_name(capcom_id)
 
     def leave_server(self):
         DB.leave_server(self, self.local_info["server_id"])
@@ -384,3 +393,15 @@ class Session(object):
                 (1, (weapon_type << 24) | location),
                 (2, hunter_rank << 16)
         ]
+
+    def add_friend_request(self, capcom_id):
+        return DB.add_friend_request(self.capcom_id, capcom_id)
+
+    def accept_friend(self, capcom_id, accepted=True):
+        return DB.accept_friend(self.capcom_id, capcom_id, accepted)
+
+    def delete_friend(self, capcom_id):
+        return DB.delete_friend(self.capcom_id, capcom_id)
+
+    def get_friends(self, first_index=None, count=None):
+        return DB.get_friends(self.capcom_id, first_index, count)
