@@ -1264,9 +1264,15 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: ユーザ検索データ返答
         TR: User search data response
         """
-        users = self.session.find_users(capcom_id, "", 1, 1)
-        assert users, "Capcom ID not found"
-        user = users[0]
+        user = self.session.find_user_by_capcom_id(capcom_id)
+        if not user:
+            # TODO: Find a better way to notify offline status in friend list
+            user_info = pati.UserSearchInfo()
+            user_info.capcom_id = pati.String(capcom_id)
+            user_info.hunter_name = pati.String("OFFLINE")
+            data = user_info.pack() + pati.pack_optional_fields([])
+            self.sendAnsAlert(PatID4.AnsUserSearchInfo, data, seq)
+            return
 
         user_info = pati.UserSearchInfo()
         user_info.capcom_id = pati.String(user.capcom_id)
