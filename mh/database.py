@@ -20,8 +20,10 @@
 """
 
 import random
+import sqlite3
 import time
-from threading import RLock
+from threading import RLock, local as thread_local
+
 
 CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -31,6 +33,8 @@ MEDIA_VERSIONS = {
     "1001301045": "RMHE08",
     "1002121503": "RMHP08",
 }
+
+BLANK_CAPCOM_ID = "******"
 
 RESERVE_DC_TIMEOUT = 40.0
 
@@ -411,10 +415,7 @@ class TempDatabase(object):
 
         # Create some default users
         if support_code not in self.consoles:
-            self.consoles[support_code] = [
-                "******", "******", "******",
-                "******", "******", "******"
-            ]
+            self.consoles[support_code] = [BLANK_CAPCOM_ID] * 6
         return support_code
 
     def new_pat_ticket(self, session):
@@ -449,7 +450,7 @@ class TempDatabase(object):
         assert 1 <= index <= 6, "Invalid Capcom ID slot"
         index -= 1
         users = self.consoles[session.online_support_code]
-        while users[index] == "******":
+        while users[index] == BLANK_CAPCOM_ID:
             capcom_id = new_random_str(6)
             if capcom_id not in self.capcom_ids:
                 self.capcom_ids[capcom_id] = {"name": name, "session": None}
@@ -492,7 +493,7 @@ class TempDatabase(object):
         size = len(capcom_ids)
         if size < count:
             capcom_ids.extend([
-                (index, ("******", {}))
+                (index, (BLANK_CAPCOM_ID, {}))
                 for index in range(first_index+size, first_index+count)
             ])
         return capcom_ids
@@ -695,11 +696,194 @@ class TempDatabase(object):
         ][begin:end]
 
 
-class DebugDatabase(TempDatabase):
+class SafeSqliteConnection(object):
+    """Safer SQLite connection wrapper."""
+
+    def __init__(self, *args, **kwargs):
+        self.__connection = sqlite3.connect(*args, **kwargs)
+        self.__connection.row_factory = sqlite3.Row
+        self.__connection.text_factory = str
+
+    def __enter__(self):
+        return self.__connection.__enter__()
+
+    def __exit__(self, type, value, traceback):
+        return self.__connection.__exit__(type, value, traceback)
+
+    def __getattribute__(self, name):
+        if name.startswith("_"):
+            return object.__getattribute__(self, name)
+        return self.__connection.__getattribute__(name)
+
+    def __setattr__(self, name, value):
+        if name.startswith("_"):
+            return object.__setattr__(self, name, value)
+        return self.__connection.__setattr__(name, value)
+
+    def __del__(self):
+        self.__connection.close()
+
+
+class ThreadSafeSqliteConnection(object):
+    """Proxy object for thread local SQLite connection.
+
+    SQLite connection/cursor can't be accessed nor closed from other threads.
+    However, multiple threads can connect to the same file database.
+    """
+    def __init__(self, *args, **kwargs):
+        self.__args = args
+        self.__kwargs = kwargs
+        self.__thread_ns = thread_local()
+        self.__get_connection()
+
+    def __enter__(self):
+        return self.__get_connection().__enter__()
+
+    def __exit__(self, type, value, traceback):
+        return self.__get_connection().__exit__(type, value, traceback)
+
+    def __getattribute__(self, name):
+        if name.startswith("_"):
+            return object.__getattribute__(self, name)
+        return self.__get_connection().__getattribute__(name)
+
+    def __setattr__(self, name, value):
+        if name.startswith("_"):
+            return object.__setattr__(self, name, value)
+        return self.__get_connection().__setattr__(name, value)
+
+    def __get_connection(self):
+        this = getattr(self.__thread_ns, "connection", None)
+        if this is None:
+            self.__thread_ns.connection = SafeSqliteConnection(*self.__args,
+                                                               **self.__kwargs)
+            this = self.__thread_ns.connection
+        return this
+
+
+class TempSQLiteDatabase(TempDatabase):
+    """Hybrid SQLite/TempDatabase.
+
+    The following data need to be retained after a shutdown:
+     - Online support code and its Capcom IDs
+     - Friend list per Capcom ID
+     - Properties (at least the hunter name) per Capcom ID
+
+    TODO:
+     - Need proper documentation, especially for the overridable interface
+    """
+
+    DATABASE_NAME = "mh3sp.db"
+
+    def __init__(self):
+        self.parent = super(TempSQLiteDatabase, self)
+        self.parent.__init__()
+        self.connection = ThreadSafeSqliteConnection(self.DATABASE_NAME,
+                                                     timeout=10.0)
+        self.create_database()
+        self.populate_database()
+
+    def create_database(self):
+        with self.connection as cursor:
+            # Create consoles table
+            #
+            # TODO:
+            #  - Should we add a "media_version" column to distinguish games?
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS consoles"
+                " (support_code TEXT, slot_index INTEGER,"
+                " capcom_id TEXT, name BLOB)"
+            )
+            cursor.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS profiles_uniq_idx"
+                " ON consoles(support_code, slot_index)"
+            )  # TODO: Fix support code generation to prevent race condition
+            cursor.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS capcom_ids_uniq_idx"
+                " ON consoles(capcom_id)"
+            )  # TODO: Fix Capcom ID generation to prevent race condition
+
+            # Create friend lists table
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS friend_lists"
+                " (capcom_id TEXT, friend_id TEXT)"
+            )
+            cursor.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS friends_uniq_idx"
+                " ON friend_lists(capcom_id, friend_id)"
+            )
+
+    def populate_database(self):
+        with self.connection as cursor:
+            rows = cursor.execute("SELECT * FROM consoles")
+            for support_code, slot_index, capcom_id, name in rows:
+                if support_code not in self.consoles:
+                    self.consoles[support_code] = [BLANK_CAPCOM_ID] * 6
+                self.consoles[support_code][slot_index - 1] = capcom_id
+                self.capcom_ids[capcom_id] = {"name": name, "session": None}
+                self.friend_lists[capcom_id] = []
+
+            rows = cursor.execute("SELECT * FROM friend_lists")
+            for capcom_id, friend_id in rows:
+                self.friend_lists[capcom_id].append(friend_id)
+
+    def force_update(self):
+        """For debugging purpose."""
+        with self.connection as cursor:
+            for support_code, capcom_ids in self.consoles.items():
+                for slot_index, capcom_id in enumerate(capcom_ids, 1):
+                    info = self.capcom_ids.get(capcom_id, {"name": ""})
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO consoles VALUES (?,?,?,?)",
+                        (support_code, slot_index, capcom_id, info["name"])
+                    )
+
+            for capcom_id, friend_ids in self.friend_lists.items():
+                for friend_id in friend_ids:
+                    cursor.execute(
+                       "INSERT OR IGNORE INTO friend_lists VALUES (?,?)",
+                       (capcom_id, friend_id)
+                    )
+
+    def use_user(self, session, index, name):
+        result = self.parent.use_user(session, index, name)
+        with self.connection as cursor:
+            cursor.execute(
+                "INSERT OR REPLACE INTO consoles VALUES (?,?,?,?)",
+                (session.online_support_code, index,
+                 session.capcom_id, session.hunter_name)
+            )
+        return result
+
+    def accept_friend(self, capcom_id, friend_id, accepted):
+        if accepted:
+            with self.connection as cursor:
+                cursor.execute(
+                    "INSERT INTO friend_lists VALUES (?,?)",
+                    (capcom_id, friend_id)
+                )
+                cursor.execute(
+                    "INSERT INTO friend_lists VALUES (?,?)",
+                    (friend_id, capcom_id)
+                )
+        return self.parent.accept_friend(capcom_id, friend_id, accepted)
+
+    def delete_friend(self, capcom_id, friend_id):
+        with self.connection as cursor:
+            cursor.execute(
+                "DELETE FROM friend_lists"
+                " WHERE capcom_id = ? AND friend_id = ?",
+                (capcom_id, friend_id)
+            )
+        return self.parent.delete_friend(capcom_id, friend_id)
+
+
+class DebugDatabase(TempSQLiteDatabase):
     """For testing purpose."""
     def __init__(self, *args, **kwargs):
-        TempDatabase.__init__(self, *args, **kwargs)
-        self.consoles = {
+        super(DebugDatabase, self).__init__(*args, **kwargs)
+
+        CONSOLES = {
             # To use it, replace with a real support code
             "TEST_CONSOLE_1": [
                 "AAAAAA", "BBBBBB", "CCCCCC", "DDDDDD", "EEEEEE", "FFFFFF"
@@ -708,7 +892,10 @@ class DebugDatabase(TempDatabase):
                 "111111", "222222", "333333", "444444", "555555", "666666"
             ],
         }
-        self.capcom_ids = {
+        for key in CONSOLES:
+            self.consoles.setdefault(key, CONSOLES[key])
+
+        CAPCOM_IDS = {
             "AAAAAA": {"name": b"Hunt A", "session": None},
             "BBBBBB": {"name": b"Hunt B", "session": None},
             "CCCCCC": {"name": b"Hunt C", "session": None},
@@ -722,7 +909,10 @@ class DebugDatabase(TempDatabase):
             "555555": {"name": b"Hunt 5", "session": None},
             "666666": {"name": b"Hunt 6", "session": None},
         }
-        self.friend_requests = {
+        for key in CAPCOM_IDS:
+            self.capcom_ids.setdefault(key, CAPCOM_IDS[key])
+
+        FRIEND_REQUESTS = {
             "AAAAAA": [],
             "BBBBBB": [],
             "CCCCCC": [],
@@ -736,7 +926,10 @@ class DebugDatabase(TempDatabase):
             "555555": [],
             "666666": [],
         }
-        self.friend_lists = {
+        for key in FRIEND_REQUESTS:
+            self.friend_requests.setdefault(key, FRIEND_REQUESTS[key])
+
+        FRIEND_LISTS = {
             "AAAAAA": [],
             "BBBBBB": [],
             "CCCCCC": [],
@@ -750,9 +943,15 @@ class DebugDatabase(TempDatabase):
             "555555": [],
             "666666": [],
         }
+        for key in FRIEND_LISTS:
+            self.friend_lists.setdefault(key, FRIEND_LISTS[key])
+
+        # Hack to force update the database with the debug data once
+        if hasattr(self, "force_update"):
+            self.force_update()
 
 
-CURRENT_DB = TempDatabase()
+CURRENT_DB = TempSQLiteDatabase()
 
 
 def get_instance():
