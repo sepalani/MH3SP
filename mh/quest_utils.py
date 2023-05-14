@@ -6,7 +6,6 @@
 
 from os import path
 import struct
-import ctypes
 from other.utils import pad
 from mh.equipment_utils import create_arena_equipment_set
 
@@ -881,38 +880,39 @@ class QuestRestrictionType:
     RESTRICTION_46_JOIN = 26
 
 
-def make_monster_quest_type(monster_type, boss_id, enabled, level, min, size, max):
+def make_monster_quest_type(monster_type, boss_id, enabled, level,
+                            min, size, max):
     data = b""
-    #- id: monster_type
-    #type: u1
-    #enum: Monster
+    # - id: monster_type
+    # type: u1
+    # enum: Monster
     data += struct.pack(">B", monster_type)
 
-    #- id: boss_id
-    #type: u2
+    # - id: boss_id
+    # type: u2
     data += struct.pack(">h", boss_id)
 
-    #- id: enabled
-    #type: u1
+    # - id: enabled
+    # type: u1
     if enabled:
         data += struct.pack(">B", 0x01)
     else:
         data += struct.pack(">B", 0x00)
 
-    #- id: level
-    #type: u1
+    # - id: level
+    # type: u1
     data += struct.pack(">B", level)
 
-    #- id: min
-    #type: u1
+    # - id: min
+    # type: u1
     data += struct.pack(">B", min)
 
-    #- id: size
-    #type: u1
+    # - id: size
+    # type: u1
     data += struct.pack(">B", size)
 
-    #- id: max
-    #type: u1
+    # - id: max
+    # type: u1
     data += struct.pack(">B", max)
 
     return data
@@ -920,16 +920,16 @@ def make_monster_quest_type(monster_type, boss_id, enabled, level, min, size, ma
 
 def make_quest_properties_type(type, objective_type, objective_count):
     data = b""
-    #- id: type
-    #type: u4
+    # - id: type
+    # type: u4
     data += struct.pack(">I", type)
 
-    #- id: objective_type
-    #type: u2
+    # - id: objective_type
+    # type: u2
     data += struct.pack(">h", objective_type)
 
-    #- id: objective_count
-    #type: u2
+    # - id: objective_count
+    # type: u2
     data += struct.pack(">h", objective_count)
 
     return data
@@ -937,17 +937,17 @@ def make_quest_properties_type(type, objective_type, objective_count):
 
 def make_reward_type(item, amount, percent):
     data = b""
-    #- id: item
-    #type: u2
-    #enum: item_type
+    # - id: item
+    # type: u2
+    # enum: item_type
     data += struct.pack(">h", item)
 
-    #- id: amount
-    #type: u1
+    # - id: amount
+    # type: u1
     data += struct.pack(">B", amount)
 
-    #- id: percent
-    #type: u1
+    # - id: percent
+    # type: u1
     data += struct.pack(">B", percent)
 
     return data
@@ -955,7 +955,7 @@ def make_reward_type(item, amount, percent):
 
 def generate_rewards(rewards):
     data = b""
-    i=-1
+    i = -1
     for i, reward in enumerate(rewards):
         data += make_reward_type(reward[0], reward[1], reward[2])
         if i == 10:
@@ -972,7 +972,8 @@ def make_binary_event_quest(quest_data):
         'client': client,
         'description': description,
         'details': details,
-        'success_message' success_message,  # usually "Complete the Main Quest."
+        # Usually "Complete the Main Quest."
+        'success_message': success_message,
         'flags': flags,
         'penalty_per_cart': penalty_per_cart,
         'quest_fee': quest_fee,
@@ -984,7 +985,7 @@ def make_binary_event_quest(quest_data):
         'hrp_restriction': hrp_restriction,
         'resources': resources,
         'supply_set_number': supply_set_number,
-        'starting_position': starting_position, 
+        'starting_position': starting_position,
         'general_enemy_level': general_enemy_level,
         'summon': summon,
         'smallmonster_data_file': smallmonster_data,
@@ -1000,8 +1001,10 @@ def make_binary_event_quest(quest_data):
             'enabled': monsterType1_enabled,
             'level': monsterType1_level,  # 0x01 through 0x3c
             'size': monsterType1_size,
-            'hp_spread': monsterType1_min, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': monsterType1_max  # controls the spread of size but details unknown
+            # 0: fixed, 1: spread of 5, 2: spread of 3
+            'hp_spread': monsterType1_min,
+            # Controls the spread of size but details unknown
+            'size_spread': monsterType1_max
         },
         'monster_2': {
             'type': monsterType2,
@@ -1009,8 +1012,10 @@ def make_binary_event_quest(quest_data):
             'enabled': monsterType2_enabled,
             'level': monsterType2_level,  # 0x01 through 0x3c
             'size': monsterType2_size,
-            'hp_spread': monsterType2_min, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': monsterType2_max  # controls the spread of size but details unknown
+            # 0: fixed, 1: spread of 5, 2: spread of 3
+            'hp_spread': monsterType2_min,
+            # Controls the spread of size but details unknown
+            'size_spread': monsterType2_max
         },
         'monster_3': {
             'type': monsterType3,
@@ -1018,8 +1023,10 @@ def make_binary_event_quest(quest_data):
             'enabled': monsterType3_enabled,
             'level': monsterType3_level,  # 0x01 through 0x3c
             'size': monsterType3_size,
-            'hp_spread': monsterType3_min, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': monsterType3_max  # controls the spread of size but details unknown
+            # 0: fixed, 1: spread of 5, 2: spread of 3
+            'hp_spread': monsterType3_min,
+            # Controls the spread of size but details unknown
+            'size_spread': monsterType3_max
         }
     },
     """
@@ -1081,298 +1088,342 @@ def make_binary_event_quest(quest_data):
     # TOOO: Remove encode("ascii") and use bytes instead
     data = b""
 
-    #- id: name
-    #  type: str
-    #  size: 44
+    # - id: name
+    # type: str
+    # size: 44
     data += pad(quest_info['name'].encode("ascii"), 40)  # Size 0x28
     data += struct.pack(">I", 0x00000000)
 
-    #- id: quest_id
-    #  type: u2
+    # - id: quest_id
+    # type: u2
     data += struct.pack(">H", quest_info['quest_id'])
 
-    #- id: description
-    #  type: str
-    #  size: 92
+    # - id: description
+    # type: str
+    # size: 92
     data += pad(quest_info['description'].encode("ascii"), 80)
     data += b'\0' * 0xC  # Padding
 
-    #- id: quest_rank
-    #  type: u1
-    #  enum: QuestRankType
+    # - id: quest_rank
+    # type: u1
+    # enum: QuestRankType
     data += struct.pack(">B", quest_info['quest_rank'])
 
-    #- id: location
-    #  type: u1
-    #  enum: LocationType
+    # - id: location
+    # type: u1
+    # enum: LocationType
     data += struct.pack(">B", quest_info['location'])  # Offset 0x8C
 
-    #- id: sub_quest_1_title
-    #  type: str
-    #  size: 41
-    data += pad(objective_details['subquest_1']['description'].encode("ascii"), 0x29)
+    # - id: sub_quest_1_title
+    # type: str
+    # size: 41
+    data += pad(
+        objective_details['subquest_1']['description'].encode("ascii"),
+        0x29
+    )
 
-    #- id: sub_quest_2_title
-    #  type: str
-    #  size: 41
-    data += pad(objective_details['subquest_2']['description'].encode("ascii"), 0x29)
+    # - id: sub_quest_2_title
+    # type: str
+    # size: 41
+    data += pad(
+        objective_details['subquest_2']['description'].encode("ascii"),
+        0x29
+    )
 
-    #- id: sucess_message
-    #  type: str
-    #  size: 92
+    # - id: sucess_message
+    # type: str
+    # size: 92
     data += pad(quest_info['success_message'].encode("ascii"), 0x5C)
 
-    #- id: time_limit
-    #  type: u2
+    # - id: time_limit
+    # type: u2
     data += struct.pack(">h", quest_info['time_limit'])  # Offset 0x13A
 
-    #- id: failure_message
-    #  type: str
-    #  size: 92
-    data += pad(b"Reward hits 0, or time\x0Aexpires.", 0x5C)  # Presently hardcoded
+    # - id: failure_message
+    # type: str
+    # size: 92
+    # Presently hardcoded
+    data += pad(b"Reward hits 0, or time\nexpires.", 0x5C)
 
-    #- id: hunter_rank_point_restriction
-    #  type: u2
+    # - id: hunter_rank_point_restriction
+    # type: u2
     data += struct.pack(">h", quest_info['hrp_restriction'])
 
-    #- id: client
-    #  type: str
-    #  size: 41
+    # - id: client
+    # type: str
+    # size: 41
     data += pad(quest_info['client'].encode("ascii"), 0x29)
 
-    #- id: unk2
-    #  size: 6
+    # - id: unk2
+    # size: 6
     data += b'\0' * 0x06
 
-    #- id: details
-    #  type: str
-    #  size: 256
-    data += pad(quest_info['details'].encode("ascii"), 0x100)  #b'\0' * 0x100
+    # - id: details
+    # type: str
+    # size: 256
+    data += pad(quest_info['details'].encode("ascii"), 0x100)  # b'\0' * 0x100
 
-    #- id: unk1
-    #  size: 61
+    # - id: unk1
+    # size: 61
     data += b'\0' * 0x3D
 
-    #- id: minion_unsure
-    #  size: 3
+    # - id: minion_unsure
+    # size: 3
     data += b'\0' * 0x03
 
-    #- id: quest_flags_unsure
-    #  size: 3
+    # - id: quest_flags_unsure
+    # size: 3
     data += b'\0' * 0x03
 
-    #- id: monster_1
-    #  type: u1
-    #  enum: Monster
-    data += struct.pack(">B", quest_info['main_monster_1'])  # Offset 0x30C ("Main monsters" 1)
+    # - id: monster_1
+    # type: u1
+    # enum: Monster
+    # Offset 0x30C ("Main monsters" 1)
+    data += struct.pack(">B", quest_info['main_monster_1'])
 
-    #- id: monster_2
-    #  type: u1
-    #  enum: Monster
-    data += struct.pack(">B", quest_info['main_monster_2'])  # Offset 0x30D ("Main monsters" 2)
+    # - id: monster_2
+    # type: u1
+    # enum: Monster
+    # Offset 0x30D ("Main monsters" 2)
+    data += struct.pack(">B", quest_info['main_monster_2'])
 
-    #- id: unk3
-    #  size: 2
+    # - id: unk3
+    # size: 2
     data += b'\0' * 0x02  # Padding
 
-    #- id: flags
-    #  type: u4
+    # - id: flags
+    # type: u4
     data += struct.pack(">I", quest_info['flags'])  # Offset 0x310
 
-    #- id: monsters
-    #  type: monster_quest_type
-    #  repeat: expr
-    #  repeat-expr: 3
+    # - id: monsters
+    # type: monster_quest_type
+    # repeat: expr
+    # repeat-expr: 3
 
     if monster_1['type'] != 0:
-        data += make_monster_quest_type(monster_type=monster_1['type'],
-                                        boss_id=monster_1['boss_id'],
-                                        enabled=monster_1['enabled'],
-                                        level=monster_1['level'],
-                                        min=monster_1['hp_spread'],
-                                        size=monster_1['size'],
-                                        max=monster_1['size_spread'])  # size: 0x08
+        data += make_monster_quest_type(
+            monster_type=monster_1['type'],
+            boss_id=monster_1['boss_id'],
+            enabled=monster_1['enabled'],
+            level=monster_1['level'],
+            min=monster_1['hp_spread'],
+            size=monster_1['size'],
+            max=monster_1['size_spread']
+        )  # size: 0x08
     else:
         data += b'\0' * 0x08
 
     if monster_2['type'] != 0:
-        data += make_monster_quest_type(monster_type=monster_2['type'],
-                                        boss_id=monster_2['boss_id'],
-                                        enabled=monster_2['enabled'],
-                                        level=monster_2['level'],
-                                        min=monster_2['hp_spread'],
-                                        size=monster_2['size'],
-                                        max=monster_2['size_spread'])  # size: 0x08
+        data += make_monster_quest_type(
+            monster_type=monster_2['type'],
+            boss_id=monster_2['boss_id'],
+            enabled=monster_2['enabled'],
+            level=monster_2['level'],
+            min=monster_2['hp_spread'],
+            size=monster_2['size'],
+            max=monster_2['size_spread']
+        )  # size: 0x08
     else:
         data += b'\0' * 0x08
 
     if monster_3['type'] != 0:
-        data += make_monster_quest_type(monster_type=monster_3['type'],
-                                        boss_id=monster_3['boss_id'],
-                                        enabled=monster_3['enabled'],
-                                        level=monster_3['level'],
-                                        min=monster_3['hp_spread'],
-                                        size=monster_3['size'],
-                                        max=monster_3['size_spread'])  # size: 0x08
+        data += make_monster_quest_type(
+            monster_type=monster_3['type'],
+            boss_id=monster_3['boss_id'],
+            enabled=monster_3['enabled'],
+            level=monster_3['level'],
+            min=monster_3['hp_spread'],
+            size=monster_3['size'],
+            max=monster_3['size_spread']
+        )  # size: 0x08
     else:
         data += b'\0' * 0x08
 
-
     # SUMMON / (INVADER?)
-    #- id: unk5
-    #  type: u4
+    # - id: unk5
+    # type: u4
     data += struct.pack(">I", quest_info['summon'])
 
-    #- id: quests_properties
-    #  type: quest_properties_type
-    #  repeat: expr
-    #  repeat-expr: 3
+    # - id: quests_properties
+    # type: quest_properties_type
+    # repeat: expr
+    # repeat-expr: 3
 
-    # "Hunt 8 jaggia:"              mainquest_type = 0x00008101, mainquest_objectivetype=0x000b, mainquest_objectivecount=0x0008
-    # "Hunt 12 jaggi:"              mainquest_type = 0x00000101, mainquest_objectivetype=0x000a, mainquest_objectivecount=0x000c
+    # "Hunt 8 jaggia:"
+    # mainquest_type = 0x00008101,
+    # mainquest_objectivetype=0x000b,
+    # mainquest_objectivecount=0x0008
 
-    # "Hunt a Great Jaggi:"         mainquest_type = 0x00000001, mainquest_objectivetype=0x000c, mainquest_objectivecount=0x0001
-    # "Wound Great Jaggi's Head:"   quest_type = 0x00000204, quest_objectivetype=0x000c, quest_objectivecount=0x0001
-    # "Stun Great Jaggi:"           quest_type = 0x00001000, quest_objectivetype=0x000c, quest_objectivecount=0x0003
+    # "Hunt 12 jaggi:"
+    # mainquest_type = 0x00000101,
+    # mainquest_objectivetype=0x000a,
+    # mainquest_objectivecount=0x000c
 
-    data += make_quest_properties_type(main_quest['type'],
-                                       main_quest['objective_type'],
-                                       main_quest['objective_num'])  # Main quest
+    # "Hunt a Great Jaggi:"
+    # mainquest_type = 0x00000001,
+    # mainquest_objectivetype=0x000c,
+    # mainquest_objectivecount=0x0001
+
+    # "Wound Great Jaggi's Head:"
+    # quest_type = 0x00000204,
+    # quest_objectivetype=0x000c,
+    # quest_objectivecount=0x0001
+
+    # "Stun Great Jaggi:"
+    # quest_type = 0x00001000,
+    # quest_objectivetype=0x000c,
+    # quest_objectivecount=0x0003
+
+    data += make_quest_properties_type(
+        main_quest['type'],
+        main_quest['objective_type'],
+        main_quest['objective_num']
+    )
 
     if subquest_1['type'] is not None:
-        data += make_quest_properties_type(subquest_1['type'],
-                                           subquest_1['objective_type'],
-                                           subquest_1['objective_num'])  # Subquest 1
+        data += make_quest_properties_type(
+            subquest_1['type'],
+            subquest_1['objective_type'],
+            subquest_1['objective_num']
+        )
     else:
         data += b"\0" * 0x08
 
     if subquest_2['type'] is not None:
-        data += make_quest_properties_type(subquest_2['type'],
-                                           subquest_2['objective_type'],
-                                           subquest_2['objective_num'])  # Subquest 2
+        data += make_quest_properties_type(
+            subquest_2['type'],
+            subquest_2['objective_type'],
+            subquest_2['objective_num']
+        )
     else:
         data += b"\0" * 0x08
 
-    #- id: contract_fee
-    #  type: u4
+    # - id: contract_fee
+    # type: u4
     data += struct.pack(">I", quest_info['quest_fee'])  # Offset 0x348
 
-    #- id: main_objective_reward
-    #  type: u4
+    # - id: main_objective_reward
+    # type: u4
     data += struct.pack(">I", main_quest['zenny_reward'])
 
-    #- id: sub_objective_a_reward
-    #  type: u4
+    # - id: sub_objective_a_reward
+    # type: u4
     data += struct.pack(">I", subquest_1['zenny_reward'])
 
-    #- id: sub_objective_b_reward
-    #  type: u4
+    # - id: sub_objective_b_reward
+    # type: u4
     data += struct.pack(">I", subquest_2['zenny_reward'])
 
-    #- id: death_reduction
-    #  type: u4
+    # - id: death_reduction
+    # type: u4
     data += struct.pack(">I", quest_info['penalty_per_cart'])
 
-    #- id: hunter_rank_points
-    #  type: u4
+    # - id: hunter_rank_points
+    # type: u4
     data += struct.pack(">I", main_quest['hrp_reward'])
 
-    #- id: unk7
-    #  type: u4
-    data += struct.pack(">I", 0x0000000f)  # 0x0000000f for the great jaggi quest/(all quests?)
+    # - id: unk7
+    # type: u4
+    # 0x0000000f for the great jaggi quest/(all quests?)
+    data += struct.pack(">I", 0x0000000f)
 
-    #- id: unk8
-    #  type: u1
+    # - id: unk8
+    # type: u1
     data += b'\0' * 0x01
 
-    #- id: gather_rank (wrong)
-    #  type: u1
+    # - id: gather_rank (wrong)
+    # type: u1
     data += b'\0' * 0x01
 
-    #- id: unk9
-    #  type: u1
+    # - id: unk9
+    # type: u1
     data += b'\0' * 0x01
 
-    #- id: unk10
-    #  type: u1
+    # - id: unk10
+    # type: u1
     data += struct.pack(">B", subquest_1['hrp_reward'])
 
-    #- id: supply_set (wrong)
-    #  type: u4
+    # - id: supply_set (wrong)
+    # type: u4
     data += struct.pack(">I", subquest_2['hrp_reward'])
 
-    #- id: Unknown 4
-    #  type: u1
+    # - id: Unknown 4
+    # type: u1
     data += struct.pack(">B", unknown['unk_4'])
 
-    #- id: supply_type (0x00: low rank, 0x01: high rank, 0x02: arena)
-    #  type: u1
+    # - id: supply_type (0x00: low rank, 0x01: high rank, 0x02: arena)
+    # type: u1
     data += struct.pack(">B", quest_info['resources'])
-    
-    #- id: unk11
-    #  size: 2
-    #  type: u1
+
+    # - id: unk11
+    # size: 2
+    # type: u1
     data += struct.pack(">B", unknown['unk_5'])
-    #  type: u1
+    # type: u1
     data += struct.pack(">B", unknown['unk_6'])
 
-    #- id: start_pos (SUPPLY SET NUMBER)
-    #  type: u4
-    data += struct.pack(">I", quest_info['supply_set_number'])  # 0x00000011 for the great jaggi quest
+    # - id: start_pos (SUPPLY SET NUMBER)
+    # type: u4
+    # 0x00000011 for the great jaggi quest
+    data += struct.pack(">I", quest_info['supply_set_number'])
 
-    #- id: unk12
-    #  type: u4
+    # - id: unk12
+    # type: u4
     data += struct.pack(">I", unknown['unk_7'])
 
-    #- id: unk13
-    #  type: u2
+    # - id: unk13
+    # type: u2
     data += b'\0' * 0x02
 
-    #- id: type_flag (STARTING POSITION, 0x0000: basecamp, 0x0001: random, 0x0002: shrine)
-    #  type: u2
+    # - id: type_flag (STARTING POSITION, 0x0000: basecamp,
+    #                  0x0001:random, 0x0002: shrine)
+    # type: u2
     data += struct.pack(">h", quest_info['starting_position'])
-    
+
     # UNK
     data += b'\0' * 0x02
 
-    #- id: type_code
-    #  type: u2
-    data += struct.pack(">h", 0x04b8) 
+    # - id: type_code
+    # type: u2
+    data += struct.pack(">h", 0x04b8)
 
-    #- id: type_amount
-    #  type: u2
+    # - id: type_amount
+    # type: u2
     data += b'\0' * 0x02
 
-    #- id: general_enemy_level
-    #  type: u2
+    # - id: general_enemy_level
+    # type: u2
     data += struct.pack(">h", quest_info['general_enemy_level'])
 
-    #- id: unk14
-    #  type: u4
+    # - id: unk14
+    # type: u4
     data += struct.pack(">I", unknown['unk_9'])
 
-    #- id: unk15
-    #  type: u4
+    # - id: unk15
+    # type: u4
     data += struct.pack(">I", unknown['unk_10'])
 
-    #- id: unk16
-    #  size: 16
+    # - id: unk16
+    # size: 16
     data += struct.pack(">I", unknown['unk_11'])
-    data += struct.pack(">I", unknown['unk_12'])  # Unknown 12 (0x00000002 for large monster hunting quests, 0x00000003 for small monster & gathering quests, 0x00000005 for Jhen & Alatreon)
+    # Unknown 12 (0x00000002 for large monster hunting quests,
+    #             0x00000003 for small monster & gathering quests,
+    #             0x00000005 for Jhen & Alatreon)
+    data += struct.pack(">I", unknown['unk_12'])
     data += make_quest_properties_type(main_quest['type'],
                                        main_quest['objective_type'],
                                        main_quest['objective_num'])
 
-    #- id: main_objective_rewards
-    #  type: reward_type
-    #  repeat: expr
-    #  repeat-expr: 11
+    # - id: main_objective_rewards
+    # type: reward_type
+    # repeat: expr
+    # repeat-expr: 11
     data += generate_rewards(main_quest['rewards_row_1'])
 
-    #- id: main_objective_additional_rewards
-    #  type: reward_type
-    #  repeat: expr
-    #  repeat-expr: 11
+    # - id: main_objective_additional_rewards
+    # type: reward_type
+    # repeat: expr
+    # repeat-expr: 11
     data += generate_rewards(main_quest['rewards_row_2'])
 
     # SUBQUEST 1 REWARDS
@@ -1399,9 +1450,9 @@ def make_binary_event_quest(quest_data):
 
     assert len(data) == 0x4B4
 
-    # Add 2-byte tail between the main quest info and the small monster data that
-    # describes how many bytes total the quest takes up before the optional
-    # arena equipment data
+    # Add 2-byte tail between the main quest info and the small monster data
+    # that describes how many bytes total the quest takes up before the
+    # optional arena equipment data
     tail = 0x4B4 + 4
     sm_data = read_quest_sm_data(quest_info['smallmonster_data_file'])
     if sm_data is not None:
@@ -1422,10 +1473,46 @@ def make_binary_event_quest(quest_data):
 
 # FLAGS INFO:
 # (Arena quests have bytes in "QUEST_FLAG_ARENA = 0b10000" set)
-# byte 1: Boss Order 1 (+1: Unknown1  +2: All At Once(CombineSubquestsRequireMQAndFirstSubquest)  +4: Marathon (CombineSubquestsRequireMQAndBothSubquests) +8: Unknown4  +16: Unknown5  +32: Unknown6  +64: Unknown7  +128: CombineMainAndSubquests)
-# byte 2: Boss Order 2 (+1: Unknown1  +2: Unknown2  +4: RequireMQAndBothSubquests  +8: Unknown4  +16: QualifyingTime  +32: DontAnnounceSubquestCompletion  +64: Unknown7  +128: ElderDragonLeftWounded)
-# byte 3: Boss Order 3 (+1: 2Mon_NoSubs_ReqSub1_Unstable  +2: Unknown2  +4: Unknown3  +8: BanjoMusic  +16: Unknown5  +32: Unknown6  +64: Unknown7  +128: Unknown8)
-# byte 4: Quest Flags (+1: Slay  +2: Deliver  +4: Capture  +8: Defend  +16: ArenaQuest  +32: Unknown2  +64: Repel(EndAtMainQuest)  +128: Unknown3)
+# byte 1: Boss Order 1 (
+#     +1: Unknown1
+#     +2: All At Once(CombineSubquestsRequireMQAndFirstSubquest)
+#     +4: Marathon (CombineSubquestsRequireMQAndBothSubquests)
+#     +8: Unknown4
+#     +16: Unknown5
+#     +32: Unknown6
+#     +64: Unknown7
+#     +128: CombineMainAndSubquests
+# )
+# byte 2: Boss Order 2 (
+#     +1: Unknown1
+#     +2: Unknown2
+#     +4: RequireMQAndBothSubquests
+#     +8: Unknown4
+#     +16: QualifyingTime
+#     +32: DontAnnounceSubquestCompletion
+#     +64: Unknown7
+#     +128: ElderDragonLeftWounded
+# )
+# byte 3: Boss Order 3 (
+#     +1: 2Mon_NoSubs_ReqSub1_Unstable
+#     +2: Unknown2
+#     +4: Unknown3
+#     +8: BanjoMusic
+#     +16: Unknown5
+#     +32: Unknown6
+#     +64: Unknown7
+#     +128: Unknown8
+# )
+# byte 4: Quest Flags (
+#     +1: Slay
+#     +2: Deliver
+#     +4: Capture
+#     +8: Defend
+#     +16: ArenaQuest
+#     +32: Unknown2
+#     +64: Repel(EndAtMainQuest)
+#     +128: Unknown3
+# )
 def generate_flags(byte1, byte2, byte3, byte4):
     res = 0x00000000
 
@@ -1458,7 +1545,7 @@ def read_quest_sm_data(fname):
         return None
     with open(data_path, 'r') as f:
         data = f.read()
-    return bytearray.fromhex(data.replace(" ","").replace("\n",""))
+    return bytearray.fromhex(data.replace(" ", "").replace("\n", ""))
 
 
 """
@@ -1473,12 +1560,21 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
         'name': "Jump Three Jaggi",
         'client': "Guild Subcontractor",
         'description': "Hunt 3 Great Jaggi",
-        'details': "I'm gonna get so fired for" + '\x0A' + "this... The Great Jaggi some" + '\x0A' +
-            "hunter brought in just" + '\x0A' + "escaped. Mind going after" + '\x0A' +
-            "them? You better hurry," + '\x0A' + "though. Bet they've got some" + '\x0A' +
+        'details':
+            "I'm gonna get so fired for\n"
+            "this... The Great Jaggi some\n"
+            "hunter brought in just\n"
+            "escaped. Mind going after\n"
+            "them? You better hurry,\n"
+            "though. Bet they've got some\n"
             "incredible materials, too.",
         'success_message': "Complete the Main Quest.",
-        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,1,1)),
+        'flags': generate_flags(
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 1, 0, 0, 0, 0, 0, 0),
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 0, 1, 0, 0, 0, 1, 1)
+        ),
         'penalty_per_cart': 1400,
         'quest_fee': 400,
         'time_limit': 50,
@@ -1489,7 +1585,7 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_NONE,
         'resources': ResourcesType.low_rank,
         'supply_set_number': 19,
-        'starting_position': StartingPositionType.camp, 
+        'starting_position': StartingPositionType.camp,
         'general_enemy_level': 0x0017,
         'summon': 0x64050219,
         'smallmonster_data_file': 'sm_jumpfourjaggi.dat',
@@ -1501,8 +1597,8 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
             'enabled': True,
             'level': 0x17,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x01,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_2': {
             'type': Monster.great_jaggi,
@@ -1510,8 +1606,8 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
             'enabled': True,
             'level': 0x17,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x01,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_3': {
             'type': Monster.great_jaggi,
@@ -1519,8 +1615,8 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
             'enabled': True,
             'level': 0x17,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x01,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         }
     },
     'objective_details': {
@@ -1530,13 +1626,22 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
             'objective_num': 0x03,
             'zenny_reward': 4000,
             'hrp_reward': 440,
-            'rewards_row_1': [(ItemsType.great_jagi_claw, 1, 3), (ItemsType.great_jagi_hide, 1, 12),
-                              (ItemsType.jagi_scale, 1, 10), (ItemsType.screamer, 1, 20),
-                              (ItemsType.kings_frill, 1, 12), (ItemsType.bone_husk_s, 8, 18),
-                              (ItemsType.great_jagi_head, 1, 25)],
-            'rewards_row_2': [(ItemsType.mystery_charm, 1, 1), (ItemsType.aquaglow_jewel, 1, 1),
-                              (ItemsType.shining_charm, 1, 1), (ItemsType.armor_sphere, 1, 1),
-                              (ItemsType.armor_sphere_plus, 1, 1)],
+            'rewards_row_1': [
+                (ItemsType.great_jagi_claw, 1, 3),
+                (ItemsType.great_jagi_hide, 1, 12),
+                (ItemsType.jagi_scale, 1, 10),
+                (ItemsType.screamer, 1, 20),
+                (ItemsType.kings_frill, 1, 12),
+                (ItemsType.bone_husk_s, 8, 18),
+                (ItemsType.great_jagi_head, 1, 25)
+            ],
+            'rewards_row_2': [
+                (ItemsType.mystery_charm, 1, 1),
+                (ItemsType.aquaglow_jewel, 1, 1),
+                (ItemsType.shining_charm, 1, 1),
+                (ItemsType.armor_sphere, 1, 1),
+                (ItemsType.armor_sphere_plus, 1, 1)
+            ],
         },
         'subquest_1': {
             'description': "Hunt 2 Great Jaggi",
@@ -1545,10 +1650,15 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
             'objective_num': 0x02,
             'zenny_reward': 4000,
             'hrp_reward': 220,
-            'rewards_row_1': [(ItemsType.great_jagi_claw, 1, 1), (ItemsType.great_jagi_hide, 1, 1),
-                              (ItemsType.jagi_scale, 1, 1), (ItemsType.screamer, 1, 1),
-                              (ItemsType.kings_frill, 1, 1), (ItemsType.bone_husk_s, 8, 1),
-                              (ItemsType.great_jagi_head, 1, 1)],
+            'rewards_row_1': [
+                (ItemsType.great_jagi_claw, 1, 1),
+                (ItemsType.great_jagi_hide, 1, 1),
+                (ItemsType.jagi_scale, 1, 1),
+                (ItemsType.screamer, 1, 1),
+                (ItemsType.kings_frill, 1, 1),
+                (ItemsType.bone_husk_s, 8, 1),
+                (ItemsType.great_jagi_head, 1, 1)
+            ],
         },
         'subquest_2': {
             'description': "None",
@@ -1561,7 +1671,8 @@ QUEST_EVENT_JUMP_FOUR_JAGGI = {
         }
     },
     'unknown': {
-        'unk_12': 0x00000002,  # (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
+        # (2 for large mon quest, 3 for small/delivery, 5 for jhen/ala)
+        'unk_12': 0x00000002,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
@@ -1582,12 +1693,21 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
         'name': "The Phantom Uragaan",
         'client': "Spoiled Princess",
         'description': "Hunt an Uragaan",
-        'details': "Oooh, I just heard they've" + '\x0A' + "spotted the cutest, tiniest," + '\x0A' +
-            "most adorable little Uragaan" + '\x0A' + "on the Volcano. Hunt me one" + '\x0A' +
-            "this instant or I will get" + '\x0A' + "very angry. And if I'm angry," + '\x0A' +
+        'details':
+            "Oooh, I just heard they've\n"
+            "spotted the cutest, tiniest,\n"
+            "most adorable little Uragaan\n"
+            "on the Volcano. Hunt me one\n"
+            "this instant or I will get\n"
+            "very angry. And if I'm angry,\n"
             "Daddy's angry. Now go!",
         'success_message': "Complete the Main Quest.",
-        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,1,0,0,0,0),(1,0,1,0,0,0,1,1)),
+        'flags': generate_flags(
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 1, 0, 0, 0, 0, 0, 0),
+            (0, 0, 0, 1, 0, 0, 0, 0),
+            (1, 0, 1, 0, 0, 0, 1, 1)
+        ),
         'penalty_per_cart': 3000,
         'quest_fee': 850,
         'time_limit': 50,
@@ -1598,7 +1718,7 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_18_INITJOIN,
         'resources': ResourcesType.low_rank,
         'supply_set_number': 15,
-        'starting_position': StartingPositionType.camp, 
+        'starting_position': StartingPositionType.camp,
         'general_enemy_level': 0x1D,
         'summon': 0x00000000,
         'smallmonster_data_file': 'sm_phantomuragaan.dat',
@@ -1610,8 +1730,8 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
             'enabled': True,
             'level': 0x1D,  # 0x01 through 0x3c
             'size': 0x13,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_2': {
             'type': Monster.none,
@@ -1619,8 +1739,8 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_3': {
             'type': Monster.none,
@@ -1628,8 +1748,8 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         }
     },
     'objective_details': {
@@ -1639,14 +1759,26 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
             'objective_num': 0x01,
             'zenny_reward': 8800,
             'hrp_reward': 1100,
-            'rewards_row_1': [(ItemsType.mystery_charm, 1, 1), (ItemsType.uragaan_shell, 1, 16),
-                              (ItemsType.uragaan_scale, 1, 20), (ItemsType.uragaan_marrow, 1, 10),
-                              (ItemsType.monster_bone_l, 1, 10), (ItemsType.bone_husk_l, 15, 13),
-                              (ItemsType.shining_charm, 1, 5), (ItemsType.rustshard, 1, 25)],
-            'rewards_row_2': [(ItemsType.mystery_charm, 1, 1), (ItemsType.uragaan_shell, 1, 16),
-                              (ItemsType.uragaan_scale, 1, 20), (ItemsType.uragaan_marrow, 1, 10),
-                              (ItemsType.monster_bone_l, 1, 10), (ItemsType.bone_husk_l, 15, 13),
-                              (ItemsType.shining_charm, 1, 5), (ItemsType.rustshard, 1, 25)],
+            'rewards_row_1': [
+                (ItemsType.mystery_charm, 1, 1),
+                (ItemsType.uragaan_shell, 1, 16),
+                (ItemsType.uragaan_scale, 1, 20),
+                (ItemsType.uragaan_marrow, 1, 10),
+                (ItemsType.monster_bone_l, 1, 10),
+                (ItemsType.bone_husk_l, 15, 13),
+                (ItemsType.shining_charm, 1, 5),
+                (ItemsType.rustshard, 1, 25)
+            ],
+            'rewards_row_2': [
+                (ItemsType.mystery_charm, 1, 1),
+                (ItemsType.uragaan_shell, 1, 16),
+                (ItemsType.uragaan_scale, 1, 20),
+                (ItemsType.uragaan_marrow, 1, 10),
+                (ItemsType.monster_bone_l, 1, 10),
+                (ItemsType.bone_husk_l, 15, 13),
+                (ItemsType.shining_charm, 1, 5),
+                (ItemsType.rustshard, 1, 25)
+            ],
         },
         'subquest_1': {
             'description': "None",
@@ -1668,7 +1800,8 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
         },
     },
     'unknown': {
-        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_12': 0x00000002,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
@@ -1683,18 +1816,29 @@ QUEST_EVENT_THE_PHANTOM_URAGAAN = {
 EVENT QUEST 8: Blood Sport
 Quest description from https://www.youtube.com/watch?v=tuRSdC_mlO4
 """
-QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
+QUEST_EVENT_BLOOD_SPORT = {
     'quest_info': {
         'quest_id': 61008,
         'name': "Blood Sport",
         'client': "Spoiled Princess",
-        'description': "Hunt an Uragaan" + '\x0A' + "and a Diablos",
-        'details': "Oh, boo! I'm tired of watching" + '\x0A' + "run-of-the-mill hunts. The" + '\x0A' +
-            "Diablos and the Uragaan are" + '\x0A' + "supposed to be the ultimate" + '\x0A' +
-            "monster duo. I'd love to watch" + '\x0A' + "them maim some foolish hunter!" + '\x0A' +
+        'description':
+            "Hunt an Uragaan\n"
+            "and a Diablos",
+        'details':
+            "Oh, boo! I'm tired of watching\n"
+            "run-of-the-mill hunts. The\n"
+            "Diablos and the Uragaan are\n"
+            "supposed to be the ultimate\n"
+            "monster duo. I'd love to watch\n"
+            "them maim some foolish hunter!\n"
             "Do put on a good show...",
         'success_message': "Complete the Main Quest.",
-        'flags': generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),
+        'flags': generate_flags(
+            (0, 1, 0, 0, 0, 0, 0, 0),
+            (1, 1, 0, 0, 0, 0, 0, 0),
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 0, 1, 0, 0, 0, 0, 0)
+        ),
         'penalty_per_cart': 6000,
         'quest_fee': 1750,
         'time_limit': 50,
@@ -1705,7 +1849,7 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_18_INITJOIN,
         'resources': ResourcesType.low_rank,
         'supply_set_number': 43,
-        'starting_position': StartingPositionType.camp, 
+        'starting_position': StartingPositionType.camp,
         'general_enemy_level': 0x001D,
         'summon': 0x00000000,
         'smallmonster_data_file': 'sm_bloodsport.dat',
@@ -1717,8 +1861,8 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
             'enabled': True,
             'level': 0x1D,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x01,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_2': {
             'type': Monster.diablos,
@@ -1726,8 +1870,8 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
             'enabled': True,
             'level': 0x1D,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x01,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_3': {
             'type': Monster.none,
@@ -1735,8 +1879,8 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         }
     },
     'objective_details': {
@@ -1746,14 +1890,26 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
             'objective_num': 0x01,
             'zenny_reward': 17600,
             'hrp_reward': 1760,
-            'rewards_row_1': [(ItemsType.uragaan_scale, 1, 1), (ItemsType.diablos_ridge, 1, 14),
-                              (ItemsType.uragaan_shell, 1, 10), (ItemsType.diablos_shell, 1, 20),
-                              (ItemsType.twisted_horn, 1, 12), (ItemsType.diablos_marrow, 8, 9),
-                              (ItemsType.uragaan_marrow, 1, 9), (ItemsType.incomplete_plans, 1, 25)],
-            'rewards_row_2': [(ItemsType.uragaan_scale, 1, 1), (ItemsType.diablos_ridge, 1, 14),
-                              (ItemsType.uragaan_shell, 1, 10), (ItemsType.diablos_shell, 1, 20),
-                              (ItemsType.twisted_horn, 1, 12), (ItemsType.diablos_marrow, 1, 9),
-                              (ItemsType.uragaan_marrow, 1, 9), (ItemsType.incomplete_plans, 1, 25)],
+            'rewards_row_1': [
+                (ItemsType.uragaan_scale, 1, 1),
+                (ItemsType.diablos_ridge, 1, 14),
+                (ItemsType.uragaan_shell, 1, 10),
+                (ItemsType.diablos_shell, 1, 20),
+                (ItemsType.twisted_horn, 1, 12),
+                (ItemsType.diablos_marrow, 8, 9),
+                (ItemsType.uragaan_marrow, 1, 9),
+                (ItemsType.incomplete_plans, 1, 25)
+            ],
+            'rewards_row_2': [
+                (ItemsType.uragaan_scale, 1, 1),
+                (ItemsType.diablos_ridge, 1, 14),
+                (ItemsType.uragaan_shell, 1, 10),
+                (ItemsType.diablos_shell, 1, 20),
+                (ItemsType.twisted_horn, 1, 12),
+                (ItemsType.diablos_marrow, 1, 9),
+                (ItemsType.uragaan_marrow, 1, 9),
+                (ItemsType.incomplete_plans, 1, 25)
+            ],
         },
         'subquest_1': {
             'description': "None",
@@ -1775,7 +1931,8 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
         },
     },
     'unknown': {
-        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_12': 0x00000002,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
@@ -1788,7 +1945,8 @@ QUEST_EVENT_BLOOD_SPORT = QUEST_EVENT_BLOOD_SPORT = {
 
 """
 EVENT QUEST 2: Mercy Mission
-(INCOMPLETE) Invading monster is "faked" by hardcoding a Royal Ludroth from the start.
+(INCOMPLETE) Invading monster is "faked" by hardcoding a Royal Ludroth
+from the start.
 """
 QUEST_EVENT_MERCY_MISSION = {
     'quest_info': {
@@ -1796,11 +1954,21 @@ QUEST_EVENT_MERCY_MISSION = {
         'name': "Mercy Mission",
         'client': "MH3SP Dev Team",
         'description': "Deliver 10 Monster Guts",
-        'details': "Wanted:" + '\x0A' + "The description for this" + '\x0A' +
-            "quest! If you can find" + '\x0A' + "it, please let us know!" + '\x0A' +
+        'details':
+            "Wanted:\n"
+            "The description for this\n"
+            "quest! If you can find\n"
+            "it, please let us know!\n"
             "Thanks!",
-        'success_message': "Complete the Main Quest"+'\x0A'+"and both Subquests.",
-        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,1,0,0,0,0,0),(0,0,0,0,0,0,0,0),(0,1,0,0,0,0,0,0)),
+        'success_message':
+            "Complete the Main Quest\n"
+            "and both Subquests.",
+        'flags': generate_flags(
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 1, 1, 0, 0, 0, 0, 0),
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (0, 1, 0, 0, 0, 0, 0, 0)
+        ),
         'penalty_per_cart': 600,
         'quest_fee': 150,
         'time_limit': 15,
@@ -1811,7 +1979,7 @@ QUEST_EVENT_MERCY_MISSION = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_NONE,
         'resources': ResourcesType.low_rank,
         'supply_set_number': 35,
-        'starting_position': StartingPositionType.camp, 
+        'starting_position': StartingPositionType.camp,
         'general_enemy_level': 0x0017,
         'summon': 0x64030303,
         'smallmonster_data_file': 'sm_mercymission.dat',
@@ -1823,8 +1991,8 @@ QUEST_EVENT_MERCY_MISSION = {
             'enabled': True,
             'level': 0x17,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x01, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x01,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_2': {
             'type': Monster.none,
@@ -1832,8 +2000,8 @@ QUEST_EVENT_MERCY_MISSION = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_3': {
             'type': Monster.none,
@@ -1841,8 +2009,8 @@ QUEST_EVENT_MERCY_MISSION = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         }
     },
     'objective_details': {
@@ -1852,13 +2020,22 @@ QUEST_EVENT_MERCY_MISSION = {
             'objective_num': 0x0A,
             'zenny_reward': 1500,
             'hrp_reward': 70,
-            'rewards_row_1': [(ItemsType.mystery_charm, 1, 8), (ItemsType.black_pearl, 1, 20),
-                              (ItemsType.honey, 2, 20), (ItemsType.armor_sphere, 1, 18),
-                              (ItemsType.small_goldenfish, 1, 8), (ItemsType.machalite_ore, 8, 14),
-                              (ItemsType.steel_eg, 1, 12)],
-            'rewards_row_2': [(ItemsType.mystery_charm, 1, 35), (ItemsType.aquaglow_jewel, 1, 5),
-                              (ItemsType.shining_charm, 1, 15), (ItemsType.armor_sphere, 1, 20),
-                              (ItemsType.armor_sphere_plus, 1, 25)],
+            'rewards_row_1': [
+                (ItemsType.mystery_charm, 1, 8),
+                (ItemsType.black_pearl, 1, 20),
+                (ItemsType.honey, 2, 20),
+                (ItemsType.armor_sphere, 1, 18),
+                (ItemsType.small_goldenfish, 1, 8),
+                (ItemsType.machalite_ore, 8, 14),
+                (ItemsType.steel_eg, 1, 12)
+            ],
+            'rewards_row_2': [
+                (ItemsType.mystery_charm, 1, 35),
+                (ItemsType.aquaglow_jewel, 1, 5),
+                (ItemsType.shining_charm, 1, 15),
+                (ItemsType.armor_sphere, 1, 20),
+                (ItemsType.armor_sphere_plus, 1, 25)
+            ],
         },
         'subquest_1': {
             'description': "Deliver 12 Red Coral Stones",
@@ -1867,10 +2044,15 @@ QUEST_EVENT_MERCY_MISSION = {
             'objective_num': 0x0C,
             'zenny_reward': 1200,
             'hrp_reward': 55,
-            'rewards_row_1': [(ItemsType.mystery_charm, 1, 8), (ItemsType.black_pearl, 1, 20),
-                              (ItemsType.honey, 2, 20), (ItemsType.armor_sphere, 1, 18),
-                              (ItemsType.small_goldenfish, 1, 8), (ItemsType.machalite_ore, 1, 14),
-                              (ItemsType.steel_eg, 1, 12)],
+            'rewards_row_1': [
+                (ItemsType.mystery_charm, 1, 8),
+                (ItemsType.black_pearl, 1, 20),
+                (ItemsType.honey, 2, 20),
+                (ItemsType.armor_sphere, 1, 18),
+                (ItemsType.small_goldenfish, 1, 8),
+                (ItemsType.machalite_ore, 1, 14),
+                (ItemsType.steel_eg, 1, 12)
+            ],
         },
         'subquest_2': {
             'description': "Deliver 3 Goldenfish",
@@ -1879,13 +2061,18 @@ QUEST_EVENT_MERCY_MISSION = {
             'objective_num': 0x03,
             'zenny_reward': 2000,
             'hrp_reward': 70,
-            'rewards_row_1': [(ItemsType.mystery_charm, 1, 35), (ItemsType.aquaglow_jewel, 1, 5),
-                              (ItemsType.shining_charm, 1, 15), (ItemsType.armor_sphere, 1, 20),
-                              (ItemsType.armor_sphere_plus, 1, 25)],
+            'rewards_row_1': [
+                (ItemsType.mystery_charm, 1, 35),
+                (ItemsType.aquaglow_jewel, 1, 5),
+                (ItemsType.shining_charm, 1, 15),
+                (ItemsType.armor_sphere, 1, 20),
+                (ItemsType.armor_sphere_plus, 1, 25)
+            ],
         },
     },
     'unknown': {
-        'unk_12': 0x00000003,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_12': 0x00000003,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
@@ -1907,12 +2094,21 @@ QUEST_EVENT_WORLD_EATER = {
         'name': "World Eater",
         'client': "Guildmaster",
         'description': "Hunt a Deviljho",
-        'details': "Emergency! A huge Deviljho has" + '\x0A' + "appeared. It's twice as big as" + '\x0A' +
-            "a normal one and it's eating" + '\x0A' + "everything in sight! Go get" + '\x0A' +
-            "it! And now, a haiku: A huge" + '\x0A' + "Deviljho/with no food in its" + '\x0A' +
+        'details':
+            "Emergency! A huge Deviljho has\n"
+            "appeared. It's twice as big as\n"
+            "a normal one and it's eating\n"
+            "everything in sight! Go get\n"
+            "it! And now, a haiku: A huge\n"
+            "Deviljho/with no food in its\n"
             "stomach/eats the whole island.",
         'success_message': "Complete the Main Quest.",
-        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,1,1)),
+        'flags': generate_flags(
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 1, 0, 0, 0, 0, 0, 0),
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 0, 1, 0, 0, 0, 1, 1)
+        ),
         'penalty_per_cart': 6000,
         'quest_fee': 1800,
         'time_limit': 50,
@@ -1923,7 +2119,7 @@ QUEST_EVENT_WORLD_EATER = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_51_INITJOIN,
         'resources': ResourcesType.high_rank,
         'supply_set_number': 31,
-        'starting_position': StartingPositionType.random, 
+        'starting_position': StartingPositionType.random,
         'general_enemy_level': 0x0040,
         'summon': 0x00000000,
         'smallmonster_data_file': 'sm_worldeater.dat',
@@ -1935,8 +2131,8 @@ QUEST_EVENT_WORLD_EATER = {
             'enabled': True,
             'level': 0x40,  # 0x01 through 0x3c
             'size': 0xC8,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_2': {
             'type': Monster.none,
@@ -1944,8 +2140,8 @@ QUEST_EVENT_WORLD_EATER = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_3': {
             'type': Monster.none,
@@ -1953,8 +2149,8 @@ QUEST_EVENT_WORLD_EATER = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         }
     },
     'objective_details': {
@@ -1964,14 +2160,24 @@ QUEST_EVENT_WORLD_EATER = {
             'objective_num': 0x01,
             'zenny_reward': 18000,
             'hrp_reward': 1800,
-            'rewards_row_1': [(ItemsType.timeworn_charm, 1, 33), (ItemsType.deviljho_gem, 1, 4),
-                              (ItemsType.deviljho_scalp, 1, 8), (ItemsType.deviljho_hide, 1, 17),
-                              (ItemsType.hvy_armor_sphere, 1, 11), (ItemsType.shining_charm, 1, 19),
-                              (ItemsType.deviljho_fang, 1, 8)],
-            'rewards_row_2': [(ItemsType.deviljho_scalp, 1, 20), (ItemsType.timeworn_charm, 1, 34),
-                              (ItemsType.deviljho_fang, 1, 6), (ItemsType.deviljho_hide, 1, 17),
-                              (ItemsType.deviljho_gem, 1, 3), (ItemsType.shining_charm, 1, 11),
-                              (ItemsType.hvy_armor_sphere, 1, 9)],
+            'rewards_row_1': [
+                (ItemsType.timeworn_charm, 1, 33),
+                (ItemsType.deviljho_gem, 1, 4),
+                (ItemsType.deviljho_scalp, 1, 8),
+                (ItemsType.deviljho_hide, 1, 17),
+                (ItemsType.hvy_armor_sphere, 1, 11),
+                (ItemsType.shining_charm, 1, 19),
+                (ItemsType.deviljho_fang, 1, 8)
+            ],
+            'rewards_row_2': [
+                (ItemsType.deviljho_scalp, 1, 20),
+                (ItemsType.timeworn_charm, 1, 34),
+                (ItemsType.deviljho_fang, 1, 6),
+                (ItemsType.deviljho_hide, 1, 17),
+                (ItemsType.deviljho_gem, 1, 3),
+                (ItemsType.shining_charm, 1, 11),
+                (ItemsType.hvy_armor_sphere, 1, 9)
+            ],
         },
         'subquest_1': {
             'description': "None",
@@ -1993,7 +2199,8 @@ QUEST_EVENT_WORLD_EATER = {
         },
     },
     'unknown': {
-        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_12': 0x00000002,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
@@ -2016,12 +2223,21 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
         'name': "Where Gods Fear to Tread",
         'client': "Scarlet Mystery Man",
         'description': "Slay the Alatreon",
-        'details': "I've been waiting, hunter. Now" + '\x0A' + "comes your final challenge:" + '\x0A' +
-            "Alatreon, a dragon of darkness" + '\x0A' + "and light. Can mere mortals" + '\x0A' +
-            "fell an elder dragon feared" + '\x0A' + "even by the gods? Don't even" + '\x0A' +
+        'details':
+            "I've been waiting, hunter. Now\n"
+            "comes your final challenge:\n"
+            "Alatreon, a dragon of darkness\n"
+            "and light. Can mere mortals\n"
+            "fell an elder dragon feared\n"
+            "even by the gods? Don't even\n"
             "bother saying your prayers...",
         'success_message': "Complete the Main Quest.",
-        'flags': generate_flags((0,0,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,0,0,0,0,1,0)),
+        'flags': generate_flags(
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 1, 0, 0, 0, 0, 0, 0),
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 0, 0, 0, 0, 0, 1, 0)
+        ),
         'penalty_per_cart': 14000,
         'quest_fee': 4200,
         'time_limit': 50,
@@ -2032,7 +2248,7 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_51_INITJOIN,
         'resources': ResourcesType.high_rank,
         'supply_set_number': 0,
-        'starting_position': StartingPositionType.shrine, 
+        'starting_position': StartingPositionType.shrine,
         'general_enemy_level': 0x0040,
         'summon': 0x00000000,
         'smallmonster_data_file': 'sm_wheregodsfeartotread.dat',
@@ -2044,8 +2260,8 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
             'enabled': True,
             'level': 0x40,  # 0x01 through 0x3c
             'size': 0x7D,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_2': {
             'type': Monster.none,
@@ -2053,8 +2269,8 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         },
         'monster_3': {
             'type': Monster.none,
@@ -2062,8 +2278,8 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         }
     },
     'objective_details': {
@@ -2073,12 +2289,22 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
             'objective_num': 0x01,
             'zenny_reward': 42000,
             'hrp_reward': 4200,
-            'rewards_row_1': [(ItemsType.alatreon_scute, 1, 40), (ItemsType.brkn_skypiercer, 1, 30),
-                              (ItemsType.alatreon_talon, 1, 10), (ItemsType.alatreon_plate, 1, 10),
-                              (ItemsType.skypiercer, 1, 5), (ItemsType.azure_dragongem, 1, 5)],
-            'rewards_row_2': [(ItemsType.alatreon_plate, 1, 11), (ItemsType.brkn_skypiercer, 1, 34),
-                              (ItemsType.alatreon_talon, 1, 39), (ItemsType.elderdragonblood, 1, 6),
-                              (ItemsType.skypiercer, 1, 5), (ItemsType.azure_dragongem, 1, 5)],
+            'rewards_row_1': [
+                (ItemsType.alatreon_scute, 1, 40),
+                (ItemsType.brkn_skypiercer, 1, 30),
+                (ItemsType.alatreon_talon, 1, 10),
+                (ItemsType.alatreon_plate, 1, 10),
+                (ItemsType.skypiercer, 1, 5),
+                (ItemsType.azure_dragongem, 1, 5)
+            ],
+            'rewards_row_2': [
+                (ItemsType.alatreon_plate, 1, 11),
+                (ItemsType.brkn_skypiercer, 1, 34),
+                (ItemsType.alatreon_talon, 1, 39),
+                (ItemsType.elderdragonblood, 1, 6),
+                (ItemsType.skypiercer, 1, 5),
+                (ItemsType.azure_dragongem, 1, 5)
+            ],
         },
         'subquest_1': {
             'description': "None",
@@ -2100,7 +2326,8 @@ QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD = {
         },
     },
     'unknown': {
-        'unk_12': 0x00000005,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_12': 0x00000005,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
@@ -2116,12 +2343,23 @@ QUEST_EVENT_GREEN_EGGS = {
         'quest_id': 61050,
         'name': "[MH3SP] Green Eggs and...",
         'client': "Ze SpyRo",
-        'description': "Hunt a Gigginox" + '\x0A' + "and an Agnaktor",
-        'details': "Why do we live, only to suffer?" + '\x0A' + "Only slayers of pig meat know" + '\x0A' +
-            "these things. Take care, Hunter," + '\x0A' + "for those who look to antidote" + '\x0A' +
-            "herbs may find their breath" + '\x0A' + "stolen away.",
+        'description':
+            "Hunt a Gigginox\n"
+            "and an Agnaktor",
+        'details':
+            "Why do we live, only to suffer?\n"
+            "Only slayers of pig meat know\n"
+            "these things. Take care, Hunter,\n"
+            "for those who look to antidote\n"
+            "herbs may find their breath\n"
+            "stolen away.",
         'success_message': "Complete the Main Quest.",
-        'flags': generate_flags((0,1,0,0,0,0,0,0),(1,1,0,0,0,0,0,0),(0,0,0,0,0,0,0,0),(1,0,1,0,0,0,0,0)),
+        'flags': generate_flags(
+            (0, 1, 0, 0, 0, 0, 0, 0),
+            (1, 1, 0, 0, 0, 0, 0, 0),
+            (0, 0, 0, 0, 0, 0, 0, 0),
+            (1, 0, 1, 0, 0, 0, 0, 0)
+        ),
         'penalty_per_cart': 2400,
         'quest_fee': 200,
         'time_limit': 50,
@@ -2132,7 +2370,7 @@ QUEST_EVENT_GREEN_EGGS = {
         'hrp_restriction': QuestRestrictionType.RESTRICTION_18_INITJOIN,
         'resources': ResourcesType.low_rank,
         'supply_set_number': 43,
-        'starting_position': StartingPositionType.camp, 
+        'starting_position': StartingPositionType.camp,
         'general_enemy_level': 0x001B,
         'summon': 0x00000000,
         'smallmonster_data_file': 'sm_emptylandarena.dat',
@@ -2144,8 +2382,8 @@ QUEST_EVENT_GREEN_EGGS = {
             'enabled': True,
             'level': 0x1B,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_2': {
             'type': Monster.agnaktor,
@@ -2153,8 +2391,8 @@ QUEST_EVENT_GREEN_EGGS = {
             'enabled': True,
             'level': 0x1B,  # 0x01 through 0x3c
             'size': 0x64,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x03  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x03
         },
         'monster_3': {
             'type': Monster.none,
@@ -2162,8 +2400,8 @@ QUEST_EVENT_GREEN_EGGS = {
             'enabled': False,
             'level': 0x00,  # 0x01 through 0x3c
             'size': 0x00,
-            'hp_spread': 0x00, # 0: fixed, 1: spread of 5, 2: spread of 3
-            'size_spread': 0x00  # controls the spread of size but details unknown
+            'hp_spread': 0x00,  # 0: fixed, 1: spread of 5, 2: spread of 3
+            'size_spread': 0x00
         }
     },
     'objective_details': {
@@ -2173,16 +2411,29 @@ QUEST_EVENT_GREEN_EGGS = {
             'objective_num': 0x01,
             'zenny_reward': 7000,
             'hrp_reward': 950,
-            'rewards_row_1': [(ItemsType.flabby_hide, 1, 18), (ItemsType.uncanny_hide, 1, 6),
-                              (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 15),
-                              (ItemsType.agnaktor_shell, 1, 10), (ItemsType.agnaktor_scale, 1, 16),
-                              (ItemsType.agnaktor_hide, 1, 13), (ItemsType.agnaktor_fin, 1, 6),
-                              (ItemsType.agnaktor_beak, 1, 5)],
-            'rewards_row_2': [(ItemsType.flabby_hide, 1, 13), (ItemsType.uncanny_hide, 1, 6),
-                              (ItemsType.pale_extract, 1, 11), (ItemsType.poison_sac, 1, 10),
-                              (ItemsType.agnaktor_shell, 1, 9), (ItemsType.agnaktor_scale, 1, 10),
-                              (ItemsType.agnaktor_hide, 1, 10), (ItemsType.agnaktor_fin, 1, 6),
-                              (ItemsType.agnaktor_beak, 1, 5), (ItemsType.commendation, 1, 20)],
+            'rewards_row_1': [
+                (ItemsType.flabby_hide, 1, 18),
+                (ItemsType.uncanny_hide, 1, 6),
+                (ItemsType.pale_extract, 1, 11),
+                (ItemsType.poison_sac, 1, 15),
+                (ItemsType.agnaktor_shell, 1, 10),
+                (ItemsType.agnaktor_scale, 1, 16),
+                (ItemsType.agnaktor_hide, 1, 13),
+                (ItemsType.agnaktor_fin, 1, 6),
+                (ItemsType.agnaktor_beak, 1, 5)
+            ],
+            'rewards_row_2': [
+                (ItemsType.flabby_hide, 1, 13),
+                (ItemsType.uncanny_hide, 1, 6),
+                (ItemsType.pale_extract, 1, 11),
+                (ItemsType.poison_sac, 1, 10),
+                (ItemsType.agnaktor_shell, 1, 9),
+                (ItemsType.agnaktor_scale, 1, 10),
+                (ItemsType.agnaktor_hide, 1, 10),
+                (ItemsType.agnaktor_fin, 1, 6),
+                (ItemsType.agnaktor_beak, 1, 5),
+                (ItemsType.commendation, 1, 20)
+            ],
         },
         'subquest_1': {
             'description': "None",
@@ -2204,7 +2455,8 @@ QUEST_EVENT_GREEN_EGGS = {
         },
     },
     'unknown': {
-        'unk_12': 0x00000002,  # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        # 2 for large mon quest, 3 for small/delivery, 5 for jhen/ala
+        'unk_12': 0x00000002,
         'unk_4': 0x00,
         'unk_5': 0x00,
         'unk_6': 0x00,
