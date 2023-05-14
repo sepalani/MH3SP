@@ -3,6 +3,7 @@
 *.pyc
 *.dol
 *.bat
+*.db
 .idea
 logs
 event
