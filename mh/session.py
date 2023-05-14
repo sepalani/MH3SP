@@ -259,10 +259,14 @@ class Session(object):
                              self.local_info["gate_id"])
 
     def is_city_empty(self, city_id):
-        return DB.get_city(self.local_info["server_id"], self.local_info["gate_id"], city_id).get_state() == db.LayerState.EMPTY
+        return DB.get_city(self.local_info["server_id"],
+                           self.local_info["gate_id"],
+                           city_id).get_state() == db.LayerState.EMPTY
 
     def reserve_city(self, city_id, reserve):
-        return DB.reserve_city(self.local_info["server_id"], self.local_info["gate_id"], city_id, reserve)
+        return DB.reserve_city(self.local_info["server_id"],
+                               self.local_info["gate_id"],
+                               city_id, reserve)
 
     def create_city(self, city_id, settings, optional_fields):
         return DB.create_city(self,
@@ -304,7 +308,8 @@ class Session(object):
 
         circle = self.get_circle()
         with circle.lock(), circle.players.lock():
-            if circle.leader != self or circle.get_population() <= 1 or not circle.departed:
+            if circle.leader != self or circle.get_population() <= 1 \
+                    or not circle.departed:
                 return None, None
             for i, player in circle.players:
                 if player == self:
