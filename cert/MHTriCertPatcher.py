@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# SPDX-FileCopyrightText: Copyright (C) 2015-2022 MH3SP Server Project
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter 3 (~tri) Certificate Patcher
 
 Patch the in-game certificate according to the region:
