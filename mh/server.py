@@ -157,6 +157,7 @@ class BasicPatServer(object):
         self.worker_threads = []  # type: List[threading.Thread]
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
+        #self.broadcast_queue = queue.Queue()  # type: queue.Queue[(packet_id, data, seq)]
 
         if max_threads <= 0:
             max_threads = multiprocessing.cpu_count()
@@ -192,12 +193,14 @@ class BasicPatServer(object):
         """
         return self.socket.fileno()
 
-    def serve_forever(self):
+    def serve_forever(self, broadcast_queue):
+        self.broadcast_queue = broadcast_queue
         self.__is_shut_down.clear()
         try:
             with self.selector as selector:
                 selector.register(self, selectors.EVENT_READ)
 
+                event_watch = Timer()
                 write_watch = Timer()
                 write_timeout = 1  # Seconds
                 while not self.__shutdown_request:
@@ -205,6 +208,9 @@ class BasicPatServer(object):
                     if self.__shutdown_request:
                         break
 
+                    broadcast_packet = None
+                    if not self.broadcast_queue.empty():
+                        broadcast_packet = self.broadcast_queue.get(block=True)
                     for (key, event) in ready:
                         selected = key.fileobj
                         if selected == self:
@@ -223,6 +229,10 @@ class BasicPatServer(object):
                                 selected.on_exception(e)
                                 if selected.is_finished():
                                     self.remove_handler(selected)
+                    if broadcast_packet is not None:
+                        for handler in self.handlers:
+                            self._queue_work(handler,
+                                broadcast_packet, selectors.EVENT_WRITE)
                     if write_watch.elapsed() >= write_timeout:
                         try:
                             for handler in self.handlers:
@@ -235,6 +245,7 @@ class BasicPatServer(object):
                                     self.remove_handler(handler)
                         finally:
                             write_watch.restart()
+                    self.event_check(event_watch)
         finally:
             self.__is_shut_down.set()
 
@@ -252,13 +263,20 @@ class BasicPatServer(object):
 
             if handler.is_finished():
                 continue
+            
+            if event == selectors.EVENT_WRITE:
+                try:
+                    if handler.session.layer > 0:  # in-game only
+                        handler.send_packet(*packet)
+                except Exception as e:
+                    handler.on_exception(e)
+            else:
+                assert event == selectors.EVENT_READ
 
-            assert event == selectors.EVENT_READ
-
-            try:
-                handler.on_packet(packet)
-            except Exception as e:
-                handler.on_exception(e)
+                try:
+                    handler.on_packet(packet)
+                except Exception as e:
+                    handler.on_exception(e)
 
             if handler.is_finished():
                 self.remove_handler(handler)
@@ -292,6 +310,10 @@ class BasicPatServer(object):
 
         thread_queue = self.worker_queues[handler.__worker_thread]
         thread_queue.put((handler, work_data, event), block=True)
+
+    def event_check(self, timer):
+        # For time-based packet sending; to be implemented per-server
+        pass
 
     def remove_handler(self, handler):
         # type: (BasicPatHandler) -> None

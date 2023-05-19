@@ -263,7 +263,7 @@ def make_binary_trading_post():
     return data
 
 
-LAYER_CHAT_COLORS = (0xbb3385ff, 0xffffffff, 0xffffffff)
+LAYER_CHAT_COLORS = (0xbb3385ff, 0xf0f0f0ff, 0xf0f0f0ff)
 
 TERMS_VERSION = 1
 TERMS = {
