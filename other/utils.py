@@ -14,12 +14,13 @@ from logging.handlers import TimedRotatingFileHandler
 import traceback
 
 try:
-    # Python 3
-    import configparser as ConfigParser
-except ImportError:
     # Python 2
+    basestring  # str, unicode
     import ConfigParser
-
+except NameError:
+    # Python 3
+    basestring = str
+    import configparser as ConfigParser
 
 CONFIG_FILE = "config.ini"
 LOG_FOLDER = "logs"
@@ -129,8 +130,8 @@ class GenericUnpacker(object):
 
 def to_bytearray(data):
     """Python2/3 bytearray helper."""
-    if isinstance(data, str):
-        return bytearray((ord(c) for c in data))
+    if isinstance(data, basestring):
+        return bytearray((ord(c) % 256 for c in data))
     elif isinstance(data, bytearray):
         return data
     else:
