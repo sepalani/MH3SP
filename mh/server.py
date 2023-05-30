@@ -273,6 +273,10 @@ class BasicPatServer(object):
             return
 
         try:
+            # TODO: Find a cleaner way to process ill-formed packets.
+            # Currently, they get stuck on `packet = selected.on_recv()`,
+            # thus blocking the `serve_forever` method.
+            client_socket.settimeout(2.0)
             handler = self.RequestHandlerClass(client_socket, client_address,
                                                self)
         except Exception:
