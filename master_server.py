@@ -33,7 +33,10 @@ def main(args):
     servers, has_ui = create_servers(silent=args.silent,
                                      debug_mode=args.debug_mode)
     threads = [
-        threading.Thread(target=server.serve_forever)
+        threading.Thread(
+            target=server.serve_forever,
+            name="{}.serve_forever".format(server.__class__.__name__)
+        )
         for server in servers
     ]
     for thread in threads:

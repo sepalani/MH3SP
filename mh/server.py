@@ -161,10 +161,13 @@ class BasicPatServer(object):
         if max_threads <= 0:
             max_threads = multiprocessing.cpu_count()
 
-        for _ in range(max_threads):
+        for n in range(max_threads):
             thread_queue = queue.Queue()
-            thread = threading.Thread(target=self._worker_target,
-                                      args=(thread_queue,))
+            thread = threading.Thread(
+                target=self._worker_target,
+                args=(thread_queue,),
+                name="{}.Worker-{}".format(self.__class__.__name__, n)
+            )
             self.worker_queues.append(thread_queue)
             self.worker_threads.append(thread)
             thread.start()
