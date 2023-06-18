@@ -14,7 +14,7 @@ EMPTY_ARENA_ITEM_SLOT = struct.pack('>I', 0x00000000)
 def slot(type_id, equipment_id, slots=0):
     """Equipment slot / TODO: Handle gems"""
     return struct.pack(">BBH", slots, type_id, equipment_id)
-    #return struct.pack(">BBHII", type_id, slots, equipment_id, 0, 0)
+    # return struct.pack(">BBHII", type_id, slots, equipment_id, 0, 0)
 
 
 def item_slot(item_id, quantity):
@@ -918,33 +918,21 @@ class Talisman:
 
 
 class EquipmentClasses:
-    # 1 chestpiece
-    # 2: gauntlets
-    # 3: faulds
-    # 4: leggings
-    # 5: helmet
-    # 6: talisman
-    # 7: greatsword
-    # 10: lance
-    # 11: (light) bowgun?
-    # 12: probably more bowgun
-    # 13: yet still, probably, more bowgun
-    # 14: Longsword
-    # 15: Switchaxe
-    Chestpiece=1
-    Gauntlets=2
-    Faulds=3
-    Leggings=4
-    Helmet=5
-    Greatsword=7
+    Chestpiece = 1
+    Gauntlets = 2
+    Faulds = 3
+    Leggings = 4
+    Helmet = 5
+    # Talisman = 6
+    Greatsword = 7
     SnS = 8
     Hammer = 9
     Lance = 10
-    BowgunFrame=11
-    BowgunBarrel=12
-    BowgunStock=13
-    Longsword=14
-    Switchaxe=15
+    BowgunFrame = 11
+    BowgunBarrel = 12
+    BowgunStock = 13
+    Longsword = 14
+    Switchaxe = 15
 
 
 class Greatsword:

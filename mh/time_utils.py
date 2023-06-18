@@ -49,7 +49,9 @@ def get_jhen_event_times():
 
 
 def is_jhen_active():
-    day_in_cycle = int(current_server_time()//SECONDS_PER_DAY) % JHEN_EVENT_OFFSET
+    day_in_cycle = int(
+        current_server_time() // SECONDS_PER_DAY
+    ) % JHEN_EVENT_OFFSET
     return JHEN_START <= day_in_cycle < JHEN_END
 
 

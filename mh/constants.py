@@ -6,13 +6,17 @@
 
 import struct
 from other.utils import pad
-from mh.time_utils import current_server_time, TICKS_PER_CYCLE, get_jhen_event_times,\
-    is_jhen_active
-from mh.quest_utils import QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT,\
-    QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, QUEST_EVENT_WORLD_EATER,\
-    QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, QUEST_EVENT_GREEN_EGGS, make_binary_event_quest
-from mh.arena_utils import GRUDGE_MATCH_ROYAL_LUDROTH, GRUDGE_MATCH_BIRD_BRUTE, GRUDGE_MATCH_TWO_FLAMES,\
-    GRUDGE_MATCH_LAND_LORDS
+from mh.time_utils import current_server_time, TICKS_PER_CYCLE, \
+    get_jhen_event_times, is_jhen_active
+from mh.quest_utils import \
+    QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT, \
+    QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, \
+    QUEST_EVENT_WORLD_EATER, QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, \
+    make_binary_event_quest
+from mh.arena_utils import \
+    GRUDGE_MATCH_ROYAL_LUDROTH, GRUDGE_MATCH_BIRD_BRUTE, \
+    GRUDGE_MATCH_TWO_FLAMES, GRUDGE_MATCH_LAND_LORDS
+
 
 def make_binary_type_time_events():
     return struct.pack(">III", *get_jhen_event_times())
@@ -42,8 +46,12 @@ def make_binary_server_type_list(is_jap=False):
         data += pad(desc, 112 if is_jap else 168)
 
     data += struct.pack(">I", 0)  # unk
-    data += struct.pack(">I", current_server_time())  # Current time at server bootup
-    data += struct.pack(">I", TICKS_PER_CYCLE)  # Max Tick Per Cycle, if 0 game defaults to 3000
+    data += struct.pack(
+        ">I", current_server_time()
+    )  # Current time at server bootup
+    data += struct.pack(
+        ">I", TICKS_PER_CYCLE
+    )  # Max tick per cycle, if 0 game defaults to 3000
 
     # Handle city seekings (x32)
     SEEKINGS = [
@@ -152,7 +160,6 @@ def make_binary_npc_greeters(is_jap=False):
     JP_OFFSET = 0x100
     offset = JP_OFFSET if is_jap else US_OFFSET
 
-
     if is_jhen_active():
         tool_shop = b"Half-off sale!"
         material_shop = b"Half-off sale!"
@@ -194,7 +201,7 @@ def make_binary_npc_greeters(is_jap=False):
         b'whatever that means. Also,\n'
         b'the Arena is back in\n'
         b'operation! And now, a:\n'
-        b'haiku: "Patient warriors /\n'    
+        b'haiku: "Patient warriors /\n'
         b'returning home at long last /\n'
         b'now join hands to hunt!"'
     )
@@ -343,7 +350,9 @@ PAT_BINARIES = {
     },
     0x0b: {  # Japanese(?)English
         "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
+        "content": make_binary_event_quest(
+            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        )
     },
     0x0c: {  # Japanese(?)English
         "version": 1,
@@ -403,7 +412,9 @@ PAT_BINARIES = {
     },
     0x1a: {  # French
         "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
+        "content": make_binary_event_quest(
+            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        )
     },
     0x1b: {  # French
         "version": 1,
@@ -463,7 +474,9 @@ PAT_BINARIES = {
     },
     0x29: {  # German
         "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
+        "content": make_binary_event_quest(
+            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        )
     },
     0x2a: {  # German
         "version": 1,
@@ -523,7 +536,9 @@ PAT_BINARIES = {
     },
     0x38: {  # Italian
         "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
+        "content": make_binary_event_quest(
+            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        )
     },
     0x39: {  # Italian
         "version": 1,
@@ -583,7 +598,9 @@ PAT_BINARIES = {
     },
     0x47: {  # Spanish
         "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD)
+        "content": make_binary_event_quest(
+            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
+        )
     },
     0x48: {  # Spanish
         "version": 1,

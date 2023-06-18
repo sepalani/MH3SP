@@ -367,7 +367,9 @@ class FmpRequestHandler(PatRequestHandler):
                 circle.remarks = pati.unpack_string(circle_info.remarks)
 
             if "unk_byte_0x0e" in circle_info:
-                circle.unk_byte_0x0e = pati.unpack_byte(circle_info.unk_byte_0x0e)
+                circle.unk_byte_0x0e = pati.unpack_byte(
+                    circle_info.unk_byte_0x0e
+                )
 
             circle.reset_players(pati.unpack_long(circle_info.capacity))
             circle.players.add(self.session)
@@ -483,17 +485,20 @@ class FmpRequestHandler(PatRequestHandler):
 
             circle = city.circles[circle_index-1]
         with circle.lock():
-            if circle.has_password() and ("password" not in circle_info or
-                                          pati.unpack_string(circle_info.password)
-                                          != circle.password):
+            if circle.has_password() and (
+                "password" not in circle_info or
+                pati.unpack_string(circle_info.password) != circle.password
+             ):
                 self.sendAnsAlert(PatID4.AnsCircleJoin,
-                                  "<LF=8><BODY><CENTER>Wrong Password!<END>", seq)
+                                  "<LF=8><BODY><CENTER>Wrong Password!<END>",
+                                  seq)
                 return
 
             player_index = circle.players.add(self.session)
             if player_index == -1:
                 self.sendAnsAlert(PatID4.AnsCircleJoin,
-                                  "<LF=8><BODY><CENTER>Quest is full!<END>", seq)
+                                  "<LF=8><BODY><CENTER>Quest is full!<END>",
+                                  seq)
                 return
 
         self.session.join_circle(circle_index-1)
@@ -813,19 +818,24 @@ class FmpRequestHandler(PatRequestHandler):
                     count += 1
                 else:
                     # Client ignore field
-                    ntc_circle_kick = struct.pack(">B", 0) + pati.lp2_string('')
+                    ntc_circle_kick = struct.pack(">B", 0) + \
+                        pati.lp2_string('')
                     handler = self.server.get_pat_handler(player)
-                    handler.try_send_packet(PatID4.NtcCircleKick, ntc_circle_kick,
-                                            seq)
-                    handler.notify_circle_leave(player.local_info['circle_id'] + 1, seq)
+                    handler.try_send_packet(
+                        PatID4.NtcCircleKick, ntc_circle_kick, seq
+                    )
+                    handler.notify_circle_leave(
+                        player.local_info['circle_id'] + 1, seq
+                    )
                     changed = True
 
             data = struct.pack(">I", count)+data
             data = struct.pack(">H", len(data))+data
             data += struct.pack(">I", 1)  # Field??
 
-            self.server.circle_broadcast(circle, PatID4.NtcCircleMatchStart, data,
-                                         seq)
+            self.server.circle_broadcast(
+                circle, PatID4.NtcCircleMatchStart, data, seq
+            )
 
             if changed:
                 circle_index = circle.parent.circles.index(circle) + 1

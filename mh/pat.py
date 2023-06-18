@@ -2288,7 +2288,9 @@ class PatRequestHandler(server.BasicPatHandler):
                 layer_data.size = pati.Long(city.get_population())
                 layer_data.size2 = pati.Long(city.get_population())
                 layer_data.capacity = pati.Long(city.get_capacity())
-                layer_data.in_quest_players = pati.Long(city.in_quest_players())
+                layer_data.in_quest_players = pati.Long(
+                    city.in_quest_players()
+                )
                 layer_data.unk_long_0x0c = pati.Long(0xc)     # TODO: Reverse
                 layer_data.state = pati.Byte(city.get_state())
                 layer_data.layer_depth = pati.Byte(city.LAYER_DEPTH)
@@ -2301,10 +2303,16 @@ class PatRequestHandler(server.BasicPatHandler):
                     for _, player in city.players:
                         layer_user = pati.LayerUserInfo()
                         layer_user.capcom_id = pati.String(player.capcom_id)
-                        layer_user.hunter_name = pati.String(player.hunter_name)
-                        layer_user.assert_fields(self.search_info["user_fields"])
+                        layer_user.hunter_name = pati.String(
+                            player.hunter_name
+                        )
+                        layer_user.assert_fields(
+                            self.search_info["user_fields"]
+                        )
                         data += layer_user.pack()
-                        data += pati.pack_optional_fields(player.get_optional_fields())
+                        data += pati.pack_optional_fields(
+                            player.get_optional_fields()
+                        )
         self.send_packet(PatID4.AnsLayerDetailSearchData, data, seq)
 
     def recvReqLayerDetailSearchFoot(self, packet_id, data, seq):
@@ -2610,8 +2618,9 @@ class PatRequestHandler(server.BasicPatHandler):
                     new_host_index, new_host = \
                         self.session.try_transfer_circle_leadership()
                     if new_host:
-                        self.sendNtcCircleHost(circle, new_host, new_host_index,
-                                               seq)
+                        self.sendNtcCircleHost(
+                            circle, new_host, new_host_index, seq
+                        )
                 else:
                     self.sendNtcCircleBreak(circle, seq)
             self.session.leave_circle()
