@@ -6,14 +6,16 @@
 
 import struct
 import traceback
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from other.utils import Logger, get_config, get_ip, hexdump, to_str
 
 import mh.pat_item as pati
 import mh.server as server
 import mh.time_utils as time_utils
-from mh.constants import *
+from mh.constants import \
+    LAYER_CHAT_COLORS, TERMS_VERSION, TERMS, SUBTERMS, ANNOUNCE, \
+    CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, PatID4
 from mh.session import Session
 
 g_circle = None
@@ -109,7 +111,7 @@ class PatRequestHandler(server.BasicPatHandler):
         """Send PAT packet and catch exceptions."""
         try:
             self.send_packet(packet_id, data, seq)
-        except Exception as e:
+        except Exception:
             self.server.warning(
                 "Failed to send %s[ID=%08x; Seq=%04x]\n%s\n%s",
                 PAT_NAMES.get(packet_id, "Packet"),
@@ -880,8 +882,13 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリスト数送信 / FMPリスト数要求
         TR: Send FMP list count / FMP list count request
         """
-        version, first_index, count = struct.unpack_from(">III", data)
-        header = pati.unpack_bytes(data, 12)
+        # TODO: Might be worth investigating these parameters as
+        # they might be useful when using multiple FMP servers.
+        version, first_index, count = struct.unpack_from(
+            ">III", data
+        )  # noqa: F841
+        # TODO: Unpack it using pati.Unpacker
+        header = pati.unpack_bytes(data, 12)  # noqa: F841
         if packet_id == PatID4.ReqFmpListHead:
             self.sendAnsFmpListHead(seq)
         elif packet_id == PatID4.ReqFmpListHead2:
@@ -2276,7 +2283,7 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         unk = 0
         cities = self.search_data
-        data = struct.pack(">II", 0, len(cities))
+        data = struct.pack(">II", unk, len(cities))
         for i, city in enumerate(cities):
             with city.lock():
                 layer_data = pati.LayerData()

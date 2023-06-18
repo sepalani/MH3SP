@@ -1,10 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter OPN server."""
 
-from mh.constants import *
 from mh.pat import PatServer, PatRequestHandler
 
 from other.utils import server_base, server_main

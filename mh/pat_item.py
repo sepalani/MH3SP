@@ -948,7 +948,6 @@ def getHunterStats(hr=921, profile=b"Navaldeus",
      - 0xf7: City's seeking
      - 0xf8: Server type
     """
-    from other import fuzz
 
     profile = to_bytearray(profile)
     if profile[-1] != b"\0":

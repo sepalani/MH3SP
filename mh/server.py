@@ -23,7 +23,7 @@ except ImportError:
 
 
 try:
-    from typing import List, Tuple
+    from typing import List, Tuple  # noqa: F401
 except ImportError:
     pass
 
@@ -119,7 +119,7 @@ class BasicPatHandler(object):
 
         try:
             self.on_finish()
-        except Exception as e:
+        except Exception:
             pass
 
         self.finished = True
@@ -282,7 +282,7 @@ class BasicPatServer(object):
             client_socket.settimeout(2.0)
             handler = self.RequestHandlerClass(client_socket, client_address,
                                                self)
-        except Exception:
+        except Exception as e:
             self.error('Error accepting connection (2). {}'.format(e))
             return
 

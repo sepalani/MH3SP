@@ -4,9 +4,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter FMP server."""
 
-from mh.database import Players
+import struct
+
 import mh.pat_item as pati
-from mh.constants import *
+from mh.constants import PatID4
 from mh.pat import PatRequestHandler, PatServer
 from other.utils import hexdump, server_base, server_main
 
