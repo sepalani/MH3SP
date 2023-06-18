@@ -6,14 +6,16 @@
 
 import struct
 import traceback
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from other.utils import Logger, get_config, get_ip, hexdump, to_str
 
 import mh.pat_item as pati
 import mh.server as server
 import mh.time_utils as time_utils
-from mh.constants import *
+from mh.constants import \
+    LAYER_CHAT_COLORS, TERMS_VERSION, TERMS, SUBTERMS, ANNOUNCE, \
+    CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, PatID4
 from mh.session import Session
 
 g_circle = None
