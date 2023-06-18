@@ -174,7 +174,7 @@ class Session(object):
 
     def layer_create(self, layer_id, settings, optional_fields):
         if self.layer == 1:
-            city = self.create_city(layer_id, settings, optional_fields)
+            self.create_city(layer_id, settings, optional_fields)
         else:
             assert False, "Can't create a layer from L{}".format(self.layer)
         self.layer_down(layer_id)
