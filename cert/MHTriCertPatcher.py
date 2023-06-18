@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2015-2022 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2015-2023 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter 3 (~tri) Certificate Patcher
 
@@ -269,8 +269,8 @@ class ECPatcher(object):
 def prompt():
     message = "\nPress Enter to exit the program\n"
     try:
-        raw_input(message)
-    except Exception as e:
+        raw_input(message)  # noqa: F821
+    except Exception:
         input(message)
 
 
