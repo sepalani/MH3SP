@@ -55,17 +55,28 @@ def make_binary_server_type_list(is_jap=False):
 
     # Handle city seekings (x32)
     SEEKINGS = [
+        # References:
+        #  - https://youtu.be/lPFQW3B1Kt0?t=31
+        #  - https://youtu.be/Ie_9lRIZF20?t=411
         b"Everyone welcome!", b"Casual play",
+        # TODO: "Beginners welcome!" doesn't appear in Expert type servers
         b"Huntin' and chattin'", b"Beginners welcome!",
+        # TODO: "Skilled players only" doesn't appear in Rookie type servers?
         b"Skilled players only", b"Let's Quest together",
         b"Event Quest ho!", b"Arena battles!",
         b"Earning money", b"HR grinding",
         b"Gathering materials", b"Rare material search",
         b"Just a Quest or two", b"In for the long haul",
-        b"Seeking14", b"Seeking15", b"Seeking16", b"Seeking17",
-        b"Seeking18", b"Seeking19", b"Seeking20", b"Seeking21",
-        b"Seeking22", b"Seeking23", b"Seeking24", b"Seeking25",
-        b"Seeking26", b"Seeking27", b"Seeking28", b"Seeking29",
+        # TODO: The following seekings don't appear in Recruiting type servers
+        b"Playing with friends", b"Solo play",
+        # Extra seekings not from the original server
+        b"Seeking16", b"Seeking17",
+        b"Seeking18", b"Seeking19",
+        b"Seeking20", b"Seeking21",
+        b"Seeking22", b"Seeking23",
+        b"Seeking24", b"Seeking25",
+        b"Seeking26", b"Seeking27",
+        b"Seeking28", b"Seeking29",
         b"Seeking30", b"Seeking31",
     ]
     for i, seeking in enumerate(SEEKINGS):
