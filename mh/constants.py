@@ -70,7 +70,7 @@ def make_binary_server_type_list(is_jap=False):
         # TODO: The following seekings don't appear in Recruiting type servers
         b"Playing with friends", b"Solo play",
         # Extra seekings not from the original server
-        b"Seeking16", b"Seeking17",
+        b"Stream Lobby", b"Turns",
         b"Seeking18", b"Seeking19",
         b"Seeking20", b"Seeking21",
         b"Seeking22", b"Seeking23",
