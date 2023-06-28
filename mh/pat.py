@@ -100,7 +100,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
     def on_init(self):
         """Default PAT handler."""
-        self.server.info("Handle client")
+        self.server.info("Handle client from {}".format(self.client_address))
         self.server.add_to_debug(self)
         self.session = Session(self)
         self.ping_timer = time_utils.Timer()
@@ -256,9 +256,16 @@ class PatRequestHandler(server.BasicPatHandler):
 
         The games sends the PAT environment properties.
         """
-        connection_data = pati.ConnectionData.unpack(data)
-        self.server.debug("Connection: {!r}".format(connection_data))
-        self.sendNtcLogin(5, connection_data, seq)
+        settings = pati.ConnectionData.unpack(data)
+        self.server.debug("Connection: {!r}".format(settings))
+        pat_ticket = b""
+        if "pat_ticket" in settings:
+            _, pat_ticket = pati.unpack_any(settings.pat_ticket)
+        elif "online_support_code" in settings:
+            _, pat_ticket = pati.unpack_any(settings.online_support_code)
+        self.server.info("Client {} Ticket `{}`".format(self.client_address,
+                                                        pat_ticket))
+        self.sendNtcLogin(5, settings, seq)
 
     def sendNtcLogin(self, server_status, connection_data, seq):
         """NtcLogin packet.
@@ -284,7 +291,8 @@ class PatRequestHandler(server.BasicPatHandler):
         obtained from Nintendo NAS server.
         """
         nas_token = pati.unpack_lp2_string(data)
-        self.server.debug("ReqAuthenticationToken: %s", nas_token)
+        self.server.info("Client {} - NAS `{}`".format(self.client_address,
+                                                       nas_token))
         self.sendAnsAuthenticationToken(nas_token, seq)
 
     def sendAnsAuthenticationToken(self, nas_token, seq):
@@ -820,6 +828,9 @@ class PatRequestHandler(server.BasicPatHandler):
             hunter_name = pati.unpack_string(user_obj.hunter_name)
         self.session.use_user(slot_index, hunter_name)
         user_obj.capcom_id = pati.String(self.session.capcom_id)
+        self.server.info("Client {} Capcom ID `{}`".format(
+            self.client_address, self.session.capcom_id
+        ))
         self.sendAnsUserObject(is_slot_empty, slot_index, user_obj, seq)
 
     def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj, seq):
