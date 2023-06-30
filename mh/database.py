@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter database module."""
 
+import math
 import random
 import sqlite3
 import time
@@ -213,11 +214,11 @@ class Circle(Lockable):
 class City(Lockable):
     LAYER_DEPTH = 3
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, is_jap=False):
         self.name = name
         self.parent = parent
         self.state = LayerState.EMPTY
-        self.players = Players(4)
+        self.players = Players(City.get_max_capacity(is_jap))
         self.optional_fields = []
         self.leader = None
         self.reserved = None
@@ -235,6 +236,10 @@ class City(Lockable):
 
     def get_capacity(self):
         return self.players.get_capacity()
+
+    @staticmethod
+    def get_max_capacity(is_jap):
+        return 8 if is_jap else 4
 
     def get_state(self):
         size = self.get_population()
@@ -282,16 +287,23 @@ class City(Lockable):
 
 class Gate(object):
     LAYER_DEPTH = 2
+    MAX_CITY_PER_GATE = 40
 
-    def __init__(self, name, parent, city_count=40, player_capacity=100):
+    def __init__(self, name, parent, capacity=100, is_jap=False):
         self.name = name
         self.parent = parent
         self.state = LayerState.EMPTY
+
+        city_max_capacity = City.get_max_capacity(is_jap)
+        city_count = int(min(
+            math.ceil(capacity / city_max_capacity), Gate.MAX_CITY_PER_GATE))
+        capacity = city_count * city_max_capacity
+
         self.cities = [
-            City("City{}".format(i), self)
+            City("City{}".format(i), self, is_jap)
             for i in range(1, city_count+1)
         ]
-        self.players = Players(player_capacity)
+        self.players = Players(capacity)
         self.optional_fields = []
 
     def get_population(self):
@@ -315,16 +327,27 @@ class Gate(object):
 
 class Server(object):
     LAYER_DEPTH = 1
+    MAX_GATE_PER_SERVER = 40
 
-    def __init__(self, name, server_type, gate_count=40, capacity=2000,
+    def __init__(self, name, server_type, capacity=6400, is_jap=False,
                  addr=None, port=None):
         self.name = name
         self.parent = None
         self.server_type = server_type
         self.addr = addr
         self.port = port
+
+        city_max_capacity = City.get_max_capacity(is_jap)
+        city_count = int(math.ceil(capacity / city_max_capacity))
+        gate_count = int(min(
+            math.ceil(float(city_count) / Server.MAX_GATE_PER_SERVER),
+            Server.MAX_GATE_PER_SERVER))
+        max_gate_player_capacity = Gate.MAX_CITY_PER_GATE * city_max_capacity
+        capacity = city_count * city_max_capacity
+
         self.gates = [
-            Gate("City Gate{}".format(i), self)
+            Gate("City Gate{}".format(i), self,
+                 min(max_gate_player_capacity, capacity), is_jap)
             for i in range(1, gate_count+1)
         ]
         self.players = Players(capacity)
