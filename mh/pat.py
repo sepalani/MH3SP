@@ -546,12 +546,14 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 60700200
         JP: 共通鍵返答
         TR: Common key response
-
-        TODO: Handle encryption properly.
         """
-        # Bypass upcoming encryption by sending a dummy packet instead
-        # self.send_packet(PatID4.AnsCommonKey, b'', seq)
-        self.sendAnsAuthenticationToken(b'', seq)
+        key = self.server.get_encryption_key()
+        if key:
+            data = pati.lp2_string(key)
+            self.send_packet(PatID4.AnsCommonKey, data, seq)
+        else:
+            self.sendAnsAuthenticationToken(b'', seq)
+
 
     def recvReqLmpConnect(self, packet_id, data, seq):
         """ReqLmpConnect packet.

@@ -220,6 +220,7 @@ def get_config(name, config_file=CONFIG_FILE):
         "MaxThread": config.getint(name, "MaxThread"),
         "UseSSL": config.getboolean(name, "UseSSL"),
         "LegacySSL": config.getboolean("SSL", "LegacySSL"),
+        "EncryptionKey": config.get("SSL", "EncryptionKey"),
         "SSLCert":
             config.get(name, "SSLCert") or
             config.get("SSL", "DefaultCert"),
@@ -308,7 +309,7 @@ def create_server(server_class, server_handler,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
                   log_to_console=True, log_to_window=False, legacy_ssl=False,
-                  debug_mode=False):
+                  debug_mode=False, encryption_key=""):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG if debug_mode else logging.INFO,
@@ -347,6 +348,7 @@ def create_server(server_class, server_handler,
         context.load_cert_chain(ssl_cert, ssl_key)
         server.socket = context.wrap_socket(server.socket, server_side=True)
 
+    server.set_encryption_key(encryption_key, not use_ssl)
     return server
 
 
@@ -371,7 +373,8 @@ def create_server_from_base(name, server_class, server_handler, silent=False,
         log_filename=config["LogFilename"],
         log_to_console=config["LogToConsole"] and not silent,
         log_to_window=config["LogToWindow"],
-        debug_mode=debug_mode
+        debug_mode=debug_mode,
+        encryption_key=config["EncryptionKey"]
     ), config["LogToWindow"]
 
 

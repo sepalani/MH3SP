@@ -9,8 +9,10 @@ import random
 import socket
 import struct
 import threading
+import hashlib
 
 from mh.time_utils import Timer
+import mh.pat_crypt
 
 try:
     # Python 3
@@ -23,7 +25,7 @@ except ImportError:
 
 
 try:
-    from typing import List, Tuple  # noqa: F401
+    from typing import List, Tuple, Optional  # noqa: F401
 except ImportError:
     pass
 
@@ -85,10 +87,13 @@ class BasicPatHandler(object):
         """Receive PAT packet."""
         size, seq, packet_id = struct.unpack(">HHI", header)
         data = self.rfile.read(size)
+        data = self.server.decrypt(data)
         return packet_id, data, seq
 
     def send_packet(self, packet_id=0, data=b'', seq=0):
         """Send PAT packet."""
+        if data:
+            data = self.server.encrypt(data)
         self.wfile.write(struct.pack(
             ">HHI",
             len(data), seq, packet_id
@@ -157,6 +162,8 @@ class BasicPatServer(object):
         self.worker_threads = []  # type: List[threading.Thread]
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
+        self.encryption_key = None # type: Optional[bytes]
+        self.encryption_key_table = None # tyoe: Optional[list]
 
         if max_threads <= 0:
             max_threads = multiprocessing.cpu_count()
@@ -179,6 +186,28 @@ class BasicPatServer(object):
             except Exception:
                 self.close()
                 raise
+
+    def set_encryption_key(self, key, create_keytable):
+        # type: (str, bool) -> None
+        self.encryption_key = hashlib.sha256(key.encode('utf-8')).digest()
+        if create_keytable:
+            self.encryption_key_table = mh.pat_crypt.keytable(self.encryption_key)
+
+    def get_encryption_key(self):
+        # type: () -> Optional[bytes]
+        return self.encryption_key
+
+    def encrypt(self, data):
+        # type: (bytes) -> bytes
+        if self.encryption_key_table is None:
+            return data
+        return mh.pat_crypt.encrypt(data, self.encryption_key_table)
+    
+    def decrypt(self, data):
+        # type: (bytes) -> bytes
+        if self.encryption_key_table is None:
+            return data
+        return mh.pat_crypt.decrypt(data, self.encryption_key_table)
 
     def server_bind(self):
         self.socket.bind(self.server_address)
