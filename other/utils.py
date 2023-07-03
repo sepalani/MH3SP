@@ -340,7 +340,7 @@ def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
     return context.wrap_socket(sock, server_side=True)
 
 
-def create_server(server_class, server_handler,
+def create_server(server_class, server_handler, binary_loader,
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
@@ -351,22 +351,26 @@ def create_server(server_class, server_handler,
         log_to_file=log_filename if log_to_file else "",
         log_to_console=log_to_console,
         log_to_window=log_to_window)
+
     if not use_ssl:
         ssl_cert = None
         ssl_key = None
-    return server_class((address, port), server_handler, max_thread, logger,
-                        debug_mode, ssl_cert=ssl_cert, ssl_key=ssl_key)
+
+    return server_class((address, port), server_handler, binary_loader,
+                          max_thread, logger, debug_mode, ssl_cert=ssl_cert,
+                          ssl_key=ssl_key)
 
 
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
 
 
-def create_server_from_base(name, server_class, server_handler, silent=False,
+def create_server_from_base(name, server_class, server_handler,
+                            binary_loader=None, silent=False,
                             debug_mode=False):
     """Create a server based on its config parameters."""
     config = get_config(name)
     return create_server(
-        server_class, server_handler,
+        server_class, server_handler, binary_loader,
         address=config["IP"],
         port=config["Port"],
         name=config["Name"],
