@@ -1,0 +1,764 @@
+{
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 3, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ]
+    ], 
+    "arena_equipment": [
+        [
+            [
+                8, 
+                39
+            ], 
+            null, 
+            null, 
+            102, 
+            108, 
+            101, 
+            107, 
+            105, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    374, 
+                    5
+                ], 
+                [
+                    360, 
+                    3
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    10, 
+                    5
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    31, 
+                    5
+                ], 
+                [
+                    32, 
+                    5
+                ], 
+                [
+                    30, 
+                    5
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    49, 
+                    1
+                ], 
+                [
+                    50, 
+                    5
+                ], 
+                [
+                    52, 
+                    2
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
+                    1, 
+                    10
+                ], 
+                [
+                    51, 
+                    2
+                ], 
+                [
+                    377, 
+                    1
+                ], 
+                [
+                    596, 
+                    1
+                ], 
+                [
+                    598, 
+                    1
+                ], 
+                [
+                    597, 
+                    1
+                ], 
+                [
+                    599, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                15, 
+                45
+            ], 
+            null, 
+            null, 
+            96, 
+            102, 
+            95, 
+            103, 
+            101, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    374, 
+                    5
+                ], 
+                [
+                    360, 
+                    3
+                ], 
+                [
+                    347, 
+                    5
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    10, 
+                    5
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    31, 
+                    5
+                ], 
+                [
+                    32, 
+                    5
+                ], 
+                [
+                    30, 
+                    5
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    50, 
+                    5
+                ], 
+                [
+                    52, 
+                    1
+                ], 
+                [
+                    51, 
+                    2
+                ], 
+                [
+                    377, 
+                    1
+                ], 
+                [
+                    596, 
+                    1
+                ], 
+                [
+                    598, 
+                    1
+                ], 
+                [
+                    597, 
+                    1
+                ], 
+                [
+                    599, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                14, 
+                38
+            ], 
+            null, 
+            null, 
+            139, 
+            112, 
+            91, 
+            99, 
+            111, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    374, 
+                    5
+                ], 
+                [
+                    375, 
+                    5
+                ], 
+                [
+                    360, 
+                    5
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    10, 
+                    5
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    31, 
+                    5
+                ], 
+                [
+                    32, 
+                    5
+                ], 
+                [
+                    30, 
+                    5
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    49, 
+                    1
+                ], 
+                [
+                    50, 
+                    5
+                ], 
+                [
+                    52, 
+                    2
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
+                    1, 
+                    10
+                ], 
+                [
+                    51, 
+                    2
+                ], 
+                [
+                    377, 
+                    1
+                ], 
+                [
+                    596, 
+                    1
+                ], 
+                [
+                    598, 
+                    1
+                ], 
+                [
+                    599, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                12
+            ], 
+            [
+                12, 
+                12
+            ], 
+            [
+                13, 
+                10
+            ], 
+            130, 
+            115, 
+            108, 
+            114, 
+            112, 
+            [
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    374, 
+                    5
+                ], 
+                [
+                    360, 
+                    3
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    10, 
+                    5
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    31, 
+                    5
+                ], 
+                [
+                    32, 
+                    5
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    49, 
+                    1
+                ], 
+                [
+                    50, 
+                    5
+                ], 
+                [
+                    582, 
+                    2
+                ], 
+                [
+                    52, 
+                    2
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
+                    1, 
+                    10
+                ], 
+                [
+                    51, 
+                    2
+                ], 
+                [
+                    377, 
+                    1
+                ], 
+                [
+                    596, 
+                    1
+                ], 
+                [
+                    598, 
+                    1
+                ], 
+                [
+                    597, 
+                    1
+                ], 
+                [
+                    599, 
+                    1
+                ]
+            ], 
+            [
+                [
+                    54, 
+                    99
+                ], 
+                [
+                    58, 
+                    40
+                ], 
+                [
+                    63, 
+                    9
+                ], 
+                [
+                    64, 
+                    9
+                ], 
+                [
+                    92, 
+                    10
+                ], 
+                [
+                    69, 
+                    60
+                ], 
+                [
+                    80, 
+                    8
+                ], 
+                [
+                    72, 
+                    20
+                ], 
+                [
+                    84, 
+                    5
+                ]
+            ]
+        ]
+    ], 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 6, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 23, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 1150, 
+        "resources": 2, 
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
+        "description": "Slay all 3 monsters", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 9, 
+        "quest_fee": 0, 
+        "quest_id": 60011, 
+        "name": "Grudge Match: Land Lords", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 0, 
+        "summon": 0, 
+        "client": "Announcer/Receptionist", 
+        "flags": [
+            [
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                1, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 7, 
+            "zenny_reward": 0, 
+            "type": 131329
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [
+                [
+                    589, 
+                    1, 
+                    10
+                ], 
+                [
+                    608, 
+                    1, 
+                    10
+                ], 
+                [
+                    612, 
+                    1, 
+                    15
+                ], 
+                [
+                    431, 
+                    1, 
+                    14
+                ], 
+                [
+                    444, 
+                    1, 
+                    10
+                ], 
+                [
+                    445, 
+                    1, 
+                    7
+                ], 
+                [
+                    570, 
+                    1, 
+                    10
+                ], 
+                [
+                    587, 
+                    1, 
+                    24
+                ]
+            ], 
+            "rewards_row_2": [], 
+            "objective_type": 8, 
+            "zenny_reward": 3000, 
+            "type": 131329
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 9, 
+            "zenny_reward": 0, 
+            "type": 131329
+        }
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 23, 
+            "boss_id": 1, 
+            "type": 9, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 18, 
+            "boss_id": 2, 
+            "type": 7, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 23, 
+            "boss_id": 0, 
+            "type": 8, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

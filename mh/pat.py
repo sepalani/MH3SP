@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter PAT module."""
 
@@ -9,13 +9,15 @@ import traceback
 from datetime import timedelta
 
 from other.utils import Logger, get_config, get_external_ip, hexdump, to_str
+from mh.quest_utils import QuestLoader
 
 import mh.pat_item as pati
 import mh.server as server
 import mh.time_utils as time_utils
 from mh.constants import \
     LAYER_CHAT_COLORS, TERMS_VERSION, TERMS, SUBTERMS, ANNOUNCE, \
-    CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, PatID4
+    CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, \
+    PatID4, get_pat_binary_from_version
 from mh.session import Session
 import mh.database as db
 
@@ -28,6 +30,9 @@ except ImportError:
 
 g_circle = None
 g_circle_info_set = None
+
+# TODO: Refactor it, possible point of failure without fallback
+g_binary_loader = QuestLoader("event/quest_rotation.json")
 
 
 class PatServer(server.BasicPatServer, Logger):
@@ -45,6 +50,7 @@ class PatServer(server.BasicPatServer, Logger):
         self.info("Running on {} port {}".format(*address))
         self.debug_con = []
         self.debug_mode = debug_mode
+        self.binary_loader = g_binary_loader
 
     def add_to_debug(self, con):
         """Add connection to the debug connection list."""
@@ -1133,10 +1139,13 @@ class PatRequestHandler(server.BasicPatHandler):
          - Spanish: 0x41, 0x3d, 0x41, 0x3e, 0x3f, 0x40
         """
         binary = PAT_BINARIES[binary_type]
-        content = binary["content"]
+        version = binary["version"]
+        if callable(version):
+            version = version(self.server.binary_loader)
+        content = get_pat_binary_from_version(binary_type, version)
         if callable(content):
-            content = content()
-        data = struct.pack(">II", binary["version"], len(content))
+            content = content(self.server.binary_loader)
+        data = struct.pack(">II", version, len(content))
         self.send_packet(PatID4.AnsBinaryHead, data, seq)
 
     def recvReqBinaryData(self, packet_id, data, seq):
@@ -1145,14 +1154,11 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 63030100
         JP: バイナリデータ要求
         TR: Binary data request
-
-        TODO: Handle multiple versions of a binary
         """
         binary_type, version, offset, size = struct.unpack(">BIII", data)
-        binary = PAT_BINARIES[binary_type]
-        content = binary["content"]
+        content = get_pat_binary_from_version(binary_type, version)
         if callable(content):
-            content = content()
+            content = content(self.server.binary_loader)
         self.sendAnsBinaryData(version, offset, size, content, seq)
 
     def sendAnsBinaryData(self, version, offset, size, binary, seq):
@@ -1438,10 +1444,10 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: バイナリバージョン確認
         TR: Binary version check
         """
-        unk, = struct.unpack(">B", data)
-        self.sendAnsBinaryVersion(unk, seq)
+        binary_type, = struct.unpack(">B", data)
+        self.sendAnsBinaryVersion(binary_type, seq)
 
-    def sendAnsBinaryVersion(self, unk, seq):
+    def sendAnsBinaryVersion(self, binary_type, seq):
         """AnsBinaryVersion packet.
 
         ID: 63010200
@@ -1449,7 +1455,10 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: Binary version acknowledgment
         """
         unused = 0
-        version = 1  # The game might send binary requests for this version
+        binary = PAT_BINARIES[binary_type]
+        version = binary["version"]
+        if callable(version):
+            version = version(self.server.binary_loader)
         data = struct.pack(">BI", unused, version)
         self.send_packet(PatID4.AnsBinaryVersion, data, seq)
 

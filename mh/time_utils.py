@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2022 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter time utils module."""
 
@@ -46,6 +46,14 @@ def get_jhen_event_times():
     return (int(cycle_start + FOG_START*SECONDS_PER_DAY),  # fog start
             int(cycle_start + JHEN_START*SECONDS_PER_DAY),  # sandstorm start
             int(cycle_start + JHEN_END*SECONDS_PER_DAY))  # sandstorm end
+
+
+def current_event_time_slot():
+    """
+    There are JHEN_EVENT_OFFSET temporal event slots per data event slot.
+        Each one activates on a different day, counting up from 0.
+    """
+    return int(current_server_time()//SECONDS_PER_DAY) % JHEN_EVENT_OFFSET
 
 
 def is_jhen_active():

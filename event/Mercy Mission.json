@@ -1,0 +1,264 @@
+{
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 3, 
+            "hrp_reward": 70, 
+            "rewards_row_1": [
+                [
+                    440, 
+                    1, 
+                    35
+                ], 
+                [
+                    447, 
+                    1, 
+                    5
+                ], 
+                [
+                    441, 
+                    1, 
+                    15
+                ], 
+                [
+                    327, 
+                    1, 
+                    20
+                ], 
+                [
+                    328, 
+                    1, 
+                    25
+                ]
+            ], 
+            "description": "Deliver 3 Goldenfish", 
+            "objective_type": 217, 
+            "zenny_reward": 2000, 
+            "type": 2
+        }, 
+        "main_quest": {
+            "objective_num": 10, 
+            "hrp_reward": 70, 
+            "rewards_row_1": [
+                [
+                    440, 
+                    1, 
+                    8
+                ], 
+                [
+                    149, 
+                    1, 
+                    20
+                ], 
+                [
+                    141, 
+                    2, 
+                    20
+                ], 
+                [
+                    327, 
+                    1, 
+                    18
+                ], 
+                [
+                    216, 
+                    1, 
+                    8
+                ], 
+                [
+                    101, 
+                    8, 
+                    14
+                ], 
+                [
+                    569, 
+                    1, 
+                    12
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    440, 
+                    1, 
+                    35
+                ], 
+                [
+                    447, 
+                    1, 
+                    5
+                ], 
+                [
+                    441, 
+                    1, 
+                    15
+                ], 
+                [
+                    327, 
+                    1, 
+                    20
+                ], 
+                [
+                    328, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 429, 
+            "zenny_reward": 1500, 
+            "type": 2
+        }, 
+        "subquest_1": {
+            "objective_num": 12, 
+            "hrp_reward": 55, 
+            "rewards_row_1": [
+                [
+                    440, 
+                    1, 
+                    8
+                ], 
+                [
+                    149, 
+                    1, 
+                    20
+                ], 
+                [
+                    141, 
+                    2, 
+                    20
+                ], 
+                [
+                    327, 
+                    1, 
+                    18
+                ], 
+                [
+                    216, 
+                    1, 
+                    8
+                ], 
+                [
+                    101, 
+                    1, 
+                    14
+                ], 
+                [
+                    569, 
+                    1, 
+                    12
+                ]
+            ], 
+            "description": "Deliver 12 Red Coral Stones", 
+            "objective_type": 430, 
+            "zenny_reward": 1200, 
+            "type": 2
+        }
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 15, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 1, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 23, 
+        "wave_2_transition_type": 0, 
+        "location": 1, 
+        "penalty_per_cart": 600, 
+        "resources": 0, 
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
+        "description": "Deliver 10 Monster Guts", 
+        "smallmonster_data_file": "sm_mercymission.dat", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 0, 
+        "quest_fee": 150, 
+        "quest_id": 61002, 
+        "name": "Mercy Mission", 
+        "main_monster_2": 23, 
+        "main_monster_1": 17, 
+        "supply_set_number": 35, 
+        "summon": 1677918979, 
+        "client": "MH3SP Dev Team", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest\nand both Subquests."
+    }, 
+    "unknown": {
+        "unk_12": 3, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 3, 
+            "hp_spread": 1, 
+            "level": 23, 
+            "boss_id": 0, 
+            "type": 16, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}
