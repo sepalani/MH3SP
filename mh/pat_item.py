@@ -642,18 +642,64 @@ class LayerData(PatData):
         (0x08, "unk_long_0x08"),
         (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
-        (0x0b, "in_quest_players"),
+        (0x0b, "child_population"),
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
-        (0x11, "positionSynchronizationInterval"),
-        # player position synchronization timer
+        (0x11, "positionInterval"), # player position synchronization timer
         (0x12, "unk_byte_0x12"),
         (0x15, "layer_depth"),
         (0x16, "layer_pathname"),
         (0x17, "unk_binary_0x17"),
         (0xff, "fallthrough_bug")  # Fill this if field 0x17 is set !!!
     )
+
+    @staticmethod
+    def create_from(index, layer, path=None):
+        data = LayerData()
+        data.unk_long_0x01 = Long(index)
+        data.index = Word(index)
+        data.positionInterval = Long(500)
+        data.unk_byte_0x12 = Byte(1)
+
+        if isinstance(layer, Server):
+            data.name = String(layer.name)
+            data.size = Long(layer.get_population())
+            data.size2 = Long(layer.get_population())
+            data.capacity = Long(layer.get_capacity())
+            data.state = Byte(0)
+            data.layer_depth = Byte(layer.LAYER_DEPTH)
+        elif isinstance(layer, Gate):
+            data.name = String(layer.name)
+            data.size = Long(layer.get_population())
+            data.size2 = Long(layer.get_population())
+            data.capacity = Long(layer.get_capacity())
+            data.state = Byte(layer.get_state())
+            data.layer_depth = Byte(layer.LAYER_DEPTH)
+        else:
+            assert isinstance(layer, City)
+
+            if path is None and layer.leader is not None:
+                path = layer.leader.get_layer_path()
+
+            data.name = String(layer.name)
+            data.size = Long(layer.get_population())
+            data.size2 = Long(layer.get_population())
+            data.capacity = Long(layer.get_capacity())
+            data.child_population = Long(layer.in_quest_players())
+            data.unk_long_0x0c = Long(0xc) # TODO: Reverse
+            data.state = Byte(layer.get_state())
+            data.layer_depth = Byte(layer.LAYER_DEPTH)
+            data.layer_pathname = String(layer.get_pathname())
+
+        if path is not None:
+            data.layer_host = Binary(path.pack())
+
+        # These fields are read when used in the NtcLayerInfoSet packet
+        # Purpose is unknown
+        # data.unk_binary_0x17 = Binary("test")
+        # data.fallthrough_bug = FallthroughBug()
+        return data
 
 
 class FriendData(PatData):
@@ -925,16 +971,7 @@ def get_layer_children(session, first_index, count, sibling=False):
     else:
         children = session.get_layer_sibling()[start:end]
     for i, child in enumerate(children, first_index):
-        layer = LayerData()
-        layer.index = Word(i)
-        layer.name = String(child.name)
-        layer.size = Long(child.get_population())
-        layer.capacity = Long(child.get_capacity())
-        layer.state = Byte(child.get_state())
-        layer.positionSynchronizationInterval = Long(120)
-        # layer.unk_binary_0x17 = Binary("test")
-        # layer.fallthrough_bug = FallthroughBug()
-        layer.unk_byte_0x12 = Byte(1)
+        layer = LayerData.create_from(i, child)
         data += layer.pack()
         data += pack_optional_fields(child.optional_fields)
     return data
@@ -967,7 +1004,7 @@ def getDummyLayerData():
     # layer.unk_long_0x0c = Long(1)
     # layer.unk_word_0x0d = Word(1)
     layer.state = Byte(1)
-    layer.positionSynchronizationInterval = Long(120)
+    layer.positionInterval = Long(500)
     # layer.unk_long_0x11 = Long(1)
 
     # Might be needed to be >=1 to keep NetworkConnectionStable alive

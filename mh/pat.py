@@ -2297,22 +2297,7 @@ class PatRequestHandler(server.BasicPatHandler):
         data = struct.pack(">II", unk, len(cities))
         for i, city in enumerate(cities):
             with city.lock():
-                layer_data = pati.LayerData()
-                layer_data.unk_long_0x01 = pati.Long(i)
-                layer_data.layer_host = pati.Binary(
-                    city.leader.get_layer_host_data()
-                )
-                layer_data.name = pati.String(city.name)
-                layer_data.size = pati.Long(city.get_population())
-                layer_data.size2 = pati.Long(city.get_population())
-                layer_data.capacity = pati.Long(city.get_capacity())
-                layer_data.in_quest_players = pati.Long(
-                    city.in_quest_players()
-                )
-                layer_data.unk_long_0x0c = pati.Long(0xc)     # TODO: Reverse
-                layer_data.state = pati.Byte(city.get_state())
-                layer_data.layer_depth = pati.Byte(city.LAYER_DEPTH)
-                layer_data.layer_pathname = pati.String(city.get_pathname())
+                layer_data = pati.LayerData.create_from(i, city)
                 layer_data.assert_fields(self.search_info["layer_fields"])
                 data += layer_data.pack()
                 data += pati.pack_optional_fields(city.optional_fields)
