@@ -26,6 +26,237 @@ class FmpRequestHandler(PatRequestHandler):
         self.server.debug("Connection: {!r}".format(connection_data))
         self.sendNtcLogin(3, connection_data, seq)
 
+    def recvReqLayerJump(self, packet_id, data, seq):
+        """ReqLayerJump packet.
+        
+        ID: 64100100
+        JP: レイヤ移動要求（位置バイナリ）
+        TR: Layer move request (position binary)
+        
+        A relay of the target user's layer_host.
+        """
+        length, unk1, server_id, unk2, gate_id, city_id = struct.unpack_from(">HIIHHH", data)
+
+        if self.session.local_info["server_id"] == server_id and\
+            self.session.local_info["gate_id"] == gate_id and\
+            self.session.local_info["city_id"] == city_id:
+            self.sendAnsAlert(PatID4.AnsLayerJump,
+                        "<LF=8><BODY><CENTER>You're already there.<END>",
+                        seq)
+        elif self.session.local_info["server_id"] != server_id:
+            # Different Server
+            if self.session.get_server_full(server_id) or\
+                self.session.get_gate_full(server_id, gate_id) or\
+                (city_id and self.session.get_city_full(server_id, gate_id, city_id)):
+                self.sendAnsAlert(PatID4.AnsLayerJump,
+                        "<LF=8><BODY><CENTER>Destination is full.<END>",
+                        seq)
+                return
+        else:
+            # TODO: Lock the gate before the player checks its capacity.
+            # with self.session.find_gate(server_id, gate_id).lock()
+            if self.session.local_info["gate_id"] != gate_id:
+                # Same Server, different Gate
+                if city_id:
+                    city = self.session.find_city(server_id, gate_id, city_id)
+                    with city.lock():
+                        if city.is_empty():
+                            self.sendAnsAlert(PatID4.AnsLayerJump,
+                                    "<LF=8><BODY><CENTER>City no longer exists.<END>",
+                                    seq)
+                            return
+                        elif self.session.get_gate_full(server_id, gate_id) or\
+                            city.is_full():
+                            self.sendAnsAlert(PatID4.AnsLayerJump,
+                                    "<LF=8><BODY><CENTER>Destination is full.<END>",
+                                    seq)
+                            return
+
+                        # Step 1: Leave current location
+                        while self.session.layer > 0:
+                            self.notify_layer_departure()
+                            self.session.layer_up()
+                        # Step 2: Join Gate
+                        self.session.layer_down(gate_id)
+                        user = pati.LayerUserInfo()
+                        user.capcom_id = pati.String(self.session.capcom_id)
+                        user.hunter_name = pati.String(self.session.hunter_name)
+                        user.stats = pati.Binary(self.session.hunter_info.pack())
+
+                        data = pati.lp2_string(self.session.capcom_id)
+                        data += user.pack()
+                        self.server.layer_broadcast(self.session, PatID4.NtcLayerIn,
+                                                    data, seq)
+                        # Step 3: Join City
+                        self.session.layer_down(city_id)
+                else:
+                    if self.session.get_gate_full(server_id, gate_id):
+                        self.sendAnsAlert(PatID4.AnsLayerJump,
+                                "<LF=8><BODY><CENTER>Destination is full.<END>",
+                                seq)
+                        return
+
+                    # Step 1: Leave current location
+                    while self.session.layer > 0:
+                        self.notify_layer_departure()
+                        self.session.layer_up()
+                    # Step 2: Join Gate
+                    self.session.layer_down(gate_id)
+                    user = pati.LayerUserInfo()
+                    user.capcom_id = pati.String(self.session.capcom_id)
+                    user.hunter_name = pati.String(self.session.hunter_name)
+                    user.stats = pati.Binary(self.session.hunter_info.pack())
+
+                    data = pati.lp2_string(self.session.capcom_id)
+                    data += user.pack()
+                    self.server.layer_broadcast(self.session, PatID4.NtcLayerIn,
+                                                data, seq)
+            else:
+                # Same Server, same Gate
+                if city_id:
+                    city = self.session.find_city(server_id, gate_id, city_id)
+                    with city.lock():
+                        if city.is_empty():
+                            self.sendAnsAlert(PatID4.AnsLayerJump,
+                                    "<LF=8><BODY><CENTER>City no longer exists.<END>",
+                                    seq)
+                            return
+                        elif city.is_full():
+                            self.sendAnsAlert(PatID4.AnsLayerJump,
+                                    "<LF=8><BODY><CENTER>Destination is full.<END>",
+                                    seq)
+                            return
+
+                        # Step 1: Leave current location
+                        while self.session.layer > 1:
+                            self.notify_layer_departure()
+                            self.session.layer_up()
+                        # Step 2: Join City
+                        self.session.layer_down(city_id)
+                else:
+                    # Step 1: Leave current location
+                    while self.session.layer > 1:
+                        self.notify_layer_departure()
+                        self.session.layer_up()
+        self.sendAnsLayerJump(seq)
+
+    def sendAnsLayerJump(self, seq):
+        """NtcLayerJumpGo packet.
+
+        ID: 64170200
+        JP: レイヤ予約移動実行返答
+        TR: Layer reservation move execution reply
+        """
+        self.send_packet(PatID4.AnsLayerJump, b"", seq)
+
+    def recvReqLayerJumpReady(self, packet_id, data, seq):
+        """AnsLayerJump packet.
+
+        ID: 64100200
+        JP: レイヤ移動返答（位置バイナリ）
+        TR: Layer move reply (position binary)
+    
+        Client asking permission to switch Servers.
+        """
+        length, unk1, server_id, unk2, gate_id, city_id = struct.unpack_from(">HIIHHH", data)
+        if self.session.get_server_full(server_id) or\
+            self.session.get_gate_full(server_id, gate_id) or\
+            (city_id and self.session.get_city_full(server_id, gate_id, city_id)):
+            self.sendAnsAlert(PatID4.NtcLayerJumpReady,
+                        "<LF=8><BODY><CENTER>Destination is full.<END>",
+                        seq)
+            return
+        # Step 1: Leave current location
+        # ( continued in sendNtcLayerJumpReady() )
+        while self.session.layer > 0:
+            self.notify_layer_departure()
+            self.session.layer_up()
+        self.sendNtcLayerJumpReady(seq)
+
+    def sendNtcLayerJumpReady(self, seq):
+        """ReqLayerJumpReady packet.
+
+        ID: 64160200
+        JP: レイヤ予約移動確認返答
+        TR: Layer reservation move confirmation reply
+        """
+        # Step 2: Join Server
+        # ( continued in recvReqLayerJumpGo() )
+        unk = 0x00000004
+        data = struct.pack(">I", unk)
+        self.send_packet(PatID4.NtcLayerJumpReady, data, seq)
+
+    def recvReqLayerJumpGo(self, packet_id, data, seq):
+        """ReqLayerJumpGo packet.
+
+        ID: 64170100
+        JP: レイヤ予約移動実行要求
+        TR: Layer reserved move execution request
+
+        Client, having switched servers, asking permission
+        to enter the target gate/city.
+        """
+        length, unk1, server_id, unk2, gate_id, city_id = struct.unpack_from(">HIIHHH", data)
+
+        # TODO: Lock the gate before the player checks its capacity.
+        # with self.session.find_gate(server_id, gate_id).lock()
+        if city_id:
+            city = self.session.find_city(server_id, gate_id, city_id)
+            with city.lock():
+                if city.is_empty():
+                    self.sendAnsAlert(PatID4.AnsLayerJump,
+                            "<LF=8><BODY><CENTER>City no longer exists.<END>",
+                            seq)
+                    return
+                elif self.session.get_gate_full(server_id, gate_id) or\
+                    city.is_full():
+                    self.sendAnsAlert(PatID4.AnsLayerCreateHead,
+                            "<LF=8><BODY><CENTER>Destination is full.<END>",
+                            seq)
+                    return
+
+                # Step 3: Join Gate
+                self.session.layer_down(gate_id)
+                user = pati.LayerUserInfo()
+                user.capcom_id = pati.String(self.session.capcom_id)
+                user.hunter_name = pati.String(self.session.hunter_name)
+                user.stats = pati.Binary(self.session.hunter_info.pack())
+
+                data = pati.lp2_string(self.session.capcom_id)
+                data += user.pack()
+                self.server.layer_broadcast(self.session, PatID4.NtcLayerIn,
+                                            data, seq)
+                # Step 4: Join City
+                self.session.layer_down(city_id)
+        else:
+            if self.session.get_gate_full(server_id, gate_id):
+                self.sendAnsAlert(PatID4.AnsLayerCreateHead,
+                        "<LF=8><BODY><CENTER>Destination is full.<END>",
+                        seq)
+                return
+
+            # Step 3: Join Gate
+            self.session.layer_down(gate_id)
+            user = pati.LayerUserInfo()
+            user.capcom_id = pati.String(self.session.capcom_id)
+            user.hunter_name = pati.String(self.session.hunter_name)
+            user.stats = pati.Binary(self.session.hunter_info.pack())
+
+            data = pati.lp2_string(self.session.capcom_id)
+            data += user.pack()
+            self.server.layer_broadcast(self.session, PatID4.NtcLayerIn,
+                                        data, seq)
+        self.sendNtcLayerJumpGo(seq)
+
+    def sendNtcLayerJumpGo(self, seq):
+        """NtcLayerJumpGo packet.
+
+        ID: 64170200
+        JP: レイヤ予約移動実行返答
+        TR: Layer reservation move execution reply
+        """
+        self.send_packet(PatID4.NtcLayerJumpGo, b"", seq)
+
     def sendAnsLayerDown(self, layer_id, layer_set, seq):
         """AnsLayerDown packet.
 
@@ -421,7 +652,6 @@ class FmpRequestHandler(PatRequestHandler):
             pati.unpack_byte(options.is_standby) == 1
 
         self.session.set_circle_standby(is_standby)
-
         circle = self.session.get_circle()
         options.capcom_id = pati.String(self.session.capcom_id)
         options.hunter_name = pati.String(self.session.hunter_name)

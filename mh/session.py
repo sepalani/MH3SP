@@ -124,6 +124,24 @@ class Session(object):
         assert self.local_info['server_id'] is not None
         return DB.get_server(self.local_info['server_id'])
 
+    def get_server_full(self, server_id):
+        return DB.get_server(server_id).is_full()
+
+    def get_gate_full(self, server_id, gate_id):
+        return DB.get_gate(server_id, gate_id).is_full()
+
+    def get_city_full(self, server_id, gate_id, city_id):
+        return DB.get_city(server_id, gate_id, city_id).is_full()
+
+    def get_city_empty(self, server_id, gate_id, city_id):
+        return DB.get_city(server_id, gate_id, city_id).is_empty()
+
+    def find_gate(self, server_id, gate_id):
+        return DB.get_gate(server_id, gate_id)
+
+    def find_city(self, server_id, gate_id, city_id):
+        return DB.get_city(server_id, gate_id, city_id)
+
     def get_gate(self):
         assert self.local_info['gate_id'] is not None
         return DB.get_gate(self.local_info['server_id'],
@@ -285,6 +303,12 @@ class Session(object):
         DB.leave_city(self)
         self.state = SessionState.GATE
 
+    def is_in_city(self):
+        return self.state == SessionState.CITY or\
+            self.state == SessionState.CIRCLE or\
+            self.state == SessionState.CIRCLE_STANDBY or\
+            self.state == SessionState.QUEST
+
     def try_transfer_city_leadership(self):
         if self.local_info['city_id'] is None:
             return None
@@ -367,7 +391,7 @@ class Session(object):
 
     def get_layer_host_data(self):
         """LayerUserInfo's layer_host."""
-        return struct.pack("IIHHH",
+        return struct.pack(">IIHHH",
                            3,  # layer depth?
                            self.local_info["server_id"] or 0,
                            1,  # ???
