@@ -9,7 +9,7 @@ import struct
 from collections import OrderedDict
 from mh.constants import pad
 from other.utils import to_bytearray, get_config, get_ip, GenericUnpacker
-
+from mh.database import Server, Gate, City
 
 class ItemType:
     Custom = 0
@@ -584,6 +584,51 @@ class UserSearchInfo(PatData):
         (0x0f, "info_mine_0x0f"),
         (0x10, "info_mine_0x10"),
     )
+
+class LayerPath(object):
+    STRUCT = struct.Struct(">IIHHH")
+
+    def __init__(self, server_id=None, gate_id=None, city_id=None):
+        # type: (int|None, int|None, int|None) -> None
+        self.server_id = server_id or 0
+        self.gate_id = gate_id or 0
+        self.city_id = city_id or 0
+    
+    def get_depth(self):
+        # type: () -> int
+        if self.city_id > 0:
+            return City.LAYER_DEPTH
+        elif self.gate_id > 0:
+            return Gate.LAYER_DEPTH
+        elif self.server_id > 0:
+            return Server.LAYER_DEPTH
+        return -1
+
+    def pack(self):
+        # type: () -> bytes
+        depth = self.get_depth()
+        unk = 1
+        return self.STRUCT.pack(depth, self.server_id, unk, self.gate_id,
+                                        self.city_id)
+    
+    @staticmethod
+    def unpack(data):
+        # type: (bytes) -> LayerPath
+        with Unpacker(data) as unpacker:
+            _, server_id = unpacker.struct(">II")
+            field_count = len(unpacker) // 2
+            assert field_count <= 3
+
+            gate_id = 0
+            city_id = 0
+            for i in range(field_count):
+                if i == 0:    
+                    _ = unpacker.struct(">H")
+                elif i == 1:
+                    gate_id = unpacker.struct(">H")
+                else:
+                    city_id = unpacker.struct(">H")
+            return LayerPath(server_id, gate_id, city_id)
 
 
 class LayerData(PatData):

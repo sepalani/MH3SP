@@ -4,8 +4,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter session module."""
 
-import struct
-
 import mh.database as db
 import mh.pat_item as pati
 
@@ -365,14 +363,13 @@ class Session(object):
         else:
             assert False, "Can't find layer"
 
+    def get_layer_path(self):
+        return pati.LayerPath(self.local_info['server_id'], self.local_info['gate_id'], 
+                              self.local_info['city_id'])
+
     def get_layer_host_data(self):
         """LayerUserInfo's layer_host."""
-        return struct.pack("IIHHH",
-                           3,  # layer depth?
-                           self.local_info["server_id"] or 0,
-                           1,  # ???
-                           self.local_info["gate_id"] or 0,
-                           self.local_info["city_id"] or 0)
+        return self.get_layer_path().pack()
 
     def get_optional_fields(self):
         """LayerUserInfo's optional fields."""
