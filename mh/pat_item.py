@@ -866,6 +866,33 @@ class LayerBinaryInfo(PatData):
         (0x03, "hunter_name")
     )
 
+class LayerUserNum(PatData):
+    FIELDS = (
+        (0x01, "path"),
+        (0x02, "population"),
+        (0x03, "index"),
+        (0x04, "unk_long_0x04"),
+        (0x05, "max_population"),
+        (0x06, "unk_long_0x06"),
+        (0x07, "child_population"),
+    )
+
+    @staticmethod
+    def pack_from(layer_data):
+        # type: (LayerData) -> bytes
+        data = LayerUserNum()
+        data.path = layer_data.layer_host
+        data.population = layer_data.size
+        data.index = Long(unpack_word(layer_data.index))
+        data.unk_long_0x04 = Long(0xAF00FA00)
+        data.max_population = layer_data.capacity
+        data.unk_long_0x06 = Long(0xBF00FB00)
+        if "child_population" in layer_data:
+            data.child_population = layer_data.child_population
+
+        return data.pack()
+
+
 
 def patdata_extender(unpacker):
     """PatData classes must be defined above this function."""

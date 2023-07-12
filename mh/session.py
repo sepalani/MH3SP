@@ -87,7 +87,6 @@ class Session(object):
 
         It doesn't purge the session state nor its PAT ticket.
         """
-        self.layer_end()
         self.connection = None
         DB.disconnect_session(self)
 
@@ -350,18 +349,18 @@ class Session(object):
             else:
                 circle.players.remove(self)
 
-    def get_layer_players(self):
+    def get_layer(self):
         if self.layer == 0:
-            server = self.get_server()
-            return server.players
+            return self.get_server()
         elif self.layer == 1:
-            gate = self.get_gate()
-            return gate.players
+            return self.get_gate()
         elif self.layer == 2:
-            city = self.get_city()
-            return city.players
+            return self.get_city()
         else:
             assert False, "Can't find layer"
+
+    def get_layer_players(self):
+        return self.get_layer().players
 
     def get_layer_path(self):
         return pati.LayerPath(self.local_info['server_id'], self.local_info['gate_id'], 
