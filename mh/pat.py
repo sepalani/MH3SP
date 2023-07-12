@@ -59,22 +59,12 @@ class PatServer(server.BasicPatServer, Logger):
 
         return None
 
-    def layer_broadcast(self, session, packet_id, data, seq,
-                        exclude_self=True):
-        for _, player in session.get_layer_players():
-            if exclude_self and player == session:
-                continue
-
-            handler = self.get_pat_handler(player)
-            if handler:
-                handler.try_send_packet(packet_id, data, seq)
-
-    def circle_broadcast(self, circle, packet_id, data, seq,
-                         session=None):
+    def broadcast(self, players, packet_id, data, seq, to_exclude=None):
+        # type: (db.Players, int, bytes, int, Session|None) -> None
         handlers = []
-        with circle.lock(), circle.players.lock():
-            for _, player in circle.players:
-                if session and player == session:
+        with players.lock():
+            for _, player in players:
+                if player == to_exclude:
                     continue
 
                 handler = self.get_pat_handler(player)
@@ -82,6 +72,18 @@ class PatServer(server.BasicPatServer, Logger):
                     handlers.append(handler)
         for handler in handlers:
             handler.try_send_packet(packet_id, data, seq)
+
+    def layer_broadcast(self, session, packet_id, data, seq,
+                        exclude_self=True):
+        # type: (Session, int, bytes, int, bool) -> None
+        self.broadcast(session.get_layer_players(), packet_id, data, seq, 
+                       session if exclude_self else None)
+
+    def circle_broadcast(self, circle, packet_id, data, seq,
+                         session=None):
+        # type: (db.Circle, int, bytes, int, Session|None) -> None
+        self.broadcast(circle.players, packet_id, data, seq, session)
+            
 
 
 class PatRequestHandler(server.BasicPatHandler):
