@@ -17,6 +17,14 @@ from mh.constants import \
     LAYER_CHAT_COLORS, TERMS_VERSION, TERMS, SUBTERMS, ANNOUNCE, \
     CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, PatID4
 from mh.session import Session
+import mh.database as db
+
+try:
+    from typing import Literal, List, Union, Optional  # noqa: F401
+
+    LayerUserNumUpdate = Literal[1,2,3,4,5]
+except ImportError:
+    pass
 
 g_circle = None
 g_circle_info_set = None
@@ -59,22 +67,12 @@ class PatServer(server.BasicPatServer, Logger):
 
         return None
 
-    def layer_broadcast(self, session, packet_id, data, seq,
-                        exclude_self=True):
-        for _, player in session.get_layer_players():
-            if exclude_self and player == session:
-                continue
-
-            handler = self.get_pat_handler(player)
-            if handler:
-                handler.try_send_packet(packet_id, data, seq)
-
-    def circle_broadcast(self, circle, packet_id, data, seq,
-                         session=None):
+    def broadcast(self, players, packet_id, data, seq, to_exclude=None):
+        # type: (db.Players, int, bytes, int, Session|None) -> None
         handlers = []
-        with circle.lock(), circle.players.lock():
-            for _, player in circle.players:
-                if session and player == session:
+        with players.lock():
+            for _, player in players:
+                if player == to_exclude:
                     continue
 
                 handler = self.get_pat_handler(player)
@@ -82,6 +80,18 @@ class PatServer(server.BasicPatServer, Logger):
                     handlers.append(handler)
         for handler in handlers:
             handler.try_send_packet(packet_id, data, seq)
+
+    def layer_broadcast(self, session, packet_id, data, seq,
+                        exclude_self=True):
+        # type: (Session, int, bytes, int, bool) -> None
+        self.broadcast(session.get_layer_players(), packet_id, data, seq, 
+                       session if exclude_self else None)
+
+    def circle_broadcast(self, circle, packet_id, data, seq,
+                         session=None):
+        # type: (db.Circle, int, bytes, int, Session|None) -> None
+        self.broadcast(circle.players, packet_id, data, seq, session)
+            
 
 
 class PatRequestHandler(server.BasicPatHandler):
@@ -1013,7 +1023,6 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ終了要求
         TR: Layer end request
         """
-        self.notify_layer_departure()
         self.sendAnsLayerEnd(seq)
 
     def sendAnsLayerEnd(self, seq):
@@ -1023,8 +1032,29 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ終了応答
         TR: Layer end response
         """
-        self.session.layer_end()
+        self.notify_layer_departure(True)
         self.send_packet(PatID4.AnsLayerEnd, b"", seq)
+
+    @staticmethod
+    def packNtcLayerUserNum(update_type, layer_data):
+        # type: (LayerUserNumUpdate, pati.LayerData) -> bytes
+        """NtcLayerUserNum packet.
+
+        ID: NtcLayerUserNum
+        JP: レイヤ人数通知
+        TR: Layer number notification
+        
+        UPDATE TYPE:
+            1 - Update numbers in the current layer
+            2 - Update numbers in the current layer plus fire an event (unknown)
+            3 - Update numbers in an unknown struct in an array
+            4 - Update numbers to the current layer's child (child_id=layer_path)
+            5 - Update numbers in unk fields in the NetworkLayerPat struct
+        """
+
+        data = struct.pack(">B", update_type)
+        data += pati.LayerUserNum.pack_from(layer_data)
+        return data
 
     def recvReqFmpInfo(self, packet_id, data, seq):
         """ReqFmpInfo packet.
@@ -2297,22 +2327,7 @@ class PatRequestHandler(server.BasicPatHandler):
         data = struct.pack(">II", unk, len(cities))
         for i, city in enumerate(cities):
             with city.lock():
-                layer_data = pati.LayerData()
-                layer_data.unk_long_0x01 = pati.Long(i)
-                layer_data.layer_host = pati.Binary(
-                    city.leader.get_layer_host_data()
-                )
-                layer_data.name = pati.String(city.name)
-                layer_data.size = pati.Long(city.get_population())
-                layer_data.size2 = pati.Long(city.get_population())
-                layer_data.capacity = pati.Long(city.get_capacity())
-                layer_data.in_quest_players = pati.Long(
-                    city.in_quest_players()
-                )
-                layer_data.unk_long_0x0c = pati.Long(0xc)     # TODO: Reverse
-                layer_data.state = pati.Byte(city.get_state())
-                layer_data.layer_depth = pati.Byte(city.LAYER_DEPTH)
-                layer_data.layer_pathname = pati.String(city.get_pathname())
+                layer_data = pati.LayerData.create_from(i, city)
                 layer_data.assert_fields(self.search_info["layer_fields"])
                 data += layer_data.pack()
                 data += pati.pack_optional_fields(city.optional_fields)
@@ -2382,6 +2397,10 @@ class PatRequestHandler(server.BasicPatHandler):
                               seq)
             return
         self.send_packet(PatID4.AnsLayerCreateHead, data, seq)
+        path = self.session.get_layer_path()
+        path.city_id = number
+        self.notify_city_info_set(path)
+        
 
     def recvReqLayerCreateSet(self, packet_id, data, seq):
         """ReqLayerCreateSet packet.
@@ -2409,6 +2428,9 @@ class PatRequestHandler(server.BasicPatHandler):
         self.session.layer_create(number, layer_set, extra)
         self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
 
+        path = self.session.get_layer_path()
+        self.notify_city_number_set(path)
+        
     def recvReqLayerCreateFoot(self, packet_id, data, seq):
         """ReqLayerCreateFoot packet.
 
@@ -2430,6 +2452,10 @@ class PatRequestHandler(server.BasicPatHandler):
         data = struct.pack(">H", number)
         self.send_packet(PatID4.AnsLayerCreateFoot, data, seq)
 
+        path = self.session.get_layer_path()
+        path.city_id = number
+        self.notify_city_info_set(path)
+
     def recvReqLayerUp(self, packet_id, data, seq):
         """ReqLayerUp packet.
 
@@ -2449,8 +2475,23 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤアップ返答
         TR: Layer up response
         """
-        self.session.layer_up()
+        self.notify_layer_departure(False)
         self.send_packet(PatID4.AnsLayerUp, b"", seq)
+
+    @staticmethod
+    def packNtcLayerInfoSet(layer_path, layer_data, optional_fields):
+        # type: (pati.LayerPath, pati.LayerData, List[int]) -> bytes
+        """NtcLayerInfoSet packet.
+
+        ID: 64201000
+        JP: レイヤ情報設定通知
+        TR: Layer information setting notification
+        """
+        data = pati.lp2_string(layer_path.pack())
+        data += layer_data.pack()
+        data += pati.pack_optional_fields(optional_fields)
+        return data
+
 
     def recvReqLayerMediationList(self, packet_id, data, seq):
         """ReqLayerMediationList packet.
@@ -2614,7 +2655,44 @@ class PatRequestHandler(server.BasicPatHandler):
         self.server.circle_broadcast(circle, PatID4.NtcCircleHost, data,
                                      seq, self.session)
 
-    def notify_layer_departure(self):
+    def notify_city_info_set(self, path):
+        # type: (pati.LayerPath) -> None
+        city = self.get_layer(path)
+        assert isinstance(city, db.City)
+
+        gate = city.parent
+        layer_data = pati.LayerData.create_from(path.city_id, city, path)
+        info_set = self.packNtcLayerInfoSet(path, layer_data,
+                                            city.optional_fields)
+        self.server.broadcast(gate.players, PatID4.NtcLayerInfoSet, info_set, 0, 
+                              self.session)
+        
+    def notify_city_number_set(self, path):
+        # type: (pati.LayerPath) -> None
+        city = self.get_layer(path)
+        assert isinstance(city, db.City)
+
+        gate = city.parent
+        layer_data = pati.LayerData.create_from(path.city_id, city, path)
+        number_set = self.packNtcLayerUserNum(4, layer_data)
+        self.server.broadcast(gate.players, PatID4.NtcLayerUserNum, number_set, 0, 
+                              self.session)
+    
+    @staticmethod
+    def get_layer(path):
+        # type: (pati.LayerPath) -> Optional[db.Server | db.Gate | db.City]
+        database = db.get_instance()
+        if path.city_id > 0:
+            return database.get_city(path.server_id, path.gate_id, path.city_id)
+        elif path.gate_id > 0:
+            return database.get_gate(path.server_id, path.gate_id)
+        elif path.server_id > 0:
+            return database.get_server(path.server_id)
+        return None
+
+    def notify_layer_departure(self, end):
+        # type: (bool) -> None
+        path = self.session.get_layer_path()
         if self.session.layer == 2:
             new_host = self.session.try_transfer_city_leadership()
             if new_host:
@@ -2626,6 +2704,19 @@ class PatRequestHandler(server.BasicPatHandler):
         if self.session.local_info['circle_id'] is not None:
             self.notify_circle_leave(self.session.local_info['circle_id'] + 1,
                                      seq=0)
+        if end:
+            self.session.layer_end()
+        else:
+            self.session.layer_up()
+
+        if path.city_id > 0:
+            city = self.get_layer(path)
+            assert isinstance(city, db.City)
+
+            self.notify_city_number_set(path)
+            if city.leader is None:
+                self.notify_city_info_set(path)
+
 
     def notify_circle_leave(self, circle_index, seq):
         circle = self.session.get_circle()
@@ -2650,8 +2741,7 @@ class PatRequestHandler(server.BasicPatHandler):
         self.send_error("{}: {}".format(type(e).__name__, str(e)))
 
     def on_finish(self):
-        self.notify_layer_departure()
-        self.session.layer_end()
+        self.notify_layer_departure(True)
         self.session.disconnect()
         self.session.delete()
 

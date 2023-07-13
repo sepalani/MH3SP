@@ -259,7 +259,6 @@ class FmpRequestHandler(PatRequestHandler):
         Sent by the game when leaving the gate via the entrance:
          - Relocate > Select Server
         """
-        self.notify_layer_departure()
         self.sendAnsLayerUp(data, seq)
 
     def recvReqUserSearchInfoMine(self, packet_id, data, seq):

@@ -36,9 +36,9 @@ class ServerType(object):
 
 
 class LayerState(object):
-    JOINABLE = 0
     EMPTY = 1
     FULL = 2
+    JOINABLE = 3
 
 
 class Lockable(object):
@@ -163,6 +163,7 @@ class Players(Lockable):
 
 class Circle(Lockable):
     def __init__(self, parent):
+        # type: (City) -> None
         self.parent = parent
         self.leader = None
         self.players = Players(4)
@@ -214,6 +215,7 @@ class City(Lockable):
     LAYER_DEPTH = 3
 
     def __init__(self, name, parent):
+        # type: (str, Gate) -> None
         self.name = name
         self.parent = parent
         self.state = LayerState.EMPTY
@@ -237,6 +239,9 @@ class City(Lockable):
         return self.players.get_capacity()
 
     def get_state(self):
+        if self.reserved:
+            return LayerState.FULL
+    
         size = self.get_population()
         if size == 0:
             return LayerState.EMPTY
@@ -279,11 +284,21 @@ class City(Lockable):
             else:
                 self.reserved = None
 
+    def reset(self):
+        with self.lock():
+            self.state = LayerState.EMPTY
+            self.players.clear()
+            self.optional_fields = []
+            self.leader = None
+            self.reserved = None
+            self.clear_circles()
+
 
 class Gate(object):
     LAYER_DEPTH = 2
 
     def __init__(self, name, parent, city_count=40, player_capacity=100):
+        # type: (str, Server, int, int) -> None
         self.name = name
         self.parent = parent
         self.state = LayerState.EMPTY
@@ -595,6 +610,7 @@ class TempDatabase(object):
         with city.lock():
             city.optional_fields = optional_fields
             city.leader = session
+            city.reserved = None
         return city
 
     def join_city(self, session, server_id, gate_id, index):
@@ -614,7 +630,7 @@ class TempDatabase(object):
             city.parent.players.add(session)
             city.players.remove(session)
             if not city.get_population():
-                city.clear_circles()
+                city.reset()
         session.local_info["city_id"] = None
         session.local_info["city_name"] = None
 
