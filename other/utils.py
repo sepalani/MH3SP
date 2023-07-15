@@ -7,11 +7,12 @@
 import os
 import logging
 import socket
+import traceback
 
 from collections import namedtuple
 from functools import partial
 from logging.handlers import TimedRotatingFileHandler
-import traceback
+from other.debug import register_debug_signal
 
 try:
     # Python 2
@@ -385,6 +386,8 @@ def create_server_from_base(name, server_class, server_handler, silent=False,
 
 def server_main(name, server_class, server_handler):
     """Create a server main based on its config parameters."""
+    register_debug_signal()
+
     config = get_config(name)
     parser = argparse_from_config(config)
     args = parser.parse_args()
