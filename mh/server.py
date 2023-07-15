@@ -150,6 +150,7 @@ class BasicPatServer(object):
         self.server_address = server_address
         self.RequestHandlerClass = RequestHandlerClass
         self.__is_shut_down = threading.Event()
+        self.__is_shut_down.set()
         self.__shutdown_request = False
         self.socket = socket.socket(self.address_family, self.socket_type)
         self._random = random.SystemRandom()  # type: random.SystemRandom
@@ -157,19 +158,7 @@ class BasicPatServer(object):
         self.worker_threads = []  # type: List[threading.Thread]
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
-
-        if max_threads <= 0:
-            max_threads = multiprocessing.cpu_count()
-
-        for n in range(max_threads):
-            thread_queue = queue.Queue()
-            thread = threading.Thread(
-                target=self._worker_target,
-                args=(thread_queue,),
-                name="{}.Worker-{}".format(self.__class__.__name__, n)
-            )
-            self.worker_queues.append(thread_queue)
-            self.worker_threads.append(thread)
+        self.max_threads = max_threads or multiprocessing.cpu_count()
 
         if bind_and_activate:
             try:
@@ -194,11 +183,27 @@ class BasicPatServer(object):
         """
         return self.socket.fileno()
 
+    def initialize_workers(self):
+        """Initialize workers queues/threads.
+
+        This needs to be deferred, otherwise the close method might try to
+        join threads that aren't started yet when an error occurs early.
+        """
+        for n in range(self.max_threads):
+            thread_queue = queue.Queue()
+            thread = threading.Thread(
+                target=self._worker_target,
+                args=(thread_queue,),
+                name="{}.Worker-{}".format(self.__class__.__name__, n)
+            )
+            self.worker_queues.append(thread_queue)
+            self.worker_threads.append(thread)
+            thread.start()
+
     def serve_forever(self):
         self.__is_shut_down.clear()
         try:
-            for thread in self.worker_threads:
-                thread.start()
+            self.initialize_workers()
 
             with self.selector as selector:
                 selector.register(self, selectors.EVENT_READ)
