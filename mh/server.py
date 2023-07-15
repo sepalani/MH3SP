@@ -170,7 +170,6 @@ class BasicPatServer(object):
             )
             self.worker_queues.append(thread_queue)
             self.worker_threads.append(thread)
-            thread.start()
 
         if bind_and_activate:
             try:
@@ -198,6 +197,9 @@ class BasicPatServer(object):
     def serve_forever(self):
         self.__is_shut_down.clear()
         try:
+            for thread in self.worker_threads:
+                thread.start()
+
             with self.selector as selector:
                 selector.register(self, selectors.EVENT_READ)
 
