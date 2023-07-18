@@ -7,6 +7,7 @@
 import random
 import sqlite3
 import time
+from other import utils
 from threading import RLock, local as thread_local
 
 
@@ -152,7 +153,7 @@ class Players(Lockable):
 
     def __iter__(self):
         if self.used < 1:
-            raise StopIteration
+            return
 
         for i, v in enumerate(self.slots):
             if v is None:
@@ -703,7 +704,10 @@ class SafeSqliteConnection(object):
     def __init__(self, *args, **kwargs):
         self.__connection = sqlite3.connect(*args, **kwargs)
         self.__connection.row_factory = sqlite3.Row
-        self.__connection.text_factory = str
+        # Avoid "unicode argument without an encoding" error
+        # Fix python2/3 text_factory = str vs bytes
+        # NB: data types aren't enforced
+        self.__connection.text_factory = utils.to_str
 
     def __enter__(self):
         return self.__connection.__enter__()
@@ -818,6 +822,8 @@ class TempSQLiteDatabase(TempDatabase):
         with self.connection as cursor:
             rows = cursor.execute("SELECT * FROM consoles")
             for support_code, slot_index, capcom_id, name in rows:
+                # Enforcing BLOB type since sometimes it's retrieved as TEXT
+                name = utils.to_bytes(name)
                 if support_code not in self.consoles:
                     self.consoles[support_code] = [BLANK_CAPCOM_ID] * 6
                 self.consoles[support_code][slot_index - 1] = capcom_id
@@ -833,7 +839,7 @@ class TempSQLiteDatabase(TempDatabase):
         with self.connection as cursor:
             for support_code, capcom_ids in self.consoles.items():
                 for slot_index, capcom_id in enumerate(capcom_ids, 1):
-                    info = self.capcom_ids.get(capcom_id, {"name": ""})
+                    info = self.capcom_ids.get(capcom_id, {"name": b""})
                     cursor.execute(
                         "INSERT OR IGNORE INTO consoles VALUES (?,?,?,?)",
                         (support_code, slot_index, capcom_id, info["name"])

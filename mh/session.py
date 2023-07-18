@@ -46,7 +46,7 @@ class Session(object):
         self.request_reconnection = False
         self.pat_ticket = None
         self.capcom_id = ""
-        self.hunter_name = ""
+        self.hunter_name = b""
         self.hunter_stats = None
         self.layer = 0
         self.state = SessionState.UNKNOWN
