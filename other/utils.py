@@ -138,6 +138,10 @@ def to_bytearray(data):
         return bytearray(data)
 
 
+def to_bytes(data):
+    return bytes(to_bytearray(data))
+
+
 def to_str(data):
     """Python2/3 str helper."""
     if isinstance(data, str):
