@@ -223,7 +223,6 @@ def get_config(name, config_file=CONFIG_FILE):
         "Name": config.get(name, "Name"),
         "MaxThread": config.getint(name, "MaxThread"),
         "UseSSL": config.getboolean(name, "UseSSL"),
-        "LegacySSL": config.getboolean("SSL", "LegacySSL"),
         "SSLCert":
             config.get(name, "SSLCert") or
             config.get("SSL", "DefaultCert"),
@@ -283,9 +282,6 @@ def argparse_from_config(config):
     parser.add_argument("-s", "--use-ssl", action="store", type=typebool,
                         default=config["UseSSL"], dest="use_ssl",
                         help="use SSL protocol")
-    parser.add_argument("-f", "--legacy-ssl", action="store", type=typebool,
-                        default=config["LegacySSL"], dest="legacy_ssl",
-                        help="force legacy SSL ciphers")
     parser.add_argument("-c", "--ssl-cert", action="store", type=str,
                         default=config["SSLCert"], dest="ssl_cert",
                         help="set server SSL certificate")
@@ -307,12 +303,47 @@ def argparse_from_config(config):
     return parser
 
 
+def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
+    """SSL wrapper for network sockets aiming Wii compatibility.
+
+    References:
+    https://docs.python.org/2.7/library/ssl.html
+    https://docs.python.org/3/library/ssl.html
+    https://www.openssl.org/docs/man1.0.2/man1/ciphers.html
+    https://www.openssl.org/docs/man1.1.1/man1/ciphers.html
+    https://www.openssl.org/docs/man3.0/man1/openssl-ciphers.html
+    """
+    import ssl
+
+    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+
+    if hasattr(ssl, "TLSVersion"):  # Since Python 3.7
+        # Required since Python 3.10
+        context.minimum_version = ssl.TLSVersion.SSLv3
+    wii_ciphers = ":".join([
+        "AES128-SHA", "AES256-SHA",
+        # The following ones are often unavailable
+        "DES-CBC-SHA", "3DES-CBC-SHA",
+        "RC4-MD5", "RC4-SHA"
+        # NB: Python might enforce additional (unsupported) ciphers
+        # for security reasons
+        # TODO: Disable them in Dolphin to emulate the Wii accurately
+    ])
+
+    # Try to enforce legacy ciphers/weak cert chain (OpenSSL >= 1.1 only)
+    if ssl.OPENSSL_VERSION_INFO >= (1, 1):
+        wii_ciphers += ":@SECLEVEL=0"
+
+    context.set_ciphers(wii_ciphers)
+    context.load_cert_chain(ssl_cert, ssl_key)
+    return context.wrap_socket(sock, server_side=True)
+
+
 def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
-                  log_to_console=True, log_to_window=False, legacy_ssl=False,
-                  debug_mode=False):
+                  log_to_console=True, log_to_window=False, debug_mode=False):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG if debug_mode else logging.INFO,
@@ -323,33 +354,7 @@ def create_server(server_class, server_handler,
                           debug_mode)
 
     if use_ssl:
-        import ssl
-
-        context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-        if hasattr(ssl, "TLSVersion"):  # Since Python 3.7
-            # Required since Python 3.10
-            context.minimum_version = ssl.TLSVersion.SSLv3
-        wii_ciphers = ":".join([
-            "AES128-SHA", "AES256-SHA",
-            # The following ones are often unavailable
-            "DES-CBC-SHA", "3DES-CBC-SHA",
-            "RC4-MD5", "RC4-SHA"
-            # NB: Python might enforce additional (unsupported) ciphers
-            # for security reasons
-            # TODO: Disable them in Dolphin to emulate the Wii accurately
-        ])
-        if legacy_ssl:
-            # https://www.openssl.org/docs/man1.0.2/man1/ciphers.html
-            # https://www.openssl.org/docs/man1.1.1/man1/ciphers.html
-            # https://www.openssl.org/docs/man3.0/man1/openssl-ciphers.html
-            openssl_version = ssl.OPENSSL_VERSION_INFO[:2]
-            message = "Unsupported LegacySSL option (OpenSSL {}.{})".format(
-                *openssl_version)
-            assert openssl_version > (1, 0), message
-            wii_ciphers += ":@SECLEVEL=0"  # Allow weak cert chain
-        context.set_ciphers(wii_ciphers)
-        context.load_cert_chain(ssl_cert, ssl_key)
-        server.socket = context.wrap_socket(server.socket, server_side=True)
+        server.socket = wii_ssl_wrap_socket(server.socket, ssl_cert, ssl_key)
 
     return server
 
@@ -368,7 +373,6 @@ def create_server_from_base(name, server_class, server_handler, silent=False,
         name=config["Name"],
         max_thread=config["MaxThread"],
         use_ssl=config["UseSSL"],
-        legacy_ssl=config["LegacySSL"],
         ssl_cert=config["SSLCert"],
         ssl_key=config["SSLKey"],
         log_to_file=config["LogToFile"],
