@@ -12,6 +12,7 @@ import lmp_server as LMP
 import fmp_server as FMP
 import rfp_server as RFP
 
+from other.debug import register_debug_signal
 from other.utils import create_server_from_base
 
 
@@ -30,6 +31,8 @@ def create_servers(silent=False, debug_mode=False):
 
 def main(args):
     """Master server main function."""
+    register_debug_signal()
+
     servers, has_ui = create_servers(silent=args.silent,
                                      debug_mode=args.debug_mode)
     threads = [
