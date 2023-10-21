@@ -11,6 +11,7 @@ import struct
 import threading
 
 from mh.time_utils import Timer
+from other.utils import wii_ssl_wrap_socket
 
 try:
     # Python 3
@@ -144,8 +145,8 @@ class BasicPatServer(object):
     socket_type = socket.SOCK_STREAM
 
     def __init__(self, server_address, RequestHandlerClass, max_threads,
-                 bind_and_activate=True):
-        # type: (Tuple[str, int], BasicPatHandler, int, bool) -> None
+                 bind_and_activate=True, ssl_cert=None, ssl_key=None):
+        # type: (Tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None
         """Constructor.  May be extended, do not override."""
         self.server_address = server_address
         self.RequestHandlerClass = RequestHandlerClass
@@ -159,6 +160,8 @@ class BasicPatServer(object):
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
         self.max_threads = max_threads or multiprocessing.cpu_count()
+        self.ssl_cert = ssl_cert
+        self.ssl_key = ssl_key
 
         if bind_and_activate:
             try:
@@ -287,6 +290,15 @@ class BasicPatServer(object):
             # Currently, they get stuck on `packet = selected.on_recv()`,
             # thus blocking the `serve_forever` method.
             client_socket.settimeout(2.0)
+
+            # TODO: Ensure this is the correct way to fix the server not
+            # accepting SSL connection anymore.
+            #
+            # See https://stackoverflow.com/a/68214507
+            if self.ssl_cert and self.ssl_key:
+                client_socket = wii_ssl_wrap_socket(
+                    client_socket, self.ssl_cert, self.ssl_key
+                )
             handler = self.RequestHandlerClass(client_socket, client_address,
                                                self)
         except Exception as e:
