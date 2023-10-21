@@ -340,7 +340,7 @@ def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
     return context.wrap_socket(sock, server_side=True)
 
 
-def create_server(server_class, server_handler,
+def create_server(server_class, server_handler, 
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
@@ -351,11 +351,14 @@ def create_server(server_class, server_handler,
         log_to_file=log_filename if log_to_file else "",
         log_to_console=log_to_console,
         log_to_window=log_to_window)
-    server = server_class((address, port), server_handler, max_thread, logger,
-                          debug_mode)
 
     if use_ssl:
-        server.socket = wii_ssl_wrap_socket(server.socket, ssl_cert, ssl_key)
+        server = server_class((address, port), server_handler,
+                          max_thread, logger, debug_mode,
+                          ssl_cert=ssl_cert, ssl_key=ssl_key)
+    else:
+        server = server_class((address, port), server_handler,
+                          max_thread, logger, debug_mode)
 
     return server
 
