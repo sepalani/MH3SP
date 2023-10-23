@@ -307,10 +307,16 @@ ANNOUNCE = b"<BR><BODY>".join([
     b"Roadmap for a list of features we are working on.",
     b"<BR><CENTER><C=2>Welcome to Loc Lac!<END>"
 ])
+MAINTENANCE = b"<BR><BODY>".join([
+    b"<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
+    b"<BR><CENTER><SIZE=4>MH3SP is currently down for maintenance.",
+    b"<BR><CENTER><C=2>Please check back later!<END>"
+])
 CHARGE = b"""<BODY><CENTER>MH3 Server Project - No charge.<END>"""
 # VULGARITY_INFO = b"""MH3 Server Project - Vulgarity info (low)."""
 VULGARITY_INFO = b""
-FMP_VERSION = 1
+FMP_CENTRAL_VERSION = 1
+FMP_VERSION = 2
 
 TIME_STATE = 0
 IS_JAP = False

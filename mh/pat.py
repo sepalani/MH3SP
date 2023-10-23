@@ -15,9 +15,10 @@ import mh.server as server
 import mh.time_utils as time_utils
 from mh.constants import \
     LAYER_CHAT_COLORS, TERMS_VERSION, TERMS, SUBTERMS, ANNOUNCE, \
-    CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, PatID4
+    CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, PatID4, \
+    FMP_CENTRAL_VERSION
 from mh.session import Session
-import mh.database as db
+import mh.state as state
 
 try:
     from typing import Literal, List, Union, Optional  # noqa: F401
@@ -34,7 +35,7 @@ class PatServer(server.BasicPatServer, Logger):
     """Generic PAT server class."""
 
     def __init__(self, address, handler_class, max_thread_count=0,
-                 logger=None, debug_mode=False):
+                 logger=None, debug_mode=False, no_timeout=False):
         server.BasicPatServer.__init__(self, address, handler_class,
                                        max_thread_count)
         Logger.__init__(self)
@@ -43,6 +44,7 @@ class PatServer(server.BasicPatServer, Logger):
         self.info("Running on {} port {}".format(*address))
         self.debug_con = []
         self.debug_mode = debug_mode
+        self.no_timeout = no_timeout
 
     def add_to_debug(self, con):
         """Add connection to the debug connection list."""
@@ -58,6 +60,9 @@ class PatServer(server.BasicPatServer, Logger):
 
     def debug_enabled(self):
         return self.debug_mode
+
+    def no_timeout_enabled(self):
+        return self.no_timeout
 
     def get_pat_handler(self, session):
         """Return pat handler from session"""
@@ -268,14 +273,14 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         settings = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(settings))
-        pat_ticket = b""
-        if "pat_ticket" in settings:
-            _, pat_ticket = pati.unpack_any(settings.pat_ticket)
-        elif "online_support_code" in settings:
-            _, pat_ticket = pati.unpack_any(settings.online_support_code)
-        self.server.info("Client {} Ticket `{}`".format(self.client_address,
-                                                        pat_ticket))
-        self.sendNtcLogin(5, settings, seq)
+        pat_ticket = settings.pat_ticket if "pat_ticket" in settings else \
+                     settings.online_support_code if "online_support_code" in settings \
+                     else ""
+        self.server.info("Client {} Ticket `{}`".format(self.client_address, pat_ticket))
+        if len(self.session.get_servers()) == 0:
+            self.sendNtcLogin(2, settings, seq)
+        else:
+            self.sendNtcLogin(5, settings, seq)
 
     def sendNtcLogin(self, server_status, connection_data, seq):
         """NtcLogin packet.
@@ -289,6 +294,27 @@ class PatRequestHandler(server.BasicPatHandler):
         data = struct.pack(">B", server_status)
         self.session = self.session.get(connection_data)
         self.send_packet(PatID4.NtcLogin, data, seq)
+
+    def recvReqMaintenance(self, packet_id, data, seq):
+        """sendAnsMaintenance packet.
+
+        ID: 62200100
+        JP: メンテナンス情報要求
+        TR: Maintenance information request
+        """
+        self.sendAnsMaintenance(MAINTENANCE, seq)
+
+    def sendAnsMaintenance(self, maintenance, seq):
+        """sendAnsMaintenance packet.
+
+        ID: 62200200
+        JP: メンテナンス情報通知
+        TR: Maintenance information notification
+
+        The server replies with the maintenance information text.
+        """
+        data = pati.lp2_string(maintenance)
+        self.send_packet(PatID4.AnsMaintenance, data, seq)
 
     def recvReqAuthenticationToken(self, packet_id, data, seq):
         """ReqAuthenticationToken packet.
@@ -721,7 +747,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: PAT ticket response
         """
         pat_ticket = self.session.new_pat_ticket()
-        data = struct.pack(">H", len(pat_ticket)) + pat_ticket
+        data = struct.pack(">H", len(pat_ticket)) + pat_ticket.encode('ascii')
         self.send_packet(PatID4.AnsTicket, data, seq)
 
     def recvReqUserListHead(self, packet_id, data, seq):
@@ -883,7 +909,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリストバージョン確認応答
         TR: FMP list version acknowledgment
         """
-        data = struct.pack(">I", FMP_VERSION)
+        data = struct.pack(">I", FMP_CENTRAL_VERSION)
         self.send_packet(PatID4.AnsFmpListVersion, data, seq)
 
     def sendAnsFmpListVersion2(self, seq):
@@ -893,7 +919,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリストバージョン確認応答
         TR: FMP list version acknowledgment
         """
-        data = struct.pack(">I", FMP_VERSION)
+        data = struct.pack(">I", self.session.get_fmp_version())
         self.send_packet(PatID4.AnsFmpListVersion2, data, seq)
 
     def recvReqFmpListHead(self, packet_id, data, seq):
@@ -903,13 +929,9 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリスト数送信 / FMPリスト数要求
         TR: Send FMP list count / FMP list count request
         """
-        # TODO: Might be worth investigating these parameters as
-        # they might be useful when using multiple FMP servers.
-        version, first_index, count = struct.unpack_from(
-            ">III", data
-        )  # noqa: F841
-        # TODO: Unpack it using pati.Unpacker
-        header = pati.unpack_bytes(data, 12)  # noqa: F841
+        version, first_index, count = struct.unpack_from(">III", data)
+        self.session.preserve_server_ids(first_index, count)
+        header = pati.unpack_bytes(data, 12)
         if packet_id == PatID4.ReqFmpListHead:
             self.sendAnsFmpListHead(seq)
         elif packet_id == PatID4.ReqFmpListHead2:
@@ -967,7 +989,7 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         unused = 0
         data = struct.pack(">II", unused, count)
-        data += pati.get_fmp_servers(self.session, first_index, count)
+        data += pati.get_fmp_central_servers(self.session, first_index, count)
         self.send_packet(PatID4.AnsFmpListData, data, seq)
 
     def sendAnsFmpListData2(self, first_index, count, seq):
@@ -1067,20 +1089,31 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         index, = struct.unpack_from(">I", data)
         fields = pati.unpack_bytes(data, 4)
-        server = self.session.join_server(index)
-        config = get_config("FMP")
-        fmp_addr = get_ip(config["IP"])
-        fmp_port = config["Port"]
         fmp_data = pati.FmpData()
-        fmp_data.server_address = pati.String(server.addr or fmp_addr)
-        fmp_data.server_port = pati.Word(server.port or fmp_port)
-        fmp_data.assert_fields(fields)
+
         if packet_id == PatID4.ReqFmpInfo:
+            config = get_config("FMP")
+            central_fmp_addr = get_ip(config["IP"])
+            central_fmp_port = config["Port"]
+            fmp_data.server_address = pati.String(central_fmp_addr)
+            fmp_data.server_port = pati.Word(central_fmp_port)
+            fmp_data.assert_fields(fields)
             self.sendAnsFmpInfo(fmp_data, fields, seq)
         elif packet_id == PatID4.ReqFmpInfo2:
+            if not self.session.server_index_exists(index):
+                self.sendAnsAlert(PatID4.AnsFmpInfo2,
+                                  "<LF=8><BODY><CENTER>\
+                                  Server is offline.<END>",
+                                  seq)
+                return
+            server_id = self.session.recall_server_id(index)
+            server = self.session.join_server(server_id)
+            fmp_data.server_address = pati.String(server.addr)
+            fmp_data.server_port = pati.Word(server.port)
+            fmp_data.assert_fields(fields)
             self.sendAnsFmpInfo2(fmp_data, fields, seq)
 
-        # Preserve session in database, due to server selection
+        # Preserve session in state, due to server selection
         self.session.request_reconnection = True
 
     def sendAnsFmpInfo(self, fmp_data, fields, seq):
@@ -1328,10 +1361,10 @@ class PatRequestHandler(server.BasicPatHandler):
         # Specifically when a client is deserializing data from the packets
         # `NtcLayerBinary` and `NtcLayerBinary2`
         # TODO: Proper field value and name
-        user_info.info_mine_0x0f = pati.Long(int(hash(user.capcom_id))
-                                             & 0xffffffff)
-        user_info.info_mine_0x10 = pati.Long(int(hash(user.capcom_id[::-1]))
-                                             & 0xffffffff)
+        user_info.info_mine_0x0f = pati.Long(int(hash(user.capcom_id)) &
+                                             0xffffffff)
+        user_info.info_mine_0x10 = pati.Long(int(hash(user.capcom_id[::-1])) &
+                                             0xffffffff)
 
         data = user_info.pack()
         # TODO: Figure out the optional fields
@@ -2658,7 +2691,7 @@ class PatRequestHandler(server.BasicPatHandler):
     def notify_city_info_set(self, path):
         # type: (pati.LayerPath) -> None
         city = self.get_layer(path)
-        assert isinstance(city, db.City)
+        assert isinstance(city, state.City)
 
         gate = city.parent
         layer_data = pati.LayerData.create_from(path.city_id, city, path)
@@ -2670,7 +2703,7 @@ class PatRequestHandler(server.BasicPatHandler):
     def notify_city_number_set(self, path):
         # type: (pati.LayerPath) -> None
         city = self.get_layer(path)
-        assert isinstance(city, db.City)
+        assert isinstance(city, state.City)
 
         gate = city.parent
         layer_data = pati.LayerData.create_from(path.city_id, city, path)
@@ -2680,14 +2713,14 @@ class PatRequestHandler(server.BasicPatHandler):
     
     @staticmethod
     def get_layer(path):
-        # type: (pati.LayerPath) -> Optional[db.Server | db.Gate | db.City]
-        database = db.get_instance()
+        # type: (pati.LayerPath) -> Optional[state.Server | state.Gate | state.City]
+        curr_state = state.get_instance()
         if path.city_id > 0:
-            return database.get_city(path.server_id, path.gate_id, path.city_id)
+            return curr_state.get_city(path.server_id, path.gate_id, path.city_id)
         elif path.gate_id > 0:
-            return database.get_gate(path.server_id, path.gate_id)
+            return curr_state.get_gate(path.server_id, path.gate_id)
         elif path.server_id > 0:
-            return database.get_server(path.server_id)
+            return curr_state.get_server(path.server_id)
         return None
 
     def notify_layer_departure(self, end):
@@ -2711,7 +2744,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
         if path.city_id > 0:
             city = self.get_layer(path)
-            assert isinstance(city, db.City)
+            assert isinstance(city, state.City)
 
             self.notify_city_number_set(path)
             if city.leader is None:
@@ -2796,7 +2829,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
         # Send a ping with 30 seconds interval
         if self.ping_timer.elapsed() >= 30:
-            if not self.server.debug_enabled() and not self.line_check:
+            if not self.server.no_timeout_enabled() and not self.line_check:
                 raise Exception("Client timed out.")
             self.line_check = False
             self.sendReqLineCheck()

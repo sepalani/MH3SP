@@ -6,6 +6,7 @@
 
 import struct
 
+from mh.state import Players, get_instance
 import mh.pat_item as pati
 from mh.constants import PatID4
 from mh.pat import PatRequestHandler, PatServer
@@ -14,7 +15,9 @@ from other.utils import hexdump, server_base, server_main, to_str
 
 class FmpServer(PatServer):
     """Basic FMP server class."""
-    pass
+    def close(self):
+        PatServer.close(self)
+        get_instance().close_cache()
 
 
 class FmpRequestHandler(PatRequestHandler):
@@ -24,7 +27,16 @@ class FmpRequestHandler(PatRequestHandler):
         """AnsConnection packet."""
         connection_data = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(connection_data))
-        self.sendNtcLogin(3, connection_data, seq)
+        loaded_session = self.session.session_ready(connection_data)
+        if loaded_session:
+            if get_instance().server_id != 0:
+                self.session.set_session_ready(connection_data, False)
+                loaded_session.connection = self
+                self.session = loaded_session
+                get_instance().register_pat_ticket(self.session)
+            self.sendNtcLogin(3, connection_data, seq)
+        else:
+            self.session.set_session_ready(connection_data, (self, connection_data, seq))
 
     def sendAnsLayerDown(self, layer_id, layer_set, seq):
         """AnsLayerDown packet.
