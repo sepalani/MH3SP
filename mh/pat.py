@@ -34,9 +34,11 @@ class PatServer(server.BasicPatServer, Logger):
     """Generic PAT server class."""
 
     def __init__(self, address, handler_class, max_thread_count=0,
-                 logger=None, debug_mode=False):
-        server.BasicPatServer.__init__(self, address, handler_class,
-                                       max_thread_count)
+                 logger=None, debug_mode=False, ssl_cert=None, ssl_key=None):
+        server.BasicPatServer.__init__(
+            self, address, handler_class, max_thread_count,
+            ssl_cert=ssl_cert, ssl_key=ssl_key
+        )
         Logger.__init__(self)
         if logger:
             self.set_logger(logger)

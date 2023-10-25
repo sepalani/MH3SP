@@ -351,13 +351,11 @@ def create_server(server_class, server_handler,
         log_to_file=log_filename if log_to_file else "",
         log_to_console=log_to_console,
         log_to_window=log_to_window)
-    server = server_class((address, port), server_handler, max_thread, logger,
-                          debug_mode)
-
-    if use_ssl:
-        server.socket = wii_ssl_wrap_socket(server.socket, ssl_cert, ssl_key)
-
-    return server
+    if not use_ssl:
+        ssl_cert = None
+        ssl_key = None
+    return server_class((address, port), server_handler, max_thread, logger,
+                        debug_mode, ssl_cert=ssl_cert, ssl_key=ssl_key)
 
 
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
