@@ -23,7 +23,7 @@ from contextlib import closing
 def warning(message, force):
     if not force:
         raise ValueError(message)
-    print("! {}". format(message))
+    print(f"! {message}")
 
 
 class CertPatcher(object):
@@ -96,8 +96,7 @@ class CertPatcher(object):
         dol - path to the main.dol file
         """
         self.CERT_LEN = 924
-        with open(dol, "rb") as f, \
-             closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)) as m:
+        with (open(dol, "rb") as f, closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)) as m):
             matches = []
             header = bytes(self.CERT_HDR)
             offset = m.find(header)
@@ -106,7 +105,7 @@ class CertPatcher(object):
                     matches.append(offset)
                 offset = m.find(header, offset+1)
             if len(matches) != 1:
-                raise ValueError("Auto-detection failed: {}".format(matches))
+                raise ValueError(f"Auto-detection failed: {matches}")
             self.CERT_OFF = matches[0]
             if self.CERT_OFF not in self.KNOWN_OFFSETS:
                 warning("Unknown version detected (offset=0x{:08x})".format(
@@ -114,9 +113,7 @@ class CertPatcher(object):
 
     def print_version(self):
         """Print detected version."""
-        print("+ Version used: {}".format(
-            self.KNOWN_OFFSETS.get(self.CERT_OFF, "Unknown")
-        ))
+        print(f'+ Version used: {self.KNOWN_OFFSETS.get(self.CERT_OFF, "Unknown")}')
 
 
 class JAPCertPatcher(CertPatcher):
@@ -247,8 +244,7 @@ class ECPatcher(object):
 
     def patch(self, path):
         """Patches EC/Wii Shop related functions required to play online."""
-        with open(path, "rb+") as f, \
-             closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_WRITE)) as m:
+        with (open(path, "rb+") as f, closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_WRITE)) as m):
             for code_patch in self.PATCHES:
                 m.seek(0)
                 signature = bytes(code_patch.signature)
@@ -256,9 +252,9 @@ class ECPatcher(object):
                 pos = m.find(signature)
                 if pos == -1:
                     if m.find(patch) != -1:
-                        print("  - {} already patched".format(code_patch.name))
+                        print(f"  - {code_patch.name} already patched")
                         continue
-                    raise IndexError("Can't find {}".format(code_patch.name))
+                    raise IndexError(f"Can't find {code_patch.name}")
                 m.seek(pos)
                 m.write(patch)
             print("  + EC/Wii Shop patching process completed successfully!")
@@ -346,7 +342,7 @@ if __name__ == '__main__':
         main()
     except (Exception, SystemExit) as e:
         if isinstance(e, ValueError):
-            print("ERROR: {}!".format(e))
+            print(f"ERROR: {e}!")
         elif not isinstance(e, SystemExit):
             print_exc()
         prompt()

@@ -73,9 +73,7 @@ def unpack_byte(data, offset=0):
     """Unpack PAT item byte."""
     item_type, value = struct.unpack_from(">BB", data, offset)
     if item_type != ItemType.Byte:
-        raise AssertionError("Invalid type for byte item: {}".format(
-            item_type
-        ))
+        raise AssertionError(f"Invalid type for byte item: {item_type}")
     return value
 
 
@@ -102,9 +100,7 @@ def unpack_word(data, offset=0):
     """Unpack PAT item word."""
     item_type, value = struct.unpack_from(">BH", data, offset)
     if item_type != ItemType.Word:
-        raise AssertionError("Invalid type for word item: {}".format(
-            item_type
-        ))
+        raise AssertionError(f"Invalid type for word item: {item_type}")
     return value
 
 
@@ -131,9 +127,7 @@ def unpack_long(data, offset=0):
     """Unpack PAT item long."""
     item_type, value = struct.unpack_from(">BI", data, offset)
     if item_type != ItemType.Long:
-        raise AssertionError("Invalid type for long item: {}".format(
-            item_type
-        ))
+        raise AssertionError(f"Invalid type for long item: {item_type}")
     return value
 
 
@@ -155,9 +149,7 @@ def unpack_longlong(data, offset=0):
     """Unpack PAT item long long."""
     item_type, value = struct.unpack_from(">BQ", data, offset)
     if item_type != ItemType.LongLong:
-        raise AssertionError("Invalid type for long long item: {}".format(
-            item_type
-        ))
+        raise AssertionError(f"Invalid type for long long item: {item_type}")
     return value
 
 
@@ -179,9 +171,7 @@ def unpack_string(data, offset=0):
     """Unpack PAT item string."""
     item_type, length = struct.unpack_from(">BH", data, offset)
     if item_type != ItemType.String:
-        raise AssertionError("Invalid type for string item: {}".format(
-            item_type
-        ))
+        raise AssertionError(f"Invalid type for string item: {item_type}")
     return data[offset+3:offset+3+length]
 
 
@@ -204,9 +194,7 @@ def unpack_binary(data, offset=0):
     """Unpack PAT item binary."""
     item_type, length = struct.unpack_from(">BH", data, offset)
     if item_type != ItemType.Binary:
-        raise AssertionError("Invalid type for binary item: {}".format(
-            item_type
-        ))
+        raise AssertionError(f"Invalid type for binary item: {item_type}")
     return data[offset+3:offset+3+length]
 
 
@@ -269,18 +257,17 @@ class PatData(OrderedDict):
         return "{}({})".format(
             type(self).__name__,
             ", ".join(
-                "{}={}".format(self.field_name(index), repr(value))
-                for index, value in items
-            )
+                f"{self.field_name(index)}={repr(value)}" for index, value in items
+            ),
         )
 
     def __getattr__(self, name):
         for field_id, field_name in self.FIELDS:
             if name == field_name:
                 if field_id not in self:
-                    raise AttributeError("{} not set".format(name))
+                    raise AttributeError(f"{name} not set")
                 return self[field_id]
-        raise AttributeError("Unknown field: {}".format(name))
+        raise AttributeError(f"Unknown field: {name}")
 
     def __setattr__(self, name, value):
         for field_id, field_name in self.FIELDS:
@@ -291,7 +278,7 @@ class PatData(OrderedDict):
                 return
         if name.startswith("_"):
             return OrderedDict.__setattr__(self, name, value)
-        raise AttributeError("Cannot set unknown field: {}".format(name))
+        raise AttributeError(f"Cannot set unknown field: {name}")
 
     def __delattr__(self, name):
         for field_id, field_name in self.FIELDS:
@@ -308,10 +295,14 @@ class PatData(OrderedDict):
         return OrderedDict.__setitem__(self, key, value)
 
     def field_name(self, index):
-        for field_id, field_name in self.FIELDS:
-            if index == field_id:
-                return field_name
-        return "field_0x{:02x}".format(index)
+        return next(
+            (
+                field_name
+                for field_id, field_name in self.FIELDS
+                if index == field_id
+            ),
+            "field_0x{:02x}".format(index),
+        )
 
     def pack(self):
         """Pack PAT items."""
@@ -354,7 +345,7 @@ class PatData(OrderedDict):
                 obj[field_id] = Binary(value)
                 offset += 2 + len(value)
             else:
-                raise ValueError("Unknown type: {}".format(item_type))
+                raise ValueError(f"Unknown type: {item_type}")
         return obj
 
 

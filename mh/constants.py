@@ -78,7 +78,7 @@ def make_binary_server_type_list(is_jap=False):
         b"Seeking26", b"Seeking27", b"Seeking28", b"Seeking29",
         b"Seeking30", b"Seeking31",
     ]
-    for i, seeking in enumerate(SEEKINGS):
+    for seeking in SEEKINGS:
         data += pad(seeking, 32 if is_jap else 48)
         data += b"\0\1\xff\0"  # TODO: Figure out the 0xff flag values
 
@@ -133,7 +133,7 @@ def make_binary_server_type_list(is_jap=False):
         data += struct.pack(">H", 0)
 
     # Handle server type HR limits
-    for i, (name, desc, hr_min, hr_max) in enumerate(PROPERTIES):
+    for name, desc, hr_min, hr_max in PROPERTIES:
         data += struct.pack(">H", hr_min)
         data += struct.pack(">H", hr_max)
 
