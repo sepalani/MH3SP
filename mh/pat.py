@@ -837,7 +837,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             fmp_data.unk_longlong_0x07 = pati.LongLong(i)
             fmp_data.player_count = pati.Long(23)
             fmp_data.player_capacity = pati.Long(100)
-            fmp_data.server_name = pati.String("FMP_0x0A_{}".format(i))
+            fmp_data.server_name = pati.String(f"FMP_0x0A_{i}")
             fmp_data.unk_string_0x0b = pati.String("X")
             fmp_data.unk_long_0x0c = pati.Long(0x12345678)
             i += 1
@@ -868,7 +868,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
             fmp_data.unk_longlong_0x07 = pati.LongLong(i)
             fmp_data.player_count = pati.Long(23)
             fmp_data.player_capacity = pati.Long(100)
-            fmp_data.server_name = pati.String("FMP2_0x0A_{}".format(i))
+            fmp_data.server_name = pati.String(f"FMP2_0x0A_{i}")
             fmp_data.unk_string_0x0b = pati.String("Y")
             fmp_data.unk_long_0x0c = pati.Long(i)
             i += 1
@@ -2075,8 +2075,6 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         TR: Circle sync list response (layer)
         """
         unk = 0
-        circles = []
-
         circle = pati.CircleInfo()
         circle.index = pati.Long(1)
         circle.unk_string_0x02 = pati.String("192.168.23.1")
@@ -2113,8 +2111,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         circle.unk_long_0x0c = pati.Long(1)
         circle.unk_string_0x0d = pati.String("192.168.23.1")
         circle.unk_byte_0x0f = pati.Byte(1)
-        circles.append(circle)
-
+        circles = [circle]
         count = len(circles)
         data = struct.pack(">II", unk, count)
         for circle in circles:
@@ -2191,7 +2188,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unk1, = struct.unpack_from(">I", data)
         unk2 = data[4:4+0xd]
         unk3 = data[4+0xd:]
-        self.server.debug("ReqCircleInfo: {}, {}, {}".format(unk1, unk2, unk3))
+        self.server.debug(f"ReqCircleInfo: {unk1}, {unk2}, {unk3}")
         self.sendAnsCircleInfo(unk1, unk2, unk3, seq)
 
     def sendAnsCircleInfo(self, unk1, unk2, unk3, seq):
@@ -2266,8 +2263,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         unk1, = struct.unpack_from(">I", data)
         unk2 = data[4:4+0xd]
         unk3 = data[4+0xd:]
-        self.server.debug("ReqCircleInfoSet: {}, {}, {}".format(
-            unk1, unk2, unk3))
+        self.server.debug(f"ReqCircleInfoSet: {unk1}, {unk2}, {unk3}")
         self.sendAnsCircleInfoSet(unk1, unk2, unk3, seq)
 
     def sendAnsCircleInfoSet(self, unk1, unk2, unk3, seq):
@@ -2341,7 +2337,7 @@ class PatRequestHandler(SocketServer.StreamRequestHandler):
         if packet_id not in PAT_NAMES:
             self.server.error("Unknown packet ID: %08x", packet_id)
             return
-        name = "recv{}".format(PAT_NAMES[packet_id])
+        name = f"recv{PAT_NAMES[packet_id]}"
 
         if not hasattr(self, name):
             self.server.error("Unsupported packet: %08x | %s", packet_id, name)

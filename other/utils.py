@@ -113,8 +113,7 @@ def create_logger(name, level=logging.DEBUG, log_to_file="",
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logging_formatter = logging.Formatter(
-        "[%(asctime)s | {}] %(message)s".format(name),
-        datefmt="%Y-%m-%d %H:%M:%S"
+        f"[%(asctime)s | {name}] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
 
     if log_to_console:

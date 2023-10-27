@@ -134,7 +134,7 @@ def dns_pack(data, ip):
     """Pack DNS answer"""
     header = b"\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00"
     response = b"\xc0\x0c\x00\x01\x00\x01\x00\x00\x08\x47\x00\x04"
-    answer = data[0:2] + header + data[12:]
+    answer = data[:2] + header + data[12:]
     answer += response + socket.inet_aton(ip)
     return answer
 
@@ -154,7 +154,7 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
             if not response:
                 continue
             sock.sendto(response, self.client_address)
-            print(">>> Forwarded via {}".format(dns_server))
+            print(f">>> Forwarded via {dns_server}")
             return True
         print("--- Failed to forward request!")
 
@@ -163,7 +163,7 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
         sock = self.request[1]
         name = data.strip()[13:].split(b'\0')[0]
         s = "".join("." if c < 32 else chr(c) for c in name)
-        print("<<< {}".format(s))
+        print(f"<<< {s}")
 
         if s in self.server.record:
             record = self.server.record[s]
@@ -175,7 +175,7 @@ class MHTriDNSRequestHandler(SocketServer.BaseRequestHandler):
 
         try:
             ip = socket.gethostbyname(s)
-            print(">>> {}".format(ip))
+            print(f">>> {ip}")
             sock.sendto(dns_pack(data, ip), self.client_address)
         except socket.gaierror:
             pass
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     if args.str2hax:
         print("!!!")
         print("!!! USE STR2HAX AT YOUR OWN RISK! THIS METHOD IS DISCOURAGED!")
-        print("!!!  - IP(s): {}".format(", ".join(STR2HAX)))
+        print(f'!!!  - IP(s): {", ".join(STR2HAX)}')
         print("!!!")
 
     try:
