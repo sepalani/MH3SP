@@ -16,6 +16,7 @@ from mh.quest_utils import \
 from mh.arena_utils import \
     GRUDGE_MATCH_ROYAL_LUDROTH, GRUDGE_MATCH_BIRD_BRUTE, \
     GRUDGE_MATCH_TWO_FLAMES, GRUDGE_MATCH_LAND_LORDS
+from res.trading_post import CURRENT_TRADES
 
 
 def make_binary_type_time_events():
@@ -228,57 +229,7 @@ def make_binary_npc_greeters(is_jap=False):
 
 
 def make_binary_trading_post():
-    data = b""
-
-    def slot(item, qty):
-        return struct.pack(">HH", item, qty)
-
-    # Popfish x8 <- Machalite Ore x2 | Rathian Coin x2
-    data += slot(0xd2, 8) + slot(0x65, 2) + slot(0x262, 2) + slot(0, 0)
-
-    # Waterblock Seed x3 <- Bone x4 | Qurupeco Coin x1
-    data += slot(0x188, 3) + slot(0xc4, 4) + slot(0x25f, 1) + slot(0, 0)
-
-    # Bone Husk S x10 <- Bone x2 | Barroth Coin x2
-    data += slot(0x156, 10) + slot(0xc4, 2) + slot(0x260, 2) + slot(0, 0)
-
-    # Dung x5 <- Monster Fluid x1 | R.Ludroth Coin x1
-    data += slot(0xc5, 5) + slot(0x155, 1) + slot(0x261, 1) + slot(0, 0)
-
-    # Sharpened Fang x5 <- Hydro Hide x2 | R.Ludroth Coin x2
-    data += slot(0x232, 5) + slot(0x141, 1) + slot(0x261, 2) + slot(0, 0)
-
-    # Toadstool x5 <- Sharpened Fang x1 | Qurupeco Coin x1
-    data += slot(0x158, 5) + slot(0x232, 1) + slot(0x25f, 1) + slot(0, 0)
-
-    # Stone x10 <- Monster Bone M x1 | Great Jaggi Coin x2
-    data += slot(0x61, 10) + slot(0x9a, 1) + slot(0x25e, 2) + slot(0, 0)
-
-    # Spider Web x5 <- Monster Fluid x1 | Barroth Coin x1
-    data += slot(0xc6, 5) + slot(0x155, 1) + slot(0x260, 1) + slot(0, 0)
-
-    # Bughopper x10 <- Big Fin x3 | R.Ludroth Coin x2
-    data += slot(0x160, 10) + slot(0x230, 3) + slot(0x261, 2) + slot(0, 0)
-
-    # Icethaw Pellet x3 <- Mystery Bone x4 | R.Ludroth Coin x1
-    data += slot(0x189, 3) + slot(0x10e, 4) + slot(0x261, 1) + slot(0, 0)
-
-    # Rathian Scale x1 <- Rathian Coin x3 | Pinnacle Coin x2
-    data += slot(0x112, 1) + slot(0x262, 3) + slot(0x267, 2) + slot(0, 0)
-
-    # Wyvern Claw x8 <- Great Baggi Claw x1 | Rathian Coin x1
-    data += slot(0x167, 8) + slot(0x21d, 1) + slot(0x262, 1) + slot(0, 0)
-
-    # Prize Gold Sword x1 <- Lagiacrus Coin x15 | Pinnacle Coin x8
-    data += slot(0x25d, 1) + slot(0x263, 15) + slot(0x267, 8) + slot(0, 0)
-
-    # Barioth Shell x1 <- Barioth Coin x3 | Pinnacle Coin x2
-    data += slot(0x194, 1) + slot(0x24a, 3) + slot(0x267, 2) + slot(0, 0)
-
-    # Armor Stone x3 <- Deviljho Coin x1 | Pinnacle Coin x1
-    data += slot(0x1bb, 3) + slot(0x24d, 1) + slot(0x267, 1) + slot(0, 0)
-
-    return data
+    return CURRENT_TRADES
 
 
 LAYER_CHAT_COLORS = (0xbb3385ff, 0xffffffff, 0xffffffff)
