@@ -4,6 +4,6 @@
 *.dol
 *.bat
 *.db
+*.dat
 .idea
 logs
-event

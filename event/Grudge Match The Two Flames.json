@@ -1,0 +1,464 @@
+{
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 3, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ]
+    ], 
+    "arena_equipment": [
+        [
+            [
+                8, 
+                9
+            ], 
+            null, 
+            null, 
+            72, 
+            77, 
+            70, 
+            78, 
+            77, 
+            [
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    20, 
+                    2
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    1
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    50, 
+                    5
+                ], 
+                [
+                    52, 
+                    1
+                ], 
+                [
+                    1, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                14, 
+                1
+            ], 
+            null, 
+            null, 
+            132, 
+            69, 
+            74, 
+            82, 
+            109, 
+            [
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    1
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    50, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                10, 
+                55
+            ], 
+            null, 
+            null, 
+            136, 
+            96, 
+            103, 
+            76, 
+            95, 
+            [
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    26, 
+                    10
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    1
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    50, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                6
+            ], 
+            [
+                12, 
+                8
+            ], 
+            [
+                13, 
+                10
+            ], 
+            140, 
+            109, 
+            123, 
+            108, 
+            106, 
+            [
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    49, 
+                    1
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    582, 
+                    1
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
+                    1, 
+                    10
+                ]
+            ], 
+            [
+                [
+                    54, 
+                    99
+                ], 
+                [
+                    55, 
+                    99
+                ], 
+                [
+                    58, 
+                    40
+                ], 
+                [
+                    84, 
+                    5
+                ], 
+                [
+                    70, 
+                    60
+                ]
+            ]
+        ]
+    ], 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 5, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 23, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 350, 
+        "resources": 2, 
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
+        "description": "Slay a Rathalos\nand a Rathian", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 9, 
+        "quest_fee": 0, 
+        "quest_id": 60008, 
+        "name": "Grudge Match: The Two Flames", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 0, 
+        "summon": 0, 
+        "client": "Announcer/Receptionist", 
+        "flags": [
+            [
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                1, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [
+                [
+                    584, 
+                    1, 
+                    10
+                ], 
+                [
+                    610, 
+                    1, 
+                    24
+                ], 
+                [
+                    431, 
+                    1, 
+                    14
+                ], 
+                [
+                    328, 
+                    1, 
+                    10
+                ], 
+                [
+                    444, 
+                    1, 
+                    5
+                ], 
+                [
+                    569, 
+                    1, 
+                    15
+                ], 
+                [
+                    570, 
+                    1, 
+                    5
+                ], 
+                [
+                    587, 
+                    1, 
+                    17
+                ]
+            ], 
+            "rewards_row_2": [], 
+            "objective_type": 2, 
+            "zenny_reward": 1000, 
+            "type": 257
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 1, 
+            "zenny_reward": 0, 
+            "type": 257
+        }
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 23, 
+            "boss_id": 1, 
+            "type": 1, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 23, 
+            "boss_id": 0, 
+            "type": 2, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

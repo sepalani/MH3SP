@@ -48,6 +48,14 @@ def get_jhen_event_times():
             int(cycle_start + JHEN_END*SECONDS_PER_DAY))  # sandstorm end
 
 
+def current_event_time_slot():
+    """
+    There are JHEN_EVENT_OFFSET temporal event slots per data event slot.
+        Each one activates on a different day, counting up from 0.
+    """
+    return int(current_server_time()//SECONDS_PER_DAY) % JHEN_EVENT_OFFSET
+
+
 def is_jhen_active():
     day_in_cycle = int(
         current_server_time() // SECONDS_PER_DAY

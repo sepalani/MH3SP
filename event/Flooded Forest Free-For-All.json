@@ -1,0 +1,232 @@
+{
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 18, 
+            "zenny_reward": 0, 
+            "type": 1
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 2600, 
+            "rewards_row_1": [
+                [
+                    445, 
+                    1, 
+                    1
+                ], 
+                [
+                    446, 
+                    1, 
+                    5
+                ], 
+                [
+                    490, 
+                    1, 
+                    14
+                ], 
+                [
+                    495, 
+                    1, 
+                    20
+                ], 
+                [
+                    498, 
+                    1, 
+                    7
+                ], 
+                [
+                    499, 
+                    1, 
+                    10
+                ], 
+                [
+                    500, 
+                    1, 
+                    8
+                ], 
+                [
+                    441, 
+                    1, 
+                    10
+                ], 
+                [
+                    186, 
+                    1, 
+                    25
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    445, 
+                    1, 
+                    1
+                ], 
+                [
+                    446, 
+                    1, 
+                    5
+                ], 
+                [
+                    490, 
+                    1, 
+                    14
+                ], 
+                [
+                    495, 
+                    1, 
+                    20
+                ], 
+                [
+                    498, 
+                    1, 
+                    7
+                ], 
+                [
+                    499, 
+                    1, 
+                    10
+                ], 
+                [
+                    500, 
+                    1, 
+                    8
+                ], 
+                [
+                    441, 
+                    1, 
+                    10
+                ], 
+                [
+                    186, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 16, 
+            "zenny_reward": 25800, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 15, 
+            "zenny_reward": 0, 
+            "type": 1
+        }
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 1, 
+        "quest_rank": 5, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 64, 
+        "wave_2_transition_type": 0, 
+        "location": 3, 
+        "penalty_per_cart": 9000, 
+        "resources": 1, 
+        "details": "Taihen! Means very bad, yes?\nFlooded Forest overrun by pack\nof leviathans -- Argosy cannot\nget anywhere near area! Big\nproblem for trade, yes? Only\nhunters can return fair seas\nto Flooded Forest. Onegai!", 
+        "description": "Hunt a Royal L., Lag. & Gobul", 
+        "smallmonster_data_file": "sm_ff_free_for_all.dat", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 10, 
+        "quest_fee": 2550, 
+        "quest_id": 61017, 
+        "name": "Flooded Forest Free-For-All", 
+        "main_monster_2": 34, 
+        "main_monster_1": 17, 
+        "supply_set_number": 43, 
+        "summon": 0, 
+        "client": "Argosy Captain", 
+        "flags": [
+            [
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 31, 
+            "boss_id": 1, 
+            "type": 15, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 31, 
+            "boss_id": 2, 
+            "type": 18, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_1": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 31, 
+            "boss_id": 0, 
+            "type": 16, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

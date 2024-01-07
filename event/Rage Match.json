@@ -1,0 +1,215 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 2, 
+            "hrp_reward": 2880, 
+            "rewards_row_1": [
+                [
+                    486, 
+                    1, 
+                    6
+                ], 
+                [
+                    485, 
+                    1, 
+                    13
+                ], 
+                [
+                    484, 
+                    1, 
+                    26
+                ], 
+                [
+                    483, 
+                    1, 
+                    20
+                ], 
+                [
+                    441, 
+                    1, 
+                    6
+                ], 
+                [
+                    487, 
+                    1, 
+                    4
+                ], 
+                [
+                    185, 
+                    1, 
+                    25
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    486, 
+                    1, 
+                    6
+                ], 
+                [
+                    485, 
+                    1, 
+                    13
+                ], 
+                [
+                    484, 
+                    1, 
+                    26
+                ], 
+                [
+                    483, 
+                    1, 
+                    20
+                ], 
+                [
+                    441, 
+                    1, 
+                    6
+                ], 
+                [
+                    487, 
+                    1, 
+                    4
+                ], 
+                [
+                    185, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 7, 
+            "zenny_reward": 36000, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 6, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 244, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 13000, 
+        "resources": 1, 
+        "details": "We've all heard of that\noutrageous dragon of rage,\nthe Deviljho! Now, we've got\nnot one -- but two -- stalking\nthe Arena! What hunter has the\ncojones to challenge these\npernicious predators? Not me.", 
+        "description": "Hunt 2 Deviljho", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 11, 
+        "quest_fee": 3600, 
+        "quest_id": 61018, 
+        "name": "Rage Match", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 43, 
+        "summon": 1677787698, 
+        "client": "Arena Manager", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 10, 
+            "hp_spread": 0, 
+            "level": 60, 
+            "boss_id": 2, 
+            "type": 7, 
+            "starting_area": 1, 
+            "spawn_count": 1, 
+            "size": 90
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 10, 
+            "hp_spread": 0, 
+            "level": 60, 
+            "boss_id": 1, 
+            "type": 7, 
+            "starting_area": 1, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

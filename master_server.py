@@ -14,14 +14,16 @@ import rfp_server as RFP
 
 from other.debug import register_debug_signal
 from other.utils import create_server_from_base
+from mh.quest_utils import QuestLoader
 
 
-def create_servers(silent=False, debug_mode=False):
+def create_servers(binary_loader, silent=False, debug_mode=False):
     """Create servers and check if it has ui."""
     servers = []
     has_ui = False
     for module in (OPN, LMP, FMP, RFP):
         server, has_window = create_server_from_base(*module.BASE,
+                                                     binary_loader=binary_loader,
                                                      silent=silent,
                                                      debug_mode=debug_mode)
         has_ui = has_ui or has_window
@@ -32,8 +34,9 @@ def create_servers(silent=False, debug_mode=False):
 def main(args):
     """Master server main function."""
     register_debug_signal()
-
-    servers, has_ui = create_servers(silent=args.silent,
+    binary_loader = QuestLoader("event/quest_rotation.json")
+    servers, has_ui = create_servers(binary_loader,
+                                     silent=args.silent,
                                      debug_mode=args.debug_mode)
     threads = [
         threading.Thread(
