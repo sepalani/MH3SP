@@ -43,7 +43,9 @@ https://web.archive.org/web/20111012090915/
 http://divinewh.im/q/c/Grudge_Match:_Bird_and_Brute
 """
 
-from mh.quest_utils import *
+from mh.quest_utils import ItemsType, Monster, LocationType,\
+    QuestRankType, QuestRestrictionType, ResourcesType,\
+    StartingPositionType, WaveType
 from mh.equipment_utils import Chestpiece, Gauntlets, Faulds,\
     Leggings, Helmet, EquipmentClasses, Greatsword,\
     SnS, Hammer, Longsword, Switchaxe, Lance,\
