@@ -29,10 +29,26 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-      - name: Launch the program
+      - name: Test OPN server
         run: |
-          # TODO: Add a proper test
-          python --version
+          python opn_server.py --dry-run --log-to-window=false
+        timeout-minutes: 1
+      - name: Test LMP server
+        run: |
+          python lmp_server.py --dry-run --log-to-window=false
+        timeout-minutes: 1
+      - name: Test FMP server
+        run: |
+          python fmp_server.py --dry-run --log-to-window=false
+        timeout-minutes: 1
+      - name: Test RFP server
+        run: |
+          python rfp_server.py --dry-run --log-to-window=false
+        timeout-minutes: 1
+      - name: Test master server
+        run: |
+          python master_server.py --dry-run -- --log-to-window=false
+        timeout-minutes: 1
 
   lint:
     runs-on: ${{ matrix.os }}
