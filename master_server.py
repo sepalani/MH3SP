@@ -17,15 +17,13 @@ from other.debug import register_debug_signal, dry_run
 from other.utils import create_server_from_base
 
 
-def create_servers(silent=False, debug_mode=False):
+def create_servers(server_args):
     """Create servers and check if it has ui."""
     servers = []
     has_ui = False
     for module in (OPN, LMP, FMP, RFP):
-        server, has_window = create_server_from_base(*module.BASE,
-                                                     silent=silent,
-                                                     debug_mode=debug_mode)
-        has_ui = has_ui or has_window
+        server, args = create_server_from_base(*module.BASE, args=server_args)
+        has_ui = has_ui or args.log_to_window
         servers.append(server)
     return servers, has_ui
 
@@ -34,8 +32,7 @@ def main(args):
     """Master server main function."""
     register_debug_signal()
 
-    servers, has_ui = create_servers(silent=args.silent,
-                                     debug_mode=args.debug_mode)
+    servers, has_ui = create_servers(server_args=args.args)
     threads = [
         threading.Thread(
             target=server.serve_forever,
@@ -92,15 +89,10 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--interactive", action="store_true",
                         dest="interactive",
                         help="create an interactive shell")
-    parser.add_argument("-s", "--silent", action="store_true",
-                        dest="silent",
-                        help="silent console logs")
-    parser.add_argument("-d", "--debug_mode", action="store_true",
-                        dest="debug_mode",
-                        help="enable debug mode, disabling timeouts and \
-                        lower logging verbosity level")
     parser.add_argument("--dry-run", action="store_true",
                         dest="dry_run",
                         help="dry run to test the server")
+    parser.add_argument("args", nargs='*',
+                        help="arguments forwarded to all servers")
     args = parser.parse_args()
     main(args)

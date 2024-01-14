@@ -272,6 +272,10 @@ def argparse_from_config(config):
     parser.add_argument("-i", "--interactive", action="store_true",
                         dest="interactive",
                         help="create an interactive shell")
+    parser.add_argument("-d", "--debug_mode", action="store_true",
+                        dest="debug_mode",
+                        help="enable debug mode, disabling timeouts and \
+                        lower logging verbosity level")
     parser.add_argument("-a", "--address", action="store", type=str,
                         default=config["IP"], dest="address",
                         help="set server address")
@@ -365,38 +369,27 @@ def create_server(server_class, server_handler,
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
 
 
-def create_server_from_base(name, server_class, server_handler, silent=False,
-                            debug_mode=False):
-    """Create a server based on its config parameters."""
+def create_server_from_base(name, server_class, server_handler, args=None):
+    """Create a server based on its config parameters and supplied args.
+
+    If args is None, sys.argv is used (see ArgumentParser.parser_args).
+    """
     config = get_config(name)
-    return create_server(
-        server_class, server_handler,
-        address=config["IP"],
-        port=config["Port"],
-        name=config["Name"],
-        max_thread=config["MaxThread"],
-        use_ssl=config["UseSSL"],
-        ssl_cert=config["SSLCert"],
-        ssl_key=config["SSLKey"],
-        log_to_file=config["LogToFile"],
-        log_filename=config["LogFilename"],
-        log_to_console=config["LogToConsole"] and not silent,
-        log_to_window=config["LogToWindow"],
-        debug_mode=debug_mode
-    ), config["LogToWindow"]
+    parser = argparse_from_config(config)
+    args = parser.parse_args(args)
+    kwargs = {
+        k: v for k, v in vars(args).items()
+        if k not in ("interactive", "dry_run")
+    }
+    return create_server(server_class, server_handler, **kwargs), args
 
 
 def server_main(name, server_class, server_handler):
     """Create a server main based on its config parameters."""
     register_debug_signal()
 
-    config = get_config(name)
-    parser = argparse_from_config(config)
-    args = parser.parse_args()
-    server = create_server(server_class, server_handler, **{
-        k: v for k, v in vars(args).items()
-        if k not in ("interactive", "dry_run")
-    })
+    server, args = create_server_from_base(name, server_class,
+                                           server_handler)
 
     try:
         import threading
