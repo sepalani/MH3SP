@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2022 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2024 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter master server."""
 
+import sys
 import threading
 import traceback
 
@@ -12,7 +13,7 @@ import lmp_server as LMP
 import fmp_server as FMP
 import rfp_server as RFP
 
-from other.debug import register_debug_signal
+from other.debug import register_debug_signal, dry_run
 from other.utils import create_server_from_base
 
 
@@ -59,6 +60,9 @@ def main(args):
             t = threading.Thread(target=interactive_mode)
             t.start()
 
+        if args.dry_run:
+            dry_run()
+
         while threads:
             for thread in threads:
                 if has_ui:
@@ -75,6 +79,7 @@ def main(args):
     except Exception:
         print('Unexpected exception caught...')
         traceback.print_exc()
+        sys.exit(1)
     finally:
         for server in servers:
             server.close()
@@ -94,5 +99,8 @@ if __name__ == "__main__":
                         dest="debug_mode",
                         help="enable debug mode, disabling timeouts and \
                         lower logging verbosity level")
+    parser.add_argument("--dry-run", action="store_true",
+                        dest="dry_run",
+                        help="dry run to test the server")
     args = parser.parse_args()
     main(args)
