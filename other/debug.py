@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2023-2024 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Debugging helper module.
 
@@ -159,3 +159,14 @@ def register_debug_signal(fn=debug_signal_handler):
         signal.signal(signal.SIGBREAK, fn)
     else:
         signal.signal(signal.SIGUSR1, fn)
+
+
+def dry_run(delay=10.):
+    """Dry run test."""
+    from threading import Timer
+    try:
+        from thread import interrupt_main
+    except ImportError:
+        from _thread import interrupt_main
+
+    Timer(delay, interrupt_main).start()
