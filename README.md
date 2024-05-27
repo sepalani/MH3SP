@@ -66,6 +66,9 @@ The project is kinda functionnal, multiplayer isn't supported yet.
  - Python 2.7 or Python 3.x
 
 ## Setup
+**This section is only for people wanting to host a server on a local infrastructure (multiplayer unsupported).
+If you want to join the open beta which supports multiplayer, please check `#open-beta-instructions` on Discord.**
+
 You can setup the server by following the guide on the [wiki](https://github.com/sepalani/MH3SP/wiki):
  - **Setup page**: the procedure to setup the server.
  - **Troubleshooting page**: common issues and how to solve them.
@@ -77,7 +80,7 @@ InusualZ's [MHTriServer](https://github.com/InusualZ/MHTriServer) or if you
 need help setting them up:
  - https://discord.gg/4sBmXC55V6
 
-You might find relevant information in the `#faq` and `#help` channels of
+You might find relevant information in the `#faq` and `#setup-help` channels of
 the discord server.
 
 ## Special thanks
