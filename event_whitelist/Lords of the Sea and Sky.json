@@ -1,0 +1,225 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 1760, 
+            "rewards_row_1": [
+                [
+                    499, 
+                    1, 
+                    10
+                ], 
+                [
+                    313, 
+                    1, 
+                    14
+                ], 
+                [
+                    177, 
+                    1, 
+                    23
+                ], 
+                [
+                    176, 
+                    1, 
+                    15
+                ], 
+                [
+                    174, 
+                    1, 
+                    4
+                ], 
+                [
+                    503, 
+                    1, 
+                    4
+                ], 
+                [
+                    440, 
+                    1, 
+                    17
+                ], 
+                [
+                    441, 
+                    1, 
+                    8
+                ], 
+                [
+                    442, 
+                    1, 
+                    5
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    441, 
+                    1, 
+                    25
+                ], 
+                [
+                    440, 
+                    1, 
+                    18
+                ], 
+                [
+                    442, 
+                    1, 
+                    5
+                ], 
+                [
+                    444, 
+                    1, 
+                    12
+                ], 
+                [
+                    445, 
+                    1, 
+                    20
+                ], 
+                [
+                    446, 
+                    1, 
+                    6
+                ], 
+                [
+                    110, 
+                    1, 
+                    14
+                ]
+            ], 
+            "objective_type": 15, 
+            "zenny_reward": 23400, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 2, 
+            "zenny_reward": 0, 
+            "type": 1
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 6, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 60, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 7800, 
+        "resources": 1, 
+        "details": "In the Arena tonight, reunited\nand it feels so--gahh! It's\nthe king and lord of sky and\nsea, Rathalos and Lagiacrus!\nTheir victims: our hunters!\nPrepare for a bout that'll\ngo down in hunting history!", 
+        "description": "Hunt a Lagiacrus\nand a Rathalos", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 11, 
+        "quest_fee": 2300, 
+        "quest_id": 61019, 
+        "name": "Lords of the Sea and Sky", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 43, 
+        "summon": 1677787954, 
+        "client": "Arena Manager", 
+        "flags": [
+            [
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 60, 
+            "boss_id": 1, 
+            "type": 2, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 60, 
+            "boss_id": 0, 
+            "type": 15, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

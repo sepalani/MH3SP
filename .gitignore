@@ -2,8 +2,8 @@
 *.key
 *.pyc
 *.dol
-*.bat
 *.db
-*.dat
 .idea
+event/*.dat
+event_whitelist/*.dat
 logs

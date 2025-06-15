@@ -14,18 +14,21 @@ import rfp_server as RFP
 
 from other.debug import register_debug_signal
 from other.utils import create_server_from_base
+
+from other.cache import Cache
 from mh.quest_utils import QuestLoader
 
-
-def create_servers(binary_loader, silent=False, debug_mode=False):
+def create_servers(server_id, binary_loader, silent=False, debug_mode=False, no_timeout=False):
     """Create servers and check if it has ui."""
     servers = []
     has_ui = False
-    for module in (OPN, LMP, FMP, RFP):
+    for module in ((OPN, LMP, FMP, RFP) if server_id==0 else (FMP,)):
         server, has_window = create_server_from_base(*module.BASE,
+                                                     server_id=server_id,
                                                      binary_loader=binary_loader,
                                                      silent=silent,
-                                                     debug_mode=debug_mode)
+                                                     debug_mode=debug_mode,
+                                                     no_timeout=no_timeout)
         has_ui = has_ui or has_window
         servers.append(server)
     return servers, has_ui
@@ -34,10 +37,13 @@ def create_servers(binary_loader, silent=False, debug_mode=False):
 def main(args):
     """Master server main function."""
     register_debug_signal()
+    
     binary_loader = QuestLoader("event/quest_rotation.json")
-    servers, has_ui = create_servers(binary_loader,
+    servers, has_ui = create_servers(server_id=args.server_id,
+                                     binary_loader=binary_loader,
                                      silent=args.silent,
-                                     debug_mode=args.debug_mode)
+                                     debug_mode=args.debug_mode,
+                                     no_timeout=args.no_timeout)
     threads = [
         threading.Thread(
             target=server.serve_forever,
@@ -45,6 +51,10 @@ def main(args):
         )
         for server in servers
     ]
+    cache = Cache(server_id=args.server_id, binary_loader=binary_loader,
+                debug_mode=args.debug_mode, log_to_file=True,
+                log_to_console=not args.silent, log_to_window=False)
+    threads.append(threading.Thread(target=cache.maintain_connection))
     for thread in threads:
         thread.start()
 
@@ -95,7 +105,15 @@ if __name__ == "__main__":
                         help="silent console logs")
     parser.add_argument("-d", "--debug_mode", action="store_true",
                         dest="debug_mode",
-                        help="enable debug mode, disabling timeouts and \
-                        lower logging verbosity level")
+                        help="enable debug mode, \
+                        raising logging verbosity level")
+    parser.add_argument("-t", "--no_timeout", action="store_true",
+                        dest="no_timeout",
+                        help="disable player timeouts")
+    parser.add_argument("-S", "--server_id", type=int, default=0,
+                        dest="server_id",
+                        help="specifies the server id used to pull info \
+                        from the config file (0 for central)")
+
     args = parser.parse_args()
     main(args)

@@ -9,7 +9,7 @@ import struct
 from collections import OrderedDict
 from mh.constants import pad
 from other.utils import to_bytearray, get_config, get_ip, GenericUnpacker
-from mh.database import Server, Gate, City
+
 
 class ItemType:
     Custom = 0
@@ -585,51 +585,6 @@ class UserSearchInfo(PatData):
         (0x10, "info_mine_0x10"),
     )
 
-class LayerPath(object):
-    STRUCT = struct.Struct(">IIHHH")
-
-    def __init__(self, server_id=None, gate_id=None, city_id=None):
-        # type: (int|None, int|None, int|None) -> None
-        self.server_id = server_id or 0
-        self.gate_id = gate_id or 0
-        self.city_id = city_id or 0
-    
-    def get_depth(self):
-        # type: () -> int
-        if self.city_id > 0:
-            return City.LAYER_DEPTH
-        elif self.gate_id > 0:
-            return Gate.LAYER_DEPTH
-        elif self.server_id > 0:
-            return Server.LAYER_DEPTH
-        return -1
-
-    def pack(self):
-        # type: () -> bytes
-        depth = self.get_depth()
-        unk = 1
-        return self.STRUCT.pack(depth, self.server_id, unk, self.gate_id,
-                                        self.city_id)
-    
-    @staticmethod
-    def unpack(data):
-        # type: (bytes) -> LayerPath
-        with Unpacker(data) as unpacker:
-            _, server_id = unpacker.struct(">II")
-            field_count = len(unpacker) // 2
-            assert field_count <= 3
-
-            gate_id = 0
-            city_id = 0
-            for i in range(field_count):
-                if i == 0:    
-                    _ = unpacker.struct(">H")
-                elif i == 1:
-                    gate_id = unpacker.struct(">H")
-                else:
-                    city_id = unpacker.struct(">H")
-            return LayerPath(server_id, gate_id, city_id)
-
 
 class LayerData(PatData):
     FIELDS = (
@@ -642,11 +597,12 @@ class LayerData(PatData):
         (0x08, "unk_long_0x08"),
         (0x09, "capacity"),
         (0x0a, "unk_long_0x0a"),
-        (0x0b, "child_population"),
+        (0x0b, "in_quest_players"),
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
-        (0x11, "positionInterval"), # player position synchronization timer
+        (0x11, "positionSynchronizationInterval"),
+        # player position synchronization timer
         (0x12, "unk_byte_0x12"),
         (0x15, "layer_depth"),
         (0x16, "layer_pathname"),
@@ -654,52 +610,19 @@ class LayerData(PatData):
         (0xff, "fallthrough_bug")  # Fill this if field 0x17 is set !!!
     )
 
+
+class MemoryData(PatData):
+    FIELDS = (
+        (0x01, "unk_byte_0x01"),
+        (0x02, "unk_byte_0x02"),
+    )
+
     @staticmethod
-    def create_from(index, layer, path=None):
-        data = LayerData()
-        data.unk_long_0x01 = Long(index)
-        data.index = Word(index)
-        data.positionInterval = Long(500)
-        data.unk_byte_0x12 = Byte(1)
-
-        if isinstance(layer, Server):
-            data.name = String(layer.name)
-            data.size = Long(layer.get_population())
-            data.size2 = Long(layer.get_population())
-            data.capacity = Long(layer.get_capacity())
-            data.state = Byte(0)
-            data.layer_depth = Byte(layer.LAYER_DEPTH)
-        elif isinstance(layer, Gate):
-            data.name = String(layer.name)
-            data.size = Long(layer.get_population())
-            data.size2 = Long(layer.get_population())
-            data.capacity = Long(layer.get_capacity())
-            data.state = Byte(layer.get_state())
-            data.layer_depth = Byte(layer.LAYER_DEPTH)
-        else:
-            assert isinstance(layer, City)
-
-            if path is None and layer.leader is not None:
-                path = layer.leader.get_layer_path()
-
-            data.name = String(layer.name)
-            data.size = Long(layer.get_population())
-            data.size2 = Long(layer.get_population())
-            data.capacity = Long(layer.get_capacity())
-            data.child_population = Long(layer.in_quest_players())
-            data.unk_long_0x0c = Long(0xc) # TODO: Reverse
-            data.state = Byte(layer.get_state())
-            data.layer_depth = Byte(layer.LAYER_DEPTH)
-            data.layer_pathname = String(layer.get_pathname())
-
-        if path is not None:
-            data.layer_host = Binary(path.pack())
-
-        # These fields are read when used in the NtcLayerInfoSet packet
-        # Purpose is unknown
-        # data.unk_binary_0x17 = Binary("test")
-        # data.fallthrough_bug = FallthroughBug()
-        return data
+    def pack_from(unk1, unk2):
+        data = MemoryData()
+        data.unk_byte_0x01 = Byte(int(bool(unk1)))
+        data.unk_byte_0x01 = Byte(int(bool(unk2)))
+        return data.pack()
 
 
 class FriendData(PatData):
@@ -866,33 +789,6 @@ class LayerBinaryInfo(PatData):
         (0x03, "hunter_name")
     )
 
-class LayerUserNum(PatData):
-    FIELDS = (
-        (0x01, "path"),
-        (0x02, "population"),
-        (0x03, "index"),
-        (0x04, "unk_long_0x04"),
-        (0x05, "max_population"),
-        (0x06, "unk_long_0x06"),
-        (0x07, "child_population"),
-    )
-
-    @staticmethod
-    def pack_from(layer_data):
-        # type: (LayerData) -> bytes
-        data = LayerUserNum()
-        data.path = layer_data.layer_host
-        data.population = layer_data.size
-        data.index = Long(unpack_word(layer_data.index))
-        data.unk_long_0x04 = Long(0xAF00FA00)
-        data.max_population = layer_data.capacity
-        data.unk_long_0x06 = Long(0xBF00FB00)
-        if "child_population" in layer_data:
-            data.child_population = layer_data.child_population
-
-        return data.pack()
-
-
 
 def patdata_extender(unpacker):
     """PatData classes must be defined above this function."""
@@ -964,14 +860,11 @@ def get_fmp_servers(session, first_index, count):
     fmp_port = config["Port"]
 
     data = b""
-    start = first_index - 1
-    end = start + count
-    servers = session.get_servers()[start:end]
+
+    servers = session.recall_servers(first_index, count)
     for i, server in enumerate(servers, first_index):
         fmp_data = FmpData()
         fmp_data.index = Long(i)  # The server might be full, if zero
-        server.addr = server.addr or fmp_addr
-        server.port = server.port or fmp_port
         fmp_data.server_address = String(server.addr)
         fmp_data.server_port = Word(server.port)
         # Might produce invalid reads if too high
@@ -987,6 +880,32 @@ def get_fmp_servers(session, first_index, count):
     return data
 
 
+def get_fmp_central_servers(session, first_index, count):
+    assert first_index > 0, "Invalid list index"
+
+    config = get_config("FMP")
+    fmp_addr = get_ip(config["IP"])
+    fmp_port = config["Port"]
+
+    start = first_index - 1
+    end = start + count
+    data = b""
+    for i in range(start, end):
+        fmp_data = FmpData()
+        fmp_data.index = Long(count+1)  # Index must not match any "real" server.
+        fmp_data.server_name = String("central")
+        fmp_data.server_address = String(fmp_addr)
+        fmp_data.server_port = Word(fmp_port)
+        fmp_data.server_type = LongLong(1)
+        fmp_data.player_count = Long(1)
+        fmp_data.player_capacity = Long(1)
+        fmp_data.unk_string_0x0b = String("X")
+        fmp_data.unk_long_0x0c = Long(0x12345678)
+        data += fmp_data.pack()
+
+    return data
+
+
 def get_layer_children(session, first_index, count, sibling=False):
     assert first_index > 0, "Invalid list index"
 
@@ -998,7 +917,16 @@ def get_layer_children(session, first_index, count, sibling=False):
     else:
         children = session.get_layer_sibling()[start:end]
     for i, child in enumerate(children, first_index):
-        layer = LayerData.create_from(i, child)
+        layer = LayerData()
+        layer.index = Word(i)
+        layer.name = String(child.name)
+        layer.size = Long(child.get_population())
+        layer.capacity = Long(child.get_capacity())
+        layer.state = Byte(child.get_state())
+        layer.positionSynchronizationInterval = Long(500)
+        # layer.unk_binary_0x17 = Binary("test")
+        # layer.fallthrough_bug = FallthroughBug()
+        layer.unk_byte_0x12 = Byte(1)
         data += layer.pack()
         data += pack_optional_fields(child.optional_fields)
     return data
@@ -1031,7 +959,7 @@ def getDummyLayerData():
     # layer.unk_long_0x0c = Long(1)
     # layer.unk_word_0x0d = Word(1)
     layer.state = Byte(1)
-    layer.positionInterval = Long(500)
+    layer.positionSynchronizationInterval = Long(500)
     # layer.unk_long_0x11 = Long(1)
 
     # Might be needed to be >=1 to keep NetworkConnectionStable alive

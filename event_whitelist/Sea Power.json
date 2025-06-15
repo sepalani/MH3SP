@@ -1,0 +1,266 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 2, 
+            "hrp_reward": 1100, 
+            "rewards_row_1": [
+                [
+                    501, 
+                    1, 
+                    5
+                ], 
+                [
+                    499, 
+                    1, 
+                    16
+                ], 
+                [
+                    500, 
+                    1, 
+                    22
+                ], 
+                [
+                    313, 
+                    1, 
+                    8
+                ], 
+                [
+                    595, 
+                    1, 
+                    14
+                ], 
+                [
+                    315, 
+                    1, 
+                    10
+                ], 
+                [
+                    503, 
+                    1, 
+                    2
+                ], 
+                [
+                    540, 
+                    1, 
+                    23
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    501, 
+                    1, 
+                    5
+                ], 
+                [
+                    499, 
+                    1, 
+                    16
+                ], 
+                [
+                    500, 
+                    1, 
+                    22
+                ], 
+                [
+                    313, 
+                    1, 
+                    8
+                ], 
+                [
+                    595, 
+                    1, 
+                    14
+                ], 
+                [
+                    315, 
+                    1, 
+                    10
+                ], 
+                [
+                    503, 
+                    1, 
+                    2
+                ], 
+                [
+                    540, 
+                    1, 
+                    23
+                ]
+            ], 
+            "objective_type": 15, 
+            "zenny_reward": 11400, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 1100, 
+            "rewards_row_1": [
+                [
+                    501, 
+                    1, 
+                    5
+                ], 
+                [
+                    499, 
+                    1, 
+                    16
+                ], 
+                [
+                    500, 
+                    1, 
+                    22
+                ], 
+                [
+                    313, 
+                    1, 
+                    8
+                ], 
+                [
+                    595, 
+                    1, 
+                    14
+                ], 
+                [
+                    315, 
+                    1, 
+                    10
+                ], 
+                [
+                    503, 
+                    1, 
+                    2
+                ], 
+                [
+                    540, 
+                    1, 
+                    23
+                ]
+            ], 
+            "description": "Hunt a Lagiacrus", 
+            "objective_type": 15, 
+            "zenny_reward": 11400, 
+            "type": 1
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 5, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 54, 
+        "wave_2_transition_type": 0, 
+        "location": 12, 
+        "penalty_per_cart": 3800, 
+        "resources": 1, 
+        "details": "I once knew a fool of a hunter\nwho found a legendary clue --\nbut paid for it with his life.\nHe left those plans behind.\nThey're useless to a retired\nhunter like me, so I figured\nI'd pass them to another fool.", 
+        "description": "Hunt 2 Lagiacrus\n", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 10, 
+        "quest_fee": 2250, 
+        "quest_id": 61016, 
+        "name": "Sea Power", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 48, 
+        "summon": 0, 
+        "client": "Retired Hunter", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 59, 
+            "boss_id": 0, 
+            "type": 15, 
+            "starting_area": 0, 
+            "spawn_count": 2, 
+            "size": 100
+        }
+    }
+}

@@ -1,0 +1,2 @@
+start cmd /c "cd C:\DATA\dwc_network_server_emulator-master && C:\Python27\python.exe master_server.py"
+start cmd /c "cd C:\Users\lilba\Documents\MH3SP && C:\Python27\python.exe master_server.py -d --server_id=0"

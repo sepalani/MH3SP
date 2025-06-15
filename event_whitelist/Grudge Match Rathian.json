@@ -1,0 +1,435 @@
+{
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 3, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ]
+    ], 
+    "arena_equipment": [
+        [
+            [
+                15, 
+                46
+            ], 
+            null, 
+            null, 
+            132, 
+            6, 
+            40, 
+            44, 
+            43, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    50, 
+                    2
+                ], 
+                [
+                    582, 
+                    1
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                14, 
+                1
+            ], 
+            null, 
+            null, 
+            134, 
+            33, 
+            30, 
+            38, 
+            17, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    49, 
+                    1
+                ], 
+                [
+                    50, 
+                    1
+                ], 
+                [
+                    2, 
+                    2
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                10, 
+                44
+            ], 
+            null, 
+            null, 
+            32, 
+            35, 
+            46, 
+            13, 
+            13, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    391, 
+                    2
+                ], 
+                [
+                    50, 
+                    1
+                ], 
+                [
+                    2, 
+                    1
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                3
+            ], 
+            [
+                12, 
+                6
+            ], 
+            [
+                13, 
+                3
+            ], 
+            7, 
+            38, 
+            35, 
+            8, 
+            10, 
+            [
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    2, 
+                    1
+                ]
+            ], 
+            [
+                [
+                    54, 
+                    99
+                ], 
+                [
+                    56, 
+                    60
+                ], 
+                [
+                    65, 
+                    5
+                ], 
+                [
+                    92, 
+                    9
+                ], 
+                [
+                    77, 
+                    12
+                ], 
+                [
+                    79, 
+                    12
+                ], 
+                [
+                    89, 
+                    10
+                ]
+            ]
+        ]
+    ], 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 2, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 26, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 350, 
+        "resources": 2, 
+        "details": "Hey there, fight fanatics!\nTonight's target is the Queen of\nthe Land, Rathian! A fan of\nflame attacks, she also packs a\npotent charge from on high!\nHunters better wear asbestos\nunderwear for this fight!", 
+        "description": "Slay a Rathian", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 0, 
+        "quest_fee": 0, 
+        "quest_id": 60002, 
+        "name": "Grudge Match: Rathian", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 0, 
+        "summon": 0, 
+        "client": "Announcer/Receptionist", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                1, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [
+                [
+                    610, 
+                    1, 
+                    21
+                ], 
+                [
+                    610, 
+                    2, 
+                    7
+                ], 
+                [
+                    431, 
+                    1, 
+                    13
+                ], 
+                [
+                    328, 
+                    1, 
+                    8
+                ], 
+                [
+                    327, 
+                    1, 
+                    14
+                ], 
+                [
+                    569, 
+                    1, 
+                    19
+                ], 
+                [
+                    615, 
+                    1, 
+                    18
+                ]
+            ], 
+            "rewards_row_2": [], 
+            "objective_type": 1, 
+            "zenny_reward": 1000, 
+            "type": 257
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 26, 
+            "boss_id": 0, 
+            "type": 1, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

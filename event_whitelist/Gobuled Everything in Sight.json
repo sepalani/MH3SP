@@ -1,0 +1,264 @@
+{
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 2, 
+            "hrp_reward": 60, 
+            "rewards_row_1": [
+                [
+                    326, 
+                    1, 
+                    10
+                ], 
+                [
+                    323, 
+                    1, 
+                    24
+                ], 
+                [
+                    324, 
+                    1, 
+                    20
+                ], 
+                [
+                    325, 
+                    1, 
+                    28
+                ], 
+                [
+                    155, 
+                    1, 
+                    18
+                ]
+            ], 
+            "description": "Fish out Gobul once", 
+            "objective_type": 18, 
+            "zenny_reward": 1200, 
+            "type": 4096
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 1230, 
+            "rewards_row_1": [
+                [
+                    110, 
+                    1, 
+                    15
+                ], 
+                [
+                    326, 
+                    1, 
+                    13
+                ], 
+                [
+                    323, 
+                    1, 
+                    15
+                ], 
+                [
+                    440, 
+                    1, 
+                    25
+                ], 
+                [
+                    422, 
+                    1, 
+                    12
+                ], 
+                [
+                    441, 
+                    1, 
+                    10
+                ], 
+                [
+                    329, 
+                    1, 
+                    10
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    110, 
+                    1, 
+                    15
+                ], 
+                [
+                    326, 
+                    1, 
+                    13
+                ], 
+                [
+                    323, 
+                    1, 
+                    15
+                ], 
+                [
+                    440, 
+                    1, 
+                    25
+                ], 
+                [
+                    422, 
+                    1, 
+                    12
+                ], 
+                [
+                    441, 
+                    1, 
+                    10
+                ], 
+                [
+                    329, 
+                    1, 
+                    10
+                ]
+            ], 
+            "objective_type": 18, 
+            "zenny_reward": 5600, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 100, 
+            "rewards_row_1": [
+                [
+                    326, 
+                    1, 
+                    10
+                ], 
+                [
+                    323, 
+                    1, 
+                    24
+                ], 
+                [
+                    324, 
+                    1, 
+                    20
+                ], 
+                [
+                    325, 
+                    1, 
+                    28
+                ], 
+                [
+                    155, 
+                    1, 
+                    18
+                ]
+            ], 
+            "description": "Destroy Gobul's lantern", 
+            "objective_type": 18, 
+            "zenny_reward": 800, 
+            "type": 516
+        }
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 3, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 32, 
+        "wave_2_transition_type": 0, 
+        "location": 3, 
+        "penalty_per_cart": 1900, 
+        "resources": 0, 
+        "details": "Taihen! My small ships all\ngobbled by huge Gobul! The\ncrew all escaped, but goods\nare in fish's stomach, yes --\neven some are super-rare items\nthere! Only hunters can get my\nitems back. Onegai!", 
+        "description": "Hunt a Gobul", 
+        "smallmonster_data_file": "sm_ff_free_for_all.dat", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 8, 
+        "quest_fee": 550, 
+        "quest_id": 61010, 
+        "name": "Gobuled Everything in Sight", 
+        "main_monster_2": 34, 
+        "main_monster_1": 17, 
+        "supply_set_number": 25, 
+        "summon": 0, 
+        "client": "Argosy Captain", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 32, 
+            "boss_id": 0, 
+            "type": 18, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 150
+        }
+    }
+}

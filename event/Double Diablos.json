@@ -1,0 +1,225 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 2, 
+            "hrp_reward": 1920, 
+            "rewards_row_1": [
+                [
+                    445, 
+                    1, 
+                    1
+                ], 
+                [
+                    457, 
+                    1, 
+                    11
+                ], 
+                [
+                    456, 
+                    1, 
+                    20
+                ], 
+                [
+                    295, 
+                    1, 
+                    18
+                ], 
+                [
+                    595, 
+                    1, 
+                    8
+                ], 
+                [
+                    455, 
+                    1, 
+                    7
+                ], 
+                [
+                    441, 
+                    1, 
+                    10
+                ], 
+                [
+                    594, 
+                    1, 
+                    25
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    445, 
+                    1, 
+                    1
+                ], 
+                [
+                    457, 
+                    1, 
+                    11
+                ], 
+                [
+                    456, 
+                    1, 
+                    20
+                ], 
+                [
+                    295, 
+                    1, 
+                    18
+                ], 
+                [
+                    595, 
+                    1, 
+                    8
+                ], 
+                [
+                    455, 
+                    1, 
+                    7
+                ], 
+                [
+                    441, 
+                    1, 
+                    10
+                ], 
+                [
+                    594, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 6, 
+            "zenny_reward": 38400, 
+            "type": 129
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 5, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 59, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 12800, 
+        "resources": 1, 
+        "details": "One Diablos would dismember\nyour average weekend warrior,\nbut two Diablos!? Only true\nhunters need apply for this\nQuest. Plan your tactics well,\nand perhaps we can compare\nnotes later... if you survive.", 
+        "description": "Capture 2 Diablos", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 10, 
+        "quest_fee": 2600, 
+        "quest_id": 61014, 
+        "name": "Double Diablos", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 43, 
+        "summon": 0, 
+        "client": "Passionate Hunter", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 11, 
+            "hp_spread": 0, 
+            "level": 59, 
+            "boss_id": 2, 
+            "type": 6, 
+            "starting_area": 1, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 10, 
+            "hp_spread": 0, 
+            "level": 59, 
+            "boss_id": 1, 
+            "type": 6, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

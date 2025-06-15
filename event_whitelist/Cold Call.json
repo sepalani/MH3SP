@@ -1,0 +1,979 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 5, 
+            "zenny_reward": 0, 
+            "type": 1
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 2240, 
+            "rewards_row_1": [
+                [
+                    405, 
+                    1, 
+                    2
+                ], 
+                [
+                    292, 
+                    1, 
+                    12
+                ], 
+                [
+                    541, 
+                    1, 
+                    20
+                ], 
+                [
+                    441, 
+                    1, 
+                    7
+                ], 
+                [
+                    440, 
+                    1, 
+                    14
+                ], 
+                [
+                    409, 
+                    1, 
+                    5
+                ], 
+                [
+                    108, 
+                    1, 
+                    10
+                ], 
+                [
+                    112, 
+                    1, 
+                    5
+                ], 
+                [
+                    591, 
+                    1, 
+                    25
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    405, 
+                    1, 
+                    2
+                ], 
+                [
+                    292, 
+                    1, 
+                    12
+                ], 
+                [
+                    541, 
+                    1, 
+                    20
+                ], 
+                [
+                    441, 
+                    1, 
+                    7
+                ], 
+                [
+                    440, 
+                    1, 
+                    14
+                ], 
+                [
+                    409, 
+                    1, 
+                    5
+                ], 
+                [
+                    108, 
+                    1, 
+                    10
+                ], 
+                [
+                    112, 
+                    1, 
+                    5
+                ], 
+                [
+                    591, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 14, 
+            "zenny_reward": 16000, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 4, 
+            "zenny_reward": 0, 
+            "type": 1
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 0, 
+                "unk2": 255, 
+                "pos_z": -979.26, 
+                "pos_x": -559.73, 
+                "pos_y": 20.32, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 352, 
+                "rot_x": 0, 
+                "type": 28, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -616.77, 
+                "pos_x": 207.09, 
+                "pos_y": 5.0, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 238, 
+                "rot_x": 0, 
+                "type": 28, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1620.63, 
+                "pos_x": 1189.65, 
+                "pos_y": 10.65, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 28, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1651.16, 
+                "pos_x": 760.17, 
+                "pos_y": 27.35, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": -22, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1902.14, 
+                "pos_x": 724.92, 
+                "pos_y": 2.63, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": -79, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 1144.14, 
+                "pos_x": -1433.39, 
+                "pos_y": 13.81, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 426, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 918.99, 
+                "pos_x": -1297.7, 
+                "pos_y": 12.96, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 477, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 806.39, 
+                "pos_x": -1437.67, 
+                "pos_y": 27.98, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 534, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 768.87, 
+                "pos_x": 1137.17, 
+                "pos_y": 5.05, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": -28, 
+                "rot_x": 0, 
+                "type": 28, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 0, 
+                "unk2": 255, 
+                "pos_z": 1833.63, 
+                "pos_x": 14.17, 
+                "pos_y": 46.5, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 28, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1106.89, 
+                "pos_x": 556.11, 
+                "pos_y": 18.99, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 728, 
+                "rot_x": 0, 
+                "type": 28, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 1109.13, 
+                "pos_x": -1739.64, 
+                "pos_y": 34.73, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": -102, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1964.12, 
+                "pos_x": 969.57, 
+                "pos_y": 0.5, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": -102, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 314.53, 
+                "pos_x": 3146.44, 
+                "pos_y": 40.98, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": -56, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -709.74, 
+                "pos_x": 3471.39, 
+                "pos_y": 7.0, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": -136, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3259.04, 
+                "pos_x": 3589.04, 
+                "pos_y": 5.0, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": -11, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3166.77, 
+                "pos_x": 3306.99, 
+                "pos_y": 5.0, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": -34, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3692.1, 
+                "pos_x": 3546.64, 
+                "pos_y": 15.73, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": -113, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3606.37, 
+                "pos_x": 3742.35, 
+                "pos_y": 29.38, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": -39, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 20.74, 
+                "pos_x": 76.48, 
+                "pos_y": 18.62, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 298, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -353.74, 
+                "pos_x": 643.46, 
+                "pos_y": 0.0, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 25696, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 236.08, 
+                "pos_x": 345.94, 
+                "pos_y": 3.39, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": -59, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": 7
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -299.36, 
+                "pos_x": 1276.36, 
+                "pos_y": 10.24, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": -19, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -701.98, 
+                "pos_x": 3776.99, 
+                "pos_y": 0.61, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 46555, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 479.04, 
+                "pos_x": 3282.63, 
+                "pos_y": 0.0, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -124.31, 
+                "pos_x": 2717.68, 
+                "pos_y": 0.6, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": -91, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -347.36, 
+                "pos_x": -629.64, 
+                "pos_y": 1496.43, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 5, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1054.46, 
+                "pos_x": -380.25, 
+                "pos_y": 1428.15, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": -45, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -2848.38, 
+                "pos_x": 4169.78, 
+                "pos_y": 7.24, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 182, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 438.18, 
+                "pos_x": 1700.26, 
+                "pos_y": 0.0, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 147, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -579.15, 
+                "pos_x": -2452.98, 
+                "pos_y": 44.18, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 51, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1208.04, 
+                "pos_x": 103.34, 
+                "pos_y": 41.02, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 244, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": 1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 157.88, 
+                "pos_x": -11.26, 
+                "pos_y": -15.36, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 238, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 509.01, 
+                "pos_x": -1291.4, 
+                "pos_y": 4.0, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1393.44, 
+                "pos_x": -855.8, 
+                "pos_y": 0.48, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 159, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1264.1, 
+                "pos_x": -525.73, 
+                "pos_y": -4.16, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": -182, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1717.3, 
+                "pos_x": -574.99, 
+                "pos_y": -4.64, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 159, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -267.32, 
+                "pos_x": 865.61, 
+                "pos_y": -4.3, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1119.9, 
+                "pos_x": -1246.4, 
+                "pos_y": 6.31, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1426.87, 
+                "pos_x": -1266.86, 
+                "pos_y": 17.79, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": 26038, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1385.65, 
+                "pos_x": -1838.98, 
+                "pos_y": -0.78, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": 39, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1722.55, 
+                "pos_x": -1219.15, 
+                "pos_y": -2.77, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -712.22, 
+                "pos_x": 1068.11, 
+                "pos_y": -9.24, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": -73, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 187.09, 
+                "pos_x": 784.49, 
+                "pos_y": -8.94, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": -73, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -936.3, 
+                "pos_x": 758.48, 
+                "pos_y": 20.97, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": -125, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1641.55, 
+                "pos_x": 1495.12, 
+                "pos_y": 21.92, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": -28, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -548.03, 
+                "pos_x": -1936.97, 
+                "pos_y": 7.33, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1374.15, 
+                "pos_x": -1706.1, 
+                "pos_y": 2.87, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 136, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -910.88, 
+                "pos_x": 399.71, 
+                "pos_y": 0.0, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": -153, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 4
+            }
+        ], 
+        [], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 24.7, 
+                "pos_x": -776.39, 
+                "pos_y": 27.75, 
+                "room": 9, 
+                "rot_z": 0, 
+                "rot_y": 23347, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 214.45, 
+                "pos_x": -1321.35, 
+                "pos_y": 97.17, 
+                "room": 9, 
+                "rot_z": 0, 
+                "rot_y": 45, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1084.8, 
+                "pos_x": -1395.61, 
+                "pos_y": 88.08, 
+                "room": 9, 
+                "rot_z": 0, 
+                "rot_y": 30646, 
+                "rot_x": 0, 
+                "type": 13, 
+                "quantity": 2
+            }
+        ]
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 3, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 27, 
+        "wave_2_transition_type": 0, 
+        "location": 4, 
+        "penalty_per_cart": 6000, 
+        "resources": 0, 
+        "details": "It was just a typical sub-zero\nnight in the Tundra. But then,\nBOOM! The sky flashed and the\nground quaked, like something\nbig had crashed down. Then the\nmonsters came. Help! We can't\nwork under these conditions!", 
+        "description": "Hunt a Gig., Bar. & bird wyv.", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 8, 
+        "quest_fee": 1600, 
+        "quest_id": 61006, 
+        "name": "Cold Call", 
+        "main_monster_2": 26, 
+        "main_monster_1": 28, 
+        "supply_set_number": 8, 
+        "summon": 0, 
+        "client": "Tundra-expedition Member", 
+        "flags": [
+            [
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 1, 
+            "hp_spread": 1, 
+            "level": 34, 
+            "boss_id": 1, 
+            "type": 4, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 1, 
+            "hp_spread": 1, 
+            "level": 35, 
+            "boss_id": 2, 
+            "type": 5, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_1": {
+            "size_spread": 1, 
+            "hp_spread": 0, 
+            "level": 34, 
+            "boss_id": 0, 
+            "type": 14, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

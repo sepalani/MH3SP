@@ -998,6 +998,10 @@ def generate_rewards(rewards):
     return data
 
 
+def or_zeros(data, str_idx, length):
+    return (data[str_idx] if str_idx in data else 0)#(b'\0' * length))
+
+
 def make_binary_event_quest(quest_data):
     """
     'quest_info': {
@@ -1193,7 +1197,7 @@ def make_binary_event_quest(quest_data):
     # size: 92
     # Presently hardcoded
     # offset: 0x013C
-    data += pad(b"Reward hits 0, or time\nexpires.", 0x5C)
+    data += (pad(quest_info['failure_message'].encode("ascii"), 0x5C) if 'failure_message' in quest_info else pad(b"Reward hits 0, or time\nexpires.", 0x5C))
 
     # - id: hunter_rank_point_restriction
     # type: u2
@@ -1202,14 +1206,24 @@ def make_binary_event_quest(quest_data):
 
     # - id: client
     # type: str
-    # size: 41
+    # size: 40
     # offset: 0x019A
-    data += pad(quest_info['client'].encode("ascii"), 0x29)
+    data += pad(quest_info['client'].encode("ascii"), 0x28)
 
-    # - id: unk2
-    # size: 6
-    # offset: 0x01C3
-    data += b'\0' * 0x06
+    # - id: unkInt0
+    # size: u4
+    # offset: 0x1C2
+    data += struct.pack(">I", or_zeros(unknown, 'unkInt0', 4))
+
+    # - id: unkShort0
+    # size: u2
+    # offset: 0x1C6
+    data += struct.pack(">H", or_zeros(unknown, 'unkShort0', 2))
+
+    # - id: unkByte0
+    # size: u1
+    # offset: 0x1C8
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte0', 1))
 
     # - id: details
     # type: str
@@ -1225,12 +1239,18 @@ def make_binary_event_quest(quest_data):
     # - id: minion_unsure
     # size: 3
     # offset: 0x0306
-    data += b'\0' * 0x03
+    #data += b'\0' * 0x03
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes0_0', 1))
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes0_1', 1))
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes0_2', 1))
 
     # - id: quest_flags_unsure
     # size: 3
     # offset: 0x0309
-    data += b'\0' * 0x03
+    #data += b'\0' * 0x03
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes1_0', 1))
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes1_1', 1))
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes1_2', 1))
 
     # - id: monster_1
     # type: u1
@@ -1247,7 +1267,9 @@ def make_binary_event_quest(quest_data):
     # - id: unk3
     # size: 2
     # offset: 0x030E
-    data += b'\0' * 0x02  # Padding
+    #data += b'\0' * 0x02  # Padding
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes2_0', 1))
+    data += struct.pack(">B", or_zeros(unknown, 'unkBytes2_1', 1))
 
     # - id: flags
     # type: u4
@@ -1400,27 +1422,28 @@ def make_binary_event_quest(quest_data):
     # type: u4
     # 0x0000000f for the great jaggi quest/(all quests?)
     # offset: 0x0360
-    data += struct.pack(">I", 0x0000000f)
+    data += struct.pack(">I", unknown['unkUintAlways15'] if 'unkUintAlways15' in unknown else 0x0000000f)#0x0000000f)
 
     # - id: unk8
     # type: u1
     # offset: 0x0364
-    data += b'\0' * 0x01
+    #data += b'\0' * 0x01
 
     # - id: gather_rank (wrong)
     # type: u1
     # offset: 0x0365
-    data += b'\0' * 0x01
+    #data += b'\0' * 0x01
 
     # - id: unk9
     # type: u1
     # offset: 0x0366
-    data += b'\0' * 0x01
+    #data += b'\0' * 0x01
 
     # - id: unk10
     # type: u1
     # offset: 0x0367
-    data += struct.pack(">B", subquest_1['hrp_reward'])
+    #data += struct.pack(">B", subquest_1['hrp_reward'])
+    data += struct.pack(">I", subquest_1['hrp_reward'])
 
     # - id: supply_set (wrong)
     # type: u4
@@ -1446,21 +1469,37 @@ def make_binary_event_quest(quest_data):
     # offset: 0x036F
     data += struct.pack(">B", unknown['unk_6'])
 
-    # - id: supply_set_number
-    # type: u4
+    # - id: unkShort1
+    # type: u2
     # 0x00000011 for the great jaggi quest
     # offset: 0x0370
-    data += struct.pack(">I", quest_info['supply_set_number'])
+    data += struct.pack(">H", or_zeros(unknown, 'unkShort1', 2))
 
-    # - id: unk12
-    # type: u4
-    # offset: 0x0374
-    data += struct.pack(">I", unknown['unk_7'])
-
-    # - id: unk13
+    # - id: supply_set_number
     # type: u2
+    # 0x00000011 for the great jaggi quest
+    # offset: 0x0372
+    data += struct.pack(">H", quest_info['supply_set_number'])
+
+    # - id: unkShort2
+    # type: u2
+    # offset: 0x0374
+    data += struct.pack(">H", or_zeros(unknown, 'unkShort2', 2))
+
+    # - id: unk_7
+    # type: u2
+    # offset: 0x0376
+    data += struct.pack(">H", unknown['unk_7'])
+
+    # - id: unkByte1
+    # type: u1
     # offset: 0x0378
-    data += b'\0' * 0x02
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte1', 1))
+
+    # - id: unkByte2
+    # type: u1
+    # offset: 0x0379
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte2', 1))
 
     # - id: type_flag (STARTING POSITION, 0x0000: basecamp,
     #                  0x0001:random, 0x0002: shrine)
@@ -1468,19 +1507,26 @@ def make_binary_event_quest(quest_data):
     # offset: 0x037A
     data += struct.pack(">h", quest_info['starting_position'])
 
-    # UNK
+    # - id: unkByte3
     # offset: 0x037C
-    data += b'\0' * 0x02
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte3', 1))
+
+    # - id: unkByte4
+    # offset: 0x037D
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte4', 1))
 
     # - id: small_monster_data_location
     # type: u2
     # offset: 0x037E
     data += struct.pack(">h", 0x04b8)
 
-    # - id: type_amount
-    # type: u2
+    # - id: unkByte7
     # offset: 0x0380
-    data += b'\0' * 0x02
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte7', 1))
+
+    # - id: unkByte8
+    # offset: 0x0381
+    data += struct.pack(">B", or_zeros(unknown, 'unkByte8', 1))
 
     # - id: general_enemy_level
     # type: u2
@@ -1767,19 +1813,48 @@ def is_arena_quest(flags):
 
 class QuestLoader:
     def __init__(self, file_loc='event/quest_rotation.json'):
-        self.version = 0
-        self.version_incrementer = 28
+        #self.version_incrementer = 28
         self.file_loc = file_loc
-        self.load_quests()
         self.version = 0
+        self.trading_post_version = 0
+        self.quests = []
+        self.trading_post = []
+        self.prev_quest_json = b""
+        self.prev_trading_post_json = b""
+        self.load_quests()
+        self.load_trading_post()
+
+    def load_trading_post(self):
+        import json
+        trading_post_list = []
+        with open('event/trading_post.json', 'r') as f:
+            trading_post_json = byteify(json.load(f))
+            self.prev_trading_post_json = trading_post_json
+            def slot(item, qty):
+                return struct.pack(">HH", item, qty)
+            for day in trading_post_json:
+                day_encoded = b""
+                for entry in day:
+                    offered, offered_quantity = entry[0]
+                    price1, price1_quantity = entry[1]
+                    price2, price2_quantity = entry[2]
+                    day_encoded += slot(offered, offered_quantity) + \
+                        slot(price1, price1_quantity) + \
+                        slot(price2, price2_quantity) + \
+                        slot(0, 0)
+                trading_post_list.append(day_encoded)
+        self.trading_post_version += len(self.trading_post)
+        self.trading_post = trading_post_list
 
     def load_quests(self):
         import json
-        self.version += self.version_incrementer
         quest_list = []
         with open(self.file_loc, 'r') as f:
             quests_json = byteify(json.load(f))
+            self.prev_quest_json = quests_json
+            idx = 0
             for day in quests_json:
+                idx += 1
                 curr_quest_list = []
                 for quest_file in day:
                     with open(quest_file, 'r') as ff:
@@ -1787,7 +1862,80 @@ class QuestLoader:
                         curr_quest = make_event_slot(curr_quest)
                         curr_quest_list.append(curr_quest)
                 quest_list.append(curr_quest_list)
+        self.version += len(self)#self.version_incrementer
         self.quests = quest_list
+
+    def dump_trading_post_to_bytes(self):
+        import json
+        trading_post_list = []
+        with open('event/trading_post.json', 'r') as f:
+            trading_post_json = byteify(json.load(f))
+            self.prev_trading_post_json = trading_post_json
+            for day in trading_post_json:
+                trading_post_list.append(day)
+        return json.dumps(trading_post_list).encode('utf-8')
+
+    def dump_quest_to_bytes(self):
+        import json
+        quest_list = []
+        with open(self.file_loc, 'r') as f:
+            quests_json = byteify(json.load(f))                
+            self.prev_quest_json = quests_json
+            for day in quests_json:
+                curr_quest_list = []
+                for quest_file in day:
+                    with open(quest_file, 'r') as ff:
+                        curr_quest = byteify(json.load(ff))
+                        curr_quest_list.append(curr_quest)
+                quest_list.append(curr_quest_list)
+        return json.dumps(quest_list).encode('utf-8')
+
+    def load_trading_post_from_bytes(self, bytedata):
+        import json
+        trading_post_list = json.loads(bytedata.decode('utf-8'))
+        new_trading_post_list = []
+        try:
+            def slot(item, qty):
+                return struct.pack(">HH", item, qty)
+            for day in trading_post_list:
+                day_encoded = b""
+                for entry in day:
+                    offered, offered_quantity = entry[0]
+                    price1, price1_quantity = entry[1]
+                    price2, price2_quantity = entry[2]
+                    day_encoded += slot(offered, offered_quantity) + \
+                        slot(price1, price1_quantity) + \
+                        slot(price2, price2_quantity) + \
+                        slot(0, 0)
+                new_trading_post_list.append(day_encoded)
+            if self.trading_post == new_trading_post_list:
+                return False, ""
+            else:
+                self.trading_post_version += self.get_trading_post_len()
+                self.trading_post = new_trading_post_list
+                return True, ""
+        except Exception as e:
+            return False, "Failed to update trading post: "+str(e)
+
+    def load_quests_from_bytes(self, bytedata):
+        import json
+        quest_list = json.loads(bytedata.decode('utf-8'))
+        new_quest_list = []
+        try:
+            for day in quest_list:
+                day_arr = []
+                for curr_quest in day:
+                    quest = make_event_slot(curr_quest)
+                    day_arr.append(quest)
+                new_quest_list.append(day_arr)
+            if self.quests == new_quest_list:
+                return False, ""
+            else:
+                self.version += len(self)#self.version_incrementer
+                self.quests = new_quest_list
+                return True, ""
+        except Exception as e:
+            return False, "Failed to update quests: "+str(e)
 
     def get_quest_dicts(self, idx):
         # Get quest dicts for the day
@@ -1806,6 +1954,15 @@ class QuestLoader:
             else:
                 quest_list.append(quest)
         return quest_list, arena_list
+
+    def get_trading_post_len(self):
+        # Get the number of trading post days
+        return len(self.trading_post)
+
+    def get_trading_post_day(self, idx):
+        # Get trading post offers for the day
+        true_idx = idx - self.trading_post_version - 1
+        return self.trading_post[true_idx]
 
     def __len__(self):
         # Get number of days

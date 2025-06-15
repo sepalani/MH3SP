@@ -6,25 +6,40 @@
 
 import struct
 
+from mh.state import Players, get_instance
 import mh.pat_item as pati
 from mh.constants import PatID4
 from mh.pat import PatRequestHandler, PatServer
-from other.utils import hexdump, server_base, server_main, to_str
+from other.utils import hexdump, server_base, server_main
 
 
 class FmpServer(PatServer):
     """Basic FMP server class."""
-    pass
+    def close(self):
+        PatServer.close(self)
+        get_instance().close_cache()
 
 
 class FmpRequestHandler(PatRequestHandler):
     """Basic FMP server request handler class."""
 
+    def sendPatchCheck(self):
+        self.sendReqConnection()
+
     def recvAnsConnection(self, packet_id, data, seq):
         """AnsConnection packet."""
         connection_data = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(connection_data))
-        self.sendNtcLogin(3, connection_data, seq)
+        loaded_session = self.session.session_ready(connection_data)
+        if loaded_session:
+            if get_instance().server_id != 0:
+                self.session.set_session_ready(connection_data, False)
+                loaded_session.connection = self
+                self.session = loaded_session
+                get_instance().register_pat_ticket(self.session)
+            self.sendNtcLogin(3, connection_data, seq)
+        else:
+            self.session.set_session_ready(connection_data, (self, connection_data, seq))
 
     def sendAnsLayerDown(self, layer_id, layer_set, seq):
         """AnsLayerDown packet.
@@ -180,9 +195,8 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤユーザ用バイナリ通知
         TR: Binary notifications for layer users
         """
-        with pati.Unpacker(data, check=False) as unpacker:
-            sender_blank = unpacker.LayerUserInfo()  # noqa: F841
-            unk_data = data[unpacker.offset:]
+        sender_blank = pati.LayerUserInfo.unpack(data)
+        unk_data = data[len(sender_blank.pack()):]
         self.sendNtcLayerBinary(unk_data, seq)
 
     def sendNtcLayerBinary(self, unk_data, seq):
@@ -214,17 +228,17 @@ class FmpRequestHandler(PatRequestHandler):
         JP: レイヤユーザ用バイナリ通知 (相手指定)
         TR: Binary notification for layer users (specify the other party)
         """
-        with pati.Unpacker(data, check=False) as unpacker:
-            partner_id = to_str(unpacker.lp2_string())
-            binary_info = unpacker.LayerBinaryInfo()  # noqa: F841
-            unk_data = data[unpacker.offset:]
+        partner = pati.unpack_lp2_string(data)
+        partner_size = len(partner) + 2
+        binary_info = pati.LayerBinaryInfo.unpack(data, partner_size)
+        unk_data = data[partner_size+len(binary_info.pack()):]
 
         self.server.debug("NtcLayerBinary2: From ({}, {})\n{}".format(
             self.session.capcom_id, self.session.hunter_name,
             hexdump(unk_data)))
-        self.sendNtcLayerBinary2(partner_id, unk_data, seq)
+        self.sendNtcLayerBinary2(partner, unk_data, seq)
 
-    def sendNtcLayerBinary2(self, partner_id, unk_data, seq):
+    def sendNtcLayerBinary2(self, partner, unk_data, seq):
         """NtcLayerBinary packet.
 
         ID: 64751000
@@ -233,11 +247,8 @@ class FmpRequestHandler(PatRequestHandler):
         """
         city = self.session.get_city()
         with city.lock():
-            partner_session = city.players.find_by_capcom_id(partner_id)
+            partner_session = city.players.find_by_capcom_id(partner)
         if partner_session is None:
-            self.server.error("sendNtcLayerBinary2: {} not found".format(
-                partner_id
-            ))
             return
 
         data = pati.lp2_string(self.session.capcom_id)
@@ -263,6 +274,7 @@ class FmpRequestHandler(PatRequestHandler):
         Sent by the game when leaving the gate via the entrance:
          - Relocate > Select Server
         """
+        self.notify_layer_departure()
         self.sendAnsLayerUp(data, seq)
 
     def recvReqUserSearchInfoMine(self, packet_id, data, seq):
@@ -646,18 +658,19 @@ class FmpRequestHandler(PatRequestHandler):
         JP: サークルバイナリ通知 (相手指定)
         TR: Circle binary notification (specified by the other party)
         """
-        with pati.Unpacker(data, check=False) as unpacker:
-            circle_index, = unpacker.struct(">I")
-            partner_id = to_str(unpacker.lp2_string())
-            binary_info = unpacker.LayerBinaryInfo()  # noqa: F841
-            unk_data = data[unpacker.offset:]
+        circle_index, = struct.unpack_from(">I", data)
+        partner = pati.unpack_lp2_string(data, 4)
+        partner_size = len(partner)+2+4
+        binary_info = pati.LayerBinaryInfo.unpack(data, partner_size)
+        unk_data = data[partner_size+len(binary_info.pack()):]
 
         self.server.debug("NtcCircleBinary2: From ({}, {})\n{}".format(
             self.session.capcom_id, self.session.hunter_name,
             hexdump(unk_data)))
-        self.sendNtcCircleBinary2(circle_index, partner_id, unk_data, seq)
 
-    def sendNtcCircleBinary2(self, circle_index, partner_id, unk_data, seq):
+        self.sendNtcCircleBinary2(circle_index, partner, unk_data, seq)
+
+    def sendNtcCircleBinary2(self, circle_index, partner, unk_data, seq):
         """NtcCircleBinary2 packet.
 
         ID: 65711000
@@ -667,11 +680,8 @@ class FmpRequestHandler(PatRequestHandler):
         city = self.session.get_city()
         circle = city.circles[circle_index-1]
         with circle.lock():
-            partner_session = circle.players.find_by_capcom_id(partner_id)
+            partner_session = circle.players.find_by_capcom_id(partner)
         if partner_session is None:
-            self.server.error("sendNtcCircleBinary2: {} not found".format(
-                partner_id
-            ))
             return
 
         data = struct.pack(">I", circle_index)

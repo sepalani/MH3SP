@@ -18,6 +18,9 @@ class LmpServer(PatServer):
 class LmpRequestHandler(PatRequestHandler):
     """Basic LMP server request handler class."""
 
+    def sendPatchCheck(self):
+        self.sendReqConnection()
+
     def recvAnsConnection(self, packet_id, data, seq):
         """AnsConnection packet."""
         connection_data = pati.ConnectionData.unpack(data)

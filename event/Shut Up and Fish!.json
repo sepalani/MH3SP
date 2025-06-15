@@ -1,0 +1,274 @@
+{
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 2, 
+            "hrp_reward": 60, 
+            "rewards_row_1": [
+                [
+                    149, 
+                    3, 
+                    15
+                ], 
+                [
+                    150, 
+                    1, 
+                    5
+                ], 
+                [
+                    214, 
+                    2, 
+                    10
+                ], 
+                [
+                    210, 
+                    3, 
+                    20
+                ], 
+                [
+                    212, 
+                    2, 
+                    7
+                ], 
+                [
+                    213, 
+                    2, 
+                    10
+                ], 
+                [
+                    215, 
+                    2, 
+                    13
+                ], 
+                [
+                    216, 
+                    1, 
+                    20
+                ]
+            ], 
+            "description": "Fish out Gobul once", 
+            "objective_type": 18, 
+            "zenny_reward": 1200, 
+            "type": 4096
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 820, 
+            "rewards_row_1": [
+                [
+                    149, 
+                    3, 
+                    15
+                ], 
+                [
+                    150, 
+                    1, 
+                    5
+                ], 
+                [
+                    214, 
+                    2, 
+                    10
+                ], 
+                [
+                    210, 
+                    3, 
+                    20
+                ], 
+                [
+                    212, 
+                    2, 
+                    7
+                ], 
+                [
+                    213, 
+                    2, 
+                    10
+                ], 
+                [
+                    215, 
+                    2, 
+                    13
+                ], 
+                [
+                    216, 
+                    1, 
+                    20
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    440, 
+                    1, 
+                    35
+                ], 
+                [
+                    447, 
+                    1, 
+                    5
+                ], 
+                [
+                    441, 
+                    1, 
+                    15
+                ], 
+                [
+                    327, 
+                    1, 
+                    20
+                ], 
+                [
+                    328, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 18, 
+            "zenny_reward": 5600, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 4, 
+            "hrp_reward": 70, 
+            "rewards_row_1": [
+                [
+                    440, 
+                    1, 
+                    35
+                ], 
+                [
+                    447, 
+                    1, 
+                    5
+                ], 
+                [
+                    441, 
+                    1, 
+                    15
+                ], 
+                [
+                    327, 
+                    1, 
+                    20
+                ], 
+                [
+                    328, 
+                    1, 
+                    25
+                ]
+            ], 
+            "description": "Deliver 4 Goldenfish", 
+            "objective_type": 217, 
+            "zenny_reward": 2400, 
+            "type": 2
+        }
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 25, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 2, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 25, 
+        "wave_2_transition_type": 0, 
+        "location": 3, 
+        "penalty_per_cart": 1900, 
+        "resources": 0, 
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
+        "description": "Hunt a Gobul", 
+        "smallmonster_data_file": "sm_ff_free_for_all.dat", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 7, 
+        "quest_fee": 550, 
+        "quest_id": 61004, 
+        "name": "Shut Up and Fish!", 
+        "main_monster_2": 34, 
+        "main_monster_1": 17, 
+        "supply_set_number": 35, 
+        "summon": 0, 
+        "client": "MH3SP Dev Team", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest\nand both Subquests."
+    }, 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 1, 
+            "hp_spread": 1, 
+            "level": 25, 
+            "boss_id": 0, 
+            "type": 18, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

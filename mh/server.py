@@ -9,9 +9,9 @@ import random
 import socket
 import struct
 import threading
+import traceback
 
 from mh.time_utils import Timer
-from other.utils import wii_ssl_wrap_socket
 
 try:
     # Python 3
@@ -121,7 +121,7 @@ class BasicPatHandler(object):
         try:
             self.on_finish()
         except Exception:
-            pass
+            self.server.error(traceback.format_exc())
 
         self.finished = True
 
@@ -145,13 +145,12 @@ class BasicPatServer(object):
     socket_type = socket.SOCK_STREAM
 
     def __init__(self, server_address, RequestHandlerClass, max_threads,
-                 bind_and_activate=True, ssl_cert=None, ssl_key=None):
-        # type: (Tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None
+                 bind_and_activate=True):
+        # type: (Tuple[str, int], BasicPatHandler, int, bool) -> None
         """Constructor.  May be extended, do not override."""
         self.server_address = server_address
         self.RequestHandlerClass = RequestHandlerClass
         self.__is_shut_down = threading.Event()
-        self.__is_shut_down.set()
         self.__shutdown_request = False
         self.socket = socket.socket(self.address_family, self.socket_type)
         self._random = random.SystemRandom()  # type: random.SystemRandom
@@ -159,9 +158,20 @@ class BasicPatServer(object):
         self.worker_threads = []  # type: List[threading.Thread]
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
-        self.max_threads = max_threads or multiprocessing.cpu_count()
-        self.ssl_cert = ssl_cert
-        self.ssl_key = ssl_key
+
+        if max_threads <= 0:
+            max_threads = multiprocessing.cpu_count()
+
+        for n in range(max_threads):
+            thread_queue = queue.Queue()
+            thread = threading.Thread(
+                target=self._worker_target,
+                args=(thread_queue,),
+                name="{}.Worker-{}".format(self.__class__.__name__, n)
+            )
+            self.worker_queues.append(thread_queue)
+            self.worker_threads.append(thread)
+            thread.start()
 
         if bind_and_activate:
             try:
@@ -186,28 +196,9 @@ class BasicPatServer(object):
         """
         return self.socket.fileno()
 
-    def initialize_workers(self):
-        """Initialize workers queues/threads.
-
-        This needs to be deferred, otherwise the close method might try to
-        join threads that aren't started yet when an error occurs early.
-        """
-        for n in range(self.max_threads):
-            thread_queue = queue.Queue()
-            thread = threading.Thread(
-                target=self._worker_target,
-                args=(thread_queue,),
-                name="{}.Worker-{}".format(self.__class__.__name__, n)
-            )
-            self.worker_queues.append(thread_queue)
-            self.worker_threads.append(thread)
-            thread.start()
-
     def serve_forever(self):
         self.__is_shut_down.clear()
         try:
-            self.initialize_workers()
-
             with self.selector as selector:
                 selector.register(self, selectors.EVENT_READ)
 
@@ -218,24 +209,28 @@ class BasicPatServer(object):
                     if self.__shutdown_request:
                         break
 
-                    for (key, event) in ready:
-                        selected = key.fileobj
-                        if selected == self:
-                            self.accept_new_connection()
-                        else:
-                            assert event == selectors.EVENT_READ
-                            try:
-                                packet = selected.on_recv()
-                                if packet is None:
+                    try:
+                        for (key, event) in ready:
+                            selected = key.fileobj
+                            if selected == self:
+                                self.accept_new_connection()
+                            else:
+                                assert event == selectors.EVENT_READ
+                                try:
+                                    packet = selected.on_recv()
+                                    if packet is None:
+                                        if selected.is_finished():
+                                            self.remove_handler(selected)
+                                        continue
+
+                                    self._queue_work(selected, packet, event)
+                                except Exception as e:
+                                    selected.on_exception(e)
                                     if selected.is_finished():
                                         self.remove_handler(selected)
-                                    continue
-
-                                self._queue_work(selected, packet, event)
-                            except Exception as e:
-                                selected.on_exception(e)
-                                if selected.is_finished():
-                                    self.remove_handler(selected)
+                    except:
+                        self.error(traceback.format_exc())
+                        
                     if write_watch.elapsed() >= write_timeout:
                         try:
                             for handler in self.handlers:
@@ -246,8 +241,12 @@ class BasicPatServer(object):
 
                                 if handler.is_finished():
                                     self.remove_handler(handler)
+                        except:
+                            self.error(traceback.format_exc())
                         finally:
                             write_watch.restart()
+        except:
+            self.error(traceback.format_exc())
         finally:
             self.__is_shut_down.set()
 
@@ -269,12 +268,15 @@ class BasicPatServer(object):
             assert event == selectors.EVENT_READ
 
             try:
-                handler.on_packet(packet)
-            except Exception as e:
-                handler.on_exception(e)
+                try:
+                    handler.on_packet(packet)
+                except Exception as e:
+                    handler.on_exception(e)
 
-            if handler.is_finished():
-                self.remove_handler(handler)
+                if handler.is_finished():
+                    self.remove_handler(handler)
+            except:
+                self.error(traceback.format_exc())
 
     def accept_new_connection(self):
         # type: () -> None
@@ -290,15 +292,6 @@ class BasicPatServer(object):
             # Currently, they get stuck on `packet = selected.on_recv()`,
             # thus blocking the `serve_forever` method.
             client_socket.settimeout(2.0)
-
-            # TODO: Ensure this is the correct way to fix the server not
-            # accepting SSL connection anymore.
-            #
-            # See https://stackoverflow.com/a/68214507
-            if self.ssl_cert and self.ssl_key:
-                client_socket = wii_ssl_wrap_socket(
-                    client_socket, self.ssl_cert, self.ssl_key
-                )
             handler = self.RequestHandlerClass(client_socket, client_address,
                                                self)
         except Exception as e:

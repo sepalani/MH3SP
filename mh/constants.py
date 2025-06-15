@@ -6,12 +6,11 @@
 
 import struct
 from other.utils import pad
-from mh.time_utils import current_server_time, TICKS_PER_CYCLE, \
-    get_jhen_event_times, is_jhen_active, current_event_time_slot
+from mh.time_utils import current_server_time, TICKS_PER_CYCLE, get_jhen_event_times,\
+    is_jhen_active, current_event_time_slot, current_trading_post_time_slot
 from mh.quest_utils import make_binary_event_quest
-from res.trading_post import CURRENT_TRADES
 
-def make_binary_type_time_events(binary_loader=None):
+def make_binary_type_time_events(binary_loader):
     return struct.pack(">III", *get_jhen_event_times())
 
 
@@ -24,6 +23,21 @@ def get_event_slot(slot_num, temporal_slot):
         quest_loader[temporal_slot][slot_num] \
         if slot_num < len(quest_loader[temporal_slot]) else b'\0' * 0x4B4
 
+
+def get_binary_loader_assisted_version(binary_loader):
+    return current_event_time_slot(binary_loader) + 1 + binary_loader.version
+
+
+def get_binary_quest_content_from_quest_slot(quest_slot):
+    return lambda temporal_slot, quest_slot=quest_slot: get_event_slot(quest_slot, temporal_slot)
+
+
+def get_binary_loader_assisted_trading_post_version(binary_loader):
+    return current_trading_post_time_slot(binary_loader) + 1 + binary_loader.trading_post_version
+
+def get_binary_trading_post(temporal_slot):
+    return lambda binary_loader, temporal_slot=temporal_slot: \
+        binary_loader.get_trading_post_day(temporal_slot)
 
 def make_binary_server_type_list(is_jap=False):
     data = bytearray()
@@ -49,37 +63,24 @@ def make_binary_server_type_list(is_jap=False):
         data += pad(desc, 112 if is_jap else 168)
 
     data += struct.pack(">I", 0)  # unk
-    data += struct.pack(
-        ">I", current_server_time()
-    )  # Current time at server bootup
-    data += struct.pack(
-        ">I", TICKS_PER_CYCLE
-    )  # Max tick per cycle, if 0 game defaults to 3000
+    data += struct.pack(">I", current_server_time())  # Current time at server bootup
+    data += struct.pack(">I", TICKS_PER_CYCLE)  # Max Tick Per Cycle, if 0 game defaults to 3000
 
     # Handle city seekings (x32)
     SEEKINGS = [
-        # References:
-        #  - https://youtu.be/lPFQW3B1Kt0?t=31
-        #  - https://youtu.be/Ie_9lRIZF20?t=411
         b"Everyone welcome!", b"Casual play",
-        # TODO: "Beginners welcome!" doesn't appear in Expert type servers
         b"Huntin' and chattin'", b"Beginners welcome!",
-        # TODO: "Skilled players only" doesn't appear in Rookie type servers?
         b"Skilled players only", b"Let's Quest together",
         b"Event Quest ho!", b"Arena battles!",
         b"Earning money", b"HR grinding",
         b"Gathering materials", b"Rare material search",
         b"Just a Quest or two", b"In for the long haul",
-        # TODO: The following seekings don't appear in Recruiting type servers
-        b"Playing with friends", b"Solo play",
         # Extra seekings not from the original server
+        b"Playing with friends", b"Solo play",
         b"Stream Lobby", b"Turns",
-        b"Seeking18", b"Seeking19",
-        b"Seeking20", b"Seeking21",
-        b"Seeking22", b"Seeking23",
-        b"Seeking24", b"Seeking25",
-        b"Seeking26", b"Seeking27",
-        b"Seeking28", b"Seeking29",
+        b"Seeking18", b"Seeking19", b"Seeking20", b"Seeking21",
+        b"Seeking22", b"Seeking23", b"Seeking24", b"Seeking25",
+        b"Seeking26", b"Seeking27", b"Seeking28", b"Seeking29",
         b"Seeking30", b"Seeking31",
     ]
     for i, seeking in enumerate(SEEKINGS):
@@ -174,7 +175,7 @@ def make_binary_npc_greeters(binary_loader, is_jap=False, temporal_slot=None):
     JP_OFFSET = 0x100
     offset = JP_OFFSET if is_jap else US_OFFSET
     if temporal_slot is None:
-        temporal_slot = current_event_time_slot()
+        temporal_slot = current_event_time_slot(binary_loader)
 
     if is_jhen_active():
         tool_shop = b"Half-off sale!"
@@ -219,7 +220,57 @@ def make_binary_npc_greeters(binary_loader, is_jap=False, temporal_slot=None):
 
 
 def make_binary_trading_post():
-    return CURRENT_TRADES
+    data = b""
+
+    def slot(item, qty):
+        return struct.pack(">HH", item, qty)
+
+    # Popfish x8 <- Machalite Ore x2 | Rathian Coin x2
+    data += slot(0xd2, 8) + slot(0x65, 2) + slot(0x262, 2) + slot(0, 0)
+
+    # Waterblock Seed x3 <- Bone x4 | Qurupeco Coin x1
+    data += slot(0x188, 3) + slot(0xc4, 4) + slot(0x25f, 1) + slot(0, 0)
+
+    # Bone Husk S x10 <- Bone x2 | Barroth Coin x2
+    data += slot(0x156, 10) + slot(0xc4, 2) + slot(0x260, 2) + slot(0, 0)
+
+    # Dung x5 <- Monster Fluid x1 | R.Ludroth Coin x1
+    data += slot(0xc5, 5) + slot(0x155, 1) + slot(0x261, 1) + slot(0, 0)
+
+    # Sharpened Fang x5 <- Hydro Hide x2 | R.Ludroth Coin x2
+    data += slot(0x232, 5) + slot(0x141, 1) + slot(0x261, 2) + slot(0, 0)
+
+    # Toadstool x5 <- Sharpened Fang x1 | Qurupeco Coin x1
+    data += slot(0x158, 5) + slot(0x232, 1) + slot(0x25f, 1) + slot(0, 0)
+
+    # Stone x10 <- Monster Bone M x1 | Great Jaggi Coin x2
+    data += slot(0x61, 10) + slot(0x9a, 1) + slot(0x25e, 2) + slot(0, 0)
+
+    # Spider Web x5 <- Monster Fluid x1 | Barroth Coin x1
+    data += slot(0xc6, 5) + slot(0x155, 1) + slot(0x260, 1) + slot(0, 0)
+
+    # Bughopper x10 <- Big Fin x3 | R.Ludroth Coin x2
+    data += slot(0x160, 10) + slot(0x230, 3) + slot(0x261, 2) + slot(0, 0)
+
+    # Icethaw Pellet x3 <- Mystery Bone x4 | R.Ludroth Coin x1
+    data += slot(0x189, 3) + slot(0x10e, 4) + slot(0x261, 1) + slot(0, 0)
+
+    # Rathian Scale x1 <- Rathian Coin x3 | Pinnacle Coin x2
+    data += slot(0x112, 1) + slot(0x262, 3) + slot(0x267, 2) + slot(0, 0)
+
+    # Wyvern Claw x8 <- Great Baggi Claw x1 | Rathian Coin x1
+    data += slot(0x167, 8) + slot(0x21d, 1) + slot(0x262, 1) + slot(0, 0)
+
+    # Prize Gold Sword x1 <- Lagiacrus Coin x15 | Pinnacle Coin x8
+    data += slot(0x25d, 1) + slot(0x263, 15) + slot(0x267, 8) + slot(0, 0)
+
+    # Barioth Shell x1 <- Barioth Coin x3 | Pinnacle Coin x2
+    data += slot(0x194, 1) + slot(0x24a, 3) + slot(0x267, 2) + slot(0, 0)
+
+    # Armor Stone x3 <- Deviljho Coin x1 | Pinnacle Coin x1
+    data += slot(0x1bb, 3) + slot(0x24d, 1) + slot(0x267, 1) + slot(0, 0)
+
+    return data
 
 
 LAYER_CHAT_COLORS = (0xbb3385ff, 0xffffffff, 0xffffffff)
@@ -248,22 +299,30 @@ ANNOUNCE = b"<BR><BODY>".join([
     b"Roadmap for a list of features we are working on.",
     b"<BR><CENTER><C=2>Welcome to Loc Lac!<END>"
 ])
+MAINTENANCE = b"<BR><BODY>".join([
+    b"<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
+    b"<BR><CENTER><SIZE=4>MH3SP is currently down for maintenance.",
+    b"<BR><CENTER><C=2>Please check back later!<END>"
+])
+UNPATCHED = "<BR><BODY>".join([
+    "<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
+    "<BR><BR><CENTER><C=1><SIZE=7>NEW PATCH ARRIVED",
+    "<BR><LEFT><SIZE=4><C=7>Please see the discord server for the new patch.",
+    "New patch is required in order to play with the other",
+    "hunters.",
+    "<BR><CENTER><C=3>{}",
+    "<END>"
+])
 CHARGE = b"""<BODY><CENTER>MH3 Server Project - No charge.<END>"""
 # VULGARITY_INFO = b"""MH3 Server Project - Vulgarity info (low)."""
 VULGARITY_INFO = b""
-FMP_VERSION = 1
+FMP_CENTRAL_VERSION = 1
+FMP_VERSION = 2
 
 TIME_STATE = 0
 IS_JAP = False
 
-
-def get_binary_loader_assisted_version(binary_loader):
-    return current_event_time_slot() + 1 + binary_loader.version
-
-
-def get_binary_quest_content_from_quest_slot(quest_slot):
-    return lambda temporal_slot, quest_slot=quest_slot: get_event_slot(quest_slot, temporal_slot)
-
+NATNEG_SERVICE_DOMAIN = 'natneg1.mh3sp.com'
 
 # Dummy PAT_BINARY
 PAT_BINARIES = {
@@ -276,12 +335,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x03: {
-        "version": lambda binary_loader: current_event_time_slot() + 1,
+        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
         "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, is_jap=IS_JAP, temporal_slot=temporal_slot)
     },
     0x04: {
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post#make_binary_trading_post()
     },
     0x05: {  # English
         "version": 1,
@@ -338,12 +397,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x12: {  # French
-        "version": lambda binary_loader: current_event_time_slot() + 1,
+        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
         "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
     },
     0x13: {  # French
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post#make_binary_trading_post()
     },
     0x14: {  # French
         "version": 1,
@@ -398,12 +457,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x21: {  # German
-        "version": lambda binary_loader: current_event_time_slot() + 1,
+        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
         "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
     },
     0x22: {  # German
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post#make_binary_trading_post()
     },
     0x23: {  # German
         "version": 1,
@@ -458,12 +517,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x30: {  # Italian
-        "version": lambda binary_loader: current_event_time_slot() + 1,
+        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
         "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
     },
     0x31: {  # Italian
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post#make_binary_trading_post()
     },
     0x32: {  # Italian
         "version": 1,
@@ -518,12 +577,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x3f: {  # Spanish
-        "version": lambda binary_loader: current_event_time_slot() + 1,
+        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
         "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
     },
     0x40: {  # Spanish
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post#make_binary_trading_post()
     },
     0x41: {  # Spanish
         "version": 1,
@@ -571,15 +630,13 @@ PAT_BINARIES = {
     },
 }
 
-
 def get_pat_binary_from_version(binary_type, version):
-    static_binaries = (0x01, 0x02, 0x04, 0x05, 0x10, 0x11,
-        0x13, 0x14, 0x1f, 0x20, 0x22, 0x23, 0x2e, 0x2f,
-        0x31, 0x32, 0x3d, 0x3e, 0x40, 0x41)
+    static_binaries = (0x01, 0x02, 0x05, 0x10, 0x11,
+        0x14, 0x1f, 0x20, 0x23, 0x2e, 0x2f,
+        0x32, 0x3d, 0x3e, 0x41)
     if binary_type in static_binaries:
         return PAT_BINARIES[binary_type]["content"]
     return PAT_BINARIES[binary_type]["content"](version)
-
 
 PAT_CATEGORIES = {
     0x60: "Opn",

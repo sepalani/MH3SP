@@ -1,0 +1,423 @@
+{
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 3, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ]
+    ], 
+    "arena_equipment": [
+        [
+            [
+                15, 
+                7
+            ], 
+            null, 
+            null, 
+            132, 
+            39, 
+            122, 
+            40, 
+            39, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    46, 
+                    10
+                ], 
+                [
+                    394, 
+                    2
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    5, 
+                    2
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                14, 
+                19
+            ], 
+            null, 
+            null, 
+            40, 
+            43, 
+            40, 
+            3, 
+            3, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    46, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    10, 
+                    5
+                ], 
+                [
+                    4, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                10, 
+                73
+            ], 
+            null, 
+            null, 
+            136, 
+            23, 
+            38, 
+            42, 
+            41, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    46, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    134, 
+                    3
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    5, 
+                    1
+                ], 
+                [
+                    2, 
+                    2
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                11
+            ], 
+            [
+                12, 
+                13
+            ], 
+            [
+                13, 
+                12
+            ], 
+            133, 
+            19, 
+            16, 
+            37, 
+            20, 
+            [
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    46, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    582, 
+                    2
+                ]
+            ], 
+            [
+                [
+                    54, 
+                    99
+                ], 
+                [
+                    55, 
+                    99
+                ], 
+                [
+                    62, 
+                    9
+                ], 
+                [
+                    73, 
+                    12
+                ], 
+                [
+                    75, 
+                    12
+                ], 
+                [
+                    77, 
+                    12
+                ], 
+                [
+                    68, 
+                    60
+                ]
+            ]
+        ]
+    ], 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 2, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 23, 
+        "wave_2_transition_type": 0, 
+        "location": 12, 
+        "penalty_per_cart": 350, 
+        "resources": 2, 
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
+        "description": "Slay a Lagiacrus", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 0, 
+        "quest_fee": 0, 
+        "quest_id": 60003, 
+        "name": "Grudge Match: Lagiacrus", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 0, 
+        "summon": 0, 
+        "client": "Announcer/Receptionist", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                1, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [
+                [
+                    611, 
+                    1, 
+                    21
+                ], 
+                [
+                    611, 
+                    2, 
+                    7
+                ], 
+                [
+                    431, 
+                    1, 
+                    13
+                ], 
+                [
+                    328, 
+                    1, 
+                    8
+                ], 
+                [
+                    327, 
+                    1, 
+                    13
+                ], 
+                [
+                    569, 
+                    1, 
+                    20
+                ], 
+                [
+                    615, 
+                    1, 
+                    18
+                ]
+            ], 
+            "rewards_row_2": [], 
+            "objective_type": 15, 
+            "zenny_reward": 1000, 
+            "type": 257
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 23, 
+            "boss_id": 0, 
+            "type": 15, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}
