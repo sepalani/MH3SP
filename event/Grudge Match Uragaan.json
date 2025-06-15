@@ -25,7 +25,63 @@
                 "pos_y": -5038.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 1828, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -1404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -3404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -5404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -4404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
                 "rot_x": 0, 
                 "type": 40, 
                 "quantity": -1
@@ -36,66 +92,10 @@
                 "unk2": 255, 
                 "pos_z": -3542.7, 
                 "pos_x": -2404.5, 
-                "pos_y": -5038.5, 
+                "pos_y": -4038.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 1828, 
-                "rot_x": 0, 
-                "type": 40, 
-                "quantity": -1
-            }, 
-            {
-                "variant": 8, 
-                "unk1": 3, 
-                "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
-                "pos_y": -5038.5, 
-                "room": 1, 
-                "rot_z": 0, 
-                "rot_y": 1828, 
-                "rot_x": 0, 
-                "type": 40, 
-                "quantity": -1
-            }, 
-            {
-                "variant": 8, 
-                "unk1": 3, 
-                "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
-                "pos_y": -5038.5, 
-                "room": 1, 
-                "rot_z": 0, 
-                "rot_y": 1828, 
-                "rot_x": 0, 
-                "type": 40, 
-                "quantity": -1
-            }, 
-            {
-                "variant": 8, 
-                "unk1": 3, 
-                "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
-                "pos_y": -5038.5, 
-                "room": 1, 
-                "rot_z": 0, 
-                "rot_y": 1828, 
-                "rot_x": 0, 
-                "type": 40, 
-                "quantity": -1
-            }, 
-            {
-                "variant": 8, 
-                "unk1": 3, 
-                "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
-                "pos_y": -5038.5, 
-                "room": 1, 
-                "rot_z": 0, 
-                "rot_y": 1828, 
+                "rot_y": 170, 
                 "rot_x": 0, 
                 "type": 40, 
                 "quantity": -1
@@ -106,78 +106,46 @@
         [
             [
                 8, 
-                39
+                6
             ], 
             null, 
             null, 
-            102, 
-            108, 
-            101, 
-            107, 
-            105, 
+            30, 
+            12, 
+            32, 
+            13, 
+            13, 
             [
                 [
                     98, 
                     20
                 ], 
                 [
-                    13, 
-                    10
-                ], 
-                [
                     14, 
                     10
                 ], 
                 [
-                    374, 
-                    5
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    391, 
+                    2
                 ], 
                 [
                     360, 
-                    3
-                ], 
-                [
-                    11, 
-                    5
-                ], 
-                [
-                    10, 
-                    5
-                ], 
-                [
-                    9, 
-                    5
-                ], 
-                [
-                    31, 
-                    5
-                ], 
-                [
-                    32, 
-                    5
-                ], 
-                [
-                    30, 
-                    5
-                ], 
-                [
-                    3, 
-                    1
+                    2
                 ], 
                 [
                     4, 
                     1
                 ], 
                 [
-                    49, 
-                    1
-                ], 
-                [
                     50, 
-                    5
-                ], 
-                [
-                    52, 
                     2
                 ], 
                 [
@@ -186,135 +154,7 @@
                 ], 
                 [
                     1, 
-                    10
-                ], 
-                [
-                    51, 
                     2
-                ], 
-                [
-                    377, 
-                    1
-                ], 
-                [
-                    596, 
-                    1
-                ], 
-                [
-                    598, 
-                    1
-                ], 
-                [
-                    597, 
-                    1
-                ], 
-                [
-                    599, 
-                    1
-                ]
-            ], 
-            []
-        ], 
-        [
-            [
-                15, 
-                45
-            ], 
-            null, 
-            null, 
-            96, 
-            102, 
-            95, 
-            103, 
-            101, 
-            [
-                [
-                    98, 
-                    20
-                ], 
-                [
-                    13, 
-                    10
-                ], 
-                [
-                    14, 
-                    10
-                ], 
-                [
-                    374, 
-                    5
-                ], 
-                [
-                    360, 
-                    3
-                ], 
-                [
-                    347, 
-                    5
-                ], 
-                [
-                    11, 
-                    5
-                ], 
-                [
-                    10, 
-                    5
-                ], 
-                [
-                    9, 
-                    5
-                ], 
-                [
-                    31, 
-                    5
-                ], 
-                [
-                    32, 
-                    5
-                ], 
-                [
-                    30, 
-                    5
-                ], 
-                [
-                    3, 
-                    1
-                ], 
-                [
-                    4, 
-                    1
-                ], 
-                [
-                    50, 
-                    5
-                ], 
-                [
-                    52, 
-                    1
-                ], 
-                [
-                    51, 
-                    2
-                ], 
-                [
-                    377, 
-                    1
-                ], 
-                [
-                    596, 
-                    1
-                ], 
-                [
-                    598, 
-                    1
-                ], 
-                [
-                    597, 
-                    1
-                ], 
-                [
-                    599, 
-                    1
                 ]
             ], 
             []
@@ -322,62 +162,38 @@
         [
             [
                 14, 
-                38
+                10
             ], 
             null, 
             null, 
-            139, 
-            112, 
-            91, 
-            99, 
-            111, 
+            129, 
+            49, 
+            120, 
+            42, 
+            47, 
             [
                 [
                     98, 
                     20
                 ], 
                 [
-                    13, 
-                    10
-                ], 
-                [
                     14, 
                     10
                 ], 
                 [
-                    374, 
-                    5
+                    13, 
+                    10
                 ], 
                 [
-                    375, 
-                    5
+                    45, 
+                    10
                 ], 
                 [
                     360, 
-                    5
+                    2
                 ], 
                 [
                     11, 
-                    5
-                ], 
-                [
-                    10, 
-                    5
-                ], 
-                [
-                    9, 
-                    5
-                ], 
-                [
-                    31, 
-                    5
-                ], 
-                [
-                    32, 
-                    5
-                ], 
-                [
-                    30, 
                     5
                 ], 
                 [
@@ -385,47 +201,63 @@
                     1
                 ], 
                 [
-                    4, 
+                    50, 
                     1
                 ], 
                 [
-                    49, 
+                    582, 
+                    2
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                9, 
+                48
+            ], 
+            null, 
+            null, 
+            42, 
+            45, 
+            124, 
+            5, 
+            45, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    15, 
                     1
                 ], 
                 [
                     50, 
-                    5
+                    1
                 ], 
                 [
-                    52, 
-                    2
-                ], 
-                [
-                    2, 
-                    3
+                    582, 
+                    1
                 ], 
                 [
                     1, 
-                    10
-                ], 
-                [
-                    51, 
-                    2
-                ], 
-                [
-                    377, 
-                    1
-                ], 
-                [
-                    596, 
-                    1
-                ], 
-                [
-                    598, 
-                    1
-                ], 
-                [
-                    599, 
                     1
                 ]
             ], 
@@ -434,113 +266,41 @@
         [
             [
                 11, 
-                12
+                5
             ], 
             [
                 12, 
-                12
+                5
             ], 
             [
                 13, 
-                10
+                6
             ], 
             130, 
-            115, 
-            108, 
-            114, 
-            112, 
+            34, 
+            31, 
+            35, 
+            34, 
             [
-                [
-                    13, 
-                    10
-                ], 
                 [
                     14, 
                     10
                 ], 
                 [
-                    374, 
-                    5
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
                 ], 
                 [
                     360, 
-                    3
-                ], 
-                [
-                    11, 
-                    5
-                ], 
-                [
-                    10, 
-                    5
-                ], 
-                [
-                    9, 
-                    5
-                ], 
-                [
-                    31, 
-                    5
-                ], 
-                [
-                    32, 
-                    5
-                ], 
-                [
-                    3, 
-                    1
-                ], 
-                [
-                    4, 
-                    1
-                ], 
-                [
-                    49, 
-                    1
-                ], 
-                [
-                    50, 
-                    5
-                ], 
-                [
-                    582, 
-                    2
-                ], 
-                [
-                    52, 
                     2
                 ], 
                 [
                     2, 
-                    3
-                ], 
-                [
-                    1, 
-                    10
-                ], 
-                [
-                    51, 
                     2
-                ], 
-                [
-                    377, 
-                    1
-                ], 
-                [
-                    596, 
-                    1
-                ], 
-                [
-                    598, 
-                    1
-                ], 
-                [
-                    597, 
-                    1
-                ], 
-                [
-                    599, 
-                    1
                 ]
             ], 
             [
@@ -549,36 +309,20 @@
                     99
                 ], 
                 [
-                    58, 
-                    40
+                    56, 
+                    60
+                ], 
+                [
+                    57, 
+                    50
                 ], 
                 [
                     63, 
                     9
                 ], 
                 [
-                    64, 
-                    9
-                ], 
-                [
-                    92, 
-                    10
-                ], 
-                [
                     69, 
-                    60
-                ], 
-                [
-                    80, 
-                    8
-                ], 
-                [
-                    72, 
-                    20
-                ], 
-                [
-                    84, 
-                    5
+                    30
                 ]
             ]
         ]
@@ -595,21 +339,21 @@
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
         "starting_position": 0, 
-        "quest_rank": 6, 
+        "quest_rank": 2, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 55, 
+        "general_enemy_level": 23, 
         "wave_2_transition_type": 0, 
         "location": 8, 
-        "penalty_per_cart": 1150, 
+        "penalty_per_cart": 600, 
         "resources": 2, 
-        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
-        "description": "Slay all 3 monsters", 
+        "details": "Riled up, fight fans? Here comes\na dragon whose name is\nsynonymous with pain: Uragaan!\nOh, and we've added a time limit\nto make the fight extra fun. Are\nthe hunters up to the challenge?\nOutlook not good!", 
+        "description": "Slay an Uragaan", 
         "wave_1_transition_target": 0, 
-        "hrp_restriction": 9, 
+        "hrp_restriction": 0, 
         "quest_fee": 0, 
-        "quest_id": 60011, 
-        "name": "Grudge Match: Land Lords", 
+        "quest_id": 60004, 
+        "name": "Grudge Match: Uragaan", 
         "main_monster_2": 0, 
         "main_monster_1": 0, 
         "supply_set_number": 0, 
@@ -619,7 +363,7 @@
             [
                 0, 
                 0, 
-                1, 
+                0, 
                 0, 
                 0, 
                 1, 
@@ -661,32 +405,27 @@
     }, 
     "objective_details": {
         "subquest_2": {
-            "objective_num": 1, 
+            "objective_num": 0, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 7, 
+            "objective_type": 0, 
             "zenny_reward": 0, 
-            "type": 131329
+            "type": 0
         }, 
         "main_quest": {
             "objective_num": 1, 
             "hrp_reward": 0, 
             "rewards_row_1": [
                 [
-                    589, 
+                    612, 
                     1, 
-                    10
-                ], 
-                [
-                    608, 
-                    1, 
-                    10
+                    19
                 ], 
                 [
                     612, 
-                    1, 
-                    15
+                    2, 
+                    7
                 ], 
                 [
                     431, 
@@ -694,68 +433,68 @@
                     14
                 ], 
                 [
-                    444, 
+                    328, 
                     1, 
-                    10
+                    8
                 ], 
                 [
-                    445, 
+                    327, 
                     1, 
-                    7
+                    12
                 ], 
                 [
-                    570, 
+                    569, 
                     1, 
-                    10
+                    20
                 ], 
                 [
-                    587, 
+                    615, 
                     1, 
-                    24
+                    20
                 ]
             ], 
             "rewards_row_2": [], 
-            "objective_type": 8, 
-            "zenny_reward": 3000, 
-            "type": 131329
+            "objective_type": 9, 
+            "zenny_reward": 1500, 
+            "type": 257
         }, 
         "subquest_1": {
-            "objective_num": 1, 
+            "objective_num": 0, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 9, 
+            "objective_type": 0, 
             "zenny_reward": 0, 
-            "type": 131329
+            "type": 0
         }
     }, 
     "large_monsters": {
         "monster_2": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 55, 
-            "boss_id": 1, 
-            "type": 9, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 1, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_3": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 56, 
-            "boss_id": 2, 
-            "type": 7, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 1, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_1": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 55, 
+            "level": 23, 
             "boss_id": 0, 
-            "type": 8, 
+            "type": 9, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter database module."""
 
@@ -883,6 +883,9 @@ class TempSQLiteDatabase(TempDatabase):
                 (capcom_id, friend_id)
             )
         return self.parent.delete_friend(capcom_id, friend_id)
+
+
+# TODO: Backport MySQLDatabase
 
 
 class DebugDatabase(TempSQLiteDatabase):

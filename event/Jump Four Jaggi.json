@@ -89,7 +89,7 @@
         }, 
         "subquest_1": {
             "objective_num": 2, 
-            "hrp_reward": 220, 
+            "hrp_reward": 440, 
             "rewards_row_1": [
                 [
                     307, 

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter PAT item module."""
 
@@ -704,6 +704,20 @@ class LayerData(PatData):
         return data
 
 
+class MemoryData(PatData):
+    FIELDS = (
+        (0x01, "unk_byte_0x01"),
+        (0x02, "unk_byte_0x02"),
+    )
+
+    @staticmethod
+    def pack_from(unk1, unk2):
+        data = MemoryData()
+        data.unk_byte_0x01 = Byte(int(bool(unk1)))
+        data.unk_byte_0x01 = Byte(int(bool(unk2)))
+        return data.pack()
+
+
 class FriendData(PatData):
     FIELDS = (
         (0x01, "index"),
@@ -868,6 +882,7 @@ class LayerBinaryInfo(PatData):
         (0x03, "hunter_name")
     )
 
+
 class LayerUserNum(PatData):
     FIELDS = (
         (0x01, "path"),
@@ -893,7 +908,6 @@ class LayerUserNum(PatData):
             data.child_population = layer_data.child_population
 
         return data.pack()
-
 
 
 def patdata_extender(unpacker):
@@ -969,6 +983,7 @@ def get_fmp_servers(session, first_index, count):
     start = first_index - 1
     end = start + count
     servers = session.get_servers()[start:end]
+    # TODO: Backport the central logic
     for i, server in enumerate(servers, first_index):
         fmp_data = FmpData()
         fmp_data.index = Long(i)  # The server might be full, if zero
@@ -987,6 +1002,9 @@ def get_fmp_servers(session, first_index, count):
         fmp_data.unk_long_0x0c = Long(0x12345678)
         data += fmp_data.pack()
     return data
+
+
+# TODO: Backport get_fmp_central_servers
 
 
 def get_layer_children(session, first_index, count, sibling=False):

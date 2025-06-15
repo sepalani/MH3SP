@@ -1,17 +1,24 @@
 {
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
     "objective_details": {
         "subquest_2": {
-            "objective_num": 1, 
+            "objective_num": 0, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 18, 
+            "objective_type": 0, 
             "zenny_reward": 0, 
-            "type": 1
+            "type": 0
         }, 
         "main_quest": {
-            "objective_num": 1, 
-            "hrp_reward": 2600, 
+            "objective_num": 2, 
+            "hrp_reward": 1920, 
             "rewards_row_1": [
                 [
                     445, 
@@ -19,34 +26,29 @@
                     1
                 ], 
                 [
-                    446, 
+                    457, 
                     1, 
-                    5
+                    11
                 ], 
                 [
-                    490, 
-                    1, 
-                    14
-                ], 
-                [
-                    495, 
+                    456, 
                     1, 
                     20
                 ], 
                 [
-                    498, 
+                    295, 
                     1, 
-                    7
+                    18
                 ], 
                 [
-                    499, 
-                    1, 
-                    10
-                ], 
-                [
-                    500, 
+                    595, 
                     1, 
                     8
+                ], 
+                [
+                    455, 
+                    1, 
+                    7
                 ], 
                 [
                     441, 
@@ -54,7 +56,7 @@
                     10
                 ], 
                 [
-                    186, 
+                    594, 
                     1, 
                     25
                 ]
@@ -66,34 +68,29 @@
                     1
                 ], 
                 [
-                    446, 
+                    457, 
                     1, 
-                    5
+                    11
                 ], 
                 [
-                    490, 
-                    1, 
-                    14
-                ], 
-                [
-                    495, 
+                    456, 
                     1, 
                     20
                 ], 
                 [
-                    498, 
+                    295, 
                     1, 
-                    7
+                    18
                 ], 
                 [
-                    499, 
-                    1, 
-                    10
-                ], 
-                [
-                    500, 
+                    595, 
                     1, 
                     8
+                ], 
+                [
+                    455, 
+                    1, 
+                    7
                 ], 
                 [
                     441, 
@@ -101,75 +98,58 @@
                     10
                 ], 
                 [
-                    186, 
+                    594, 
                     1, 
                     25
                 ]
             ], 
-            "objective_type": 16, 
-            "zenny_reward": 25800, 
-            "type": 1
+            "objective_type": 6, 
+            "zenny_reward": 38400, 
+            "type": 129
         }, 
         "subquest_1": {
-            "objective_num": 1, 
+            "objective_num": 0, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 15, 
+            "objective_type": 0, 
             "zenny_reward": 0, 
-            "type": 1
+            "type": 0
         }
     }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
     "quest_info": {
         "wave_1_transition_type": 0, 
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
-        "starting_position": 1, 
+        "starting_position": 0, 
         "quest_rank": 5, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 64, 
+        "general_enemy_level": 59, 
         "wave_2_transition_type": 0, 
-        "location": 3, 
-        "penalty_per_cart": 9000, 
+        "location": 8, 
+        "penalty_per_cart": 12800, 
         "resources": 1, 
-        "details": "Taihen! Means very bad, yes?\nFlooded Forest overrun by pack\nof leviathans -- Argosy cannot\nget anywhere near area! Big\nproblem for trade, yes? Only\nhunters can return fair seas\nto Flooded Forest. Onegai!", 
-        "description": "Hunt a Royal L., Lag. & Gobul", 
-        "smallmonster_data_file": "sm_ff_free_for_all.dat", 
+        "details": "One Diablos would dismember\nyour average weekend warrior,\nbut two Diablos!? Only true\nhunters need apply for this\nQuest. Plan your tactics well,\nand perhaps we can compare\nnotes later... if you survive.", 
+        "description": "Capture 2 Diablos", 
         "wave_1_transition_target": 0, 
         "hrp_restriction": 10, 
-        "quest_fee": 2550, 
-        "quest_id": 61017, 
-        "name": "Flooded Forest Free-For-All", 
-        "main_monster_2": 34, 
-        "main_monster_1": 17, 
+        "quest_fee": 2600, 
+        "quest_id": 61014, 
+        "name": "Double Diablos", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
         "supply_set_number": 43, 
         "summon": 0, 
-        "client": "Argosy Captain", 
+        "client": "Passionate Hunter", 
         "flags": [
             [
                 0, 
                 0, 
-                1, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0
-            ], 
-            [
-                1, 
-                1, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0
-            ], 
-            [
-                0, 
-                0, 
                 0, 
                 0, 
                 0, 
@@ -179,51 +159,64 @@
             ], 
             [
                 1, 
-                0, 
                 1, 
                 0, 
                 0, 
                 0, 
                 0, 
+                0, 
                 0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
             ]
         ], 
         "success_message": "Complete the Main Quest."
     }, 
-    "unknown": {
-        "unk_12": 2, 
-        "unk_4": 0, 
-        "unk_5": 0, 
-        "unk_6": 0, 
-        "unk_7": 0
-    }, 
     "large_monsters": {
         "monster_2": {
-            "size_spread": 3, 
+            "size_spread": 11, 
             "hp_spread": 0, 
-            "level": 54, 
-            "boss_id": 1, 
-            "type": 15, 
-            "starting_area": 0, 
+            "level": 59, 
+            "boss_id": 2, 
+            "type": 6, 
+            "starting_area": 1, 
             "spawn_count": 1, 
             "size": 100
         }, 
         "monster_3": {
-            "size_spread": 3, 
+            "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 54, 
-            "boss_id": 2, 
-            "type": 18, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 1, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_1": {
-            "size_spread": 3, 
+            "size_spread": 10, 
             "hp_spread": 0, 
-            "level": 54, 
-            "boss_id": 0, 
-            "type": 16, 
+            "level": 59, 
+            "boss_id": 1, 
+            "type": 6, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100

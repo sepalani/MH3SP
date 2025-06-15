@@ -40,6 +40,7 @@ def main(args):
         )
         for server in servers
     ]
+    # TODO: Backport cache's logic (i.e. new thread, maintain_connection)
     for thread in threads:
         thread.start()
 
@@ -92,6 +93,8 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true",
                         dest="dry_run",
                         help="dry run to test the server")
+    # TODO: Backport central/cache parameters (server_id, no_timeout)
+    #  - no_timeout is currently available as a server argument as follows:
     parser.add_argument("args", nargs='*',
                         help="arguments forwarded to all servers")
     args = parser.parse_args()

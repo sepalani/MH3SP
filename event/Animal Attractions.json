@@ -17,120 +17,94 @@
             "type": 0
         }, 
         "main_quest": {
-            "objective_num": 48, 
-            "hrp_reward": 750, 
+            "objective_num": 2, 
+            "hrp_reward": 1250, 
             "rewards_row_1": [
                 [
-                    307, 
-                    2, 
-                    3
-                ], 
-                [
-                    308, 
-                    2, 
-                    12
-                ], 
-                [
-                    420, 
+                    300, 
                     1, 
-                    10
+                    2
                 ], 
                 [
-                    110, 
+                    299, 
                     1, 
-                    20
+                    24
                 ], 
                 [
-                    565, 
+                    301, 
                     1, 
-                    12
-                ], 
-                [
-                    431, 
-                    2, 
                     18
                 ], 
                 [
-                    41, 
+                    155, 
                     1, 
-                    25
+                    8
+                ], 
+                [
+                    154, 
+                    1, 
+                    8
+                ], 
+                [
+                    303, 
+                    1, 
+                    12
+                ], 
+                [
+                    590, 
+                    1, 
+                    28
                 ]
             ], 
             "rewards_row_2": [
                 [
-                    440, 
+                    300, 
                     1, 
-                    1
+                    2
                 ], 
                 [
-                    447, 
+                    299, 
                     1, 
-                    1
+                    24
                 ], 
                 [
-                    441, 
+                    301, 
                     1, 
-                    1
+                    18
                 ], 
                 [
-                    327, 
+                    155, 
                     1, 
-                    1
+                    8
                 ], 
                 [
-                    328, 
+                    154, 
                     1, 
-                    1
+                    8
+                ], 
+                [
+                    303, 
+                    1, 
+                    12
+                ], 
+                [
+                    590, 
+                    1, 
+                    28
                 ]
             ], 
-            "objective_type": 12, 
-            "zenny_reward": 15000, 
-            "type": 1
+            "objective_type": 8, 
+            "zenny_reward": 14400, 
+            "type": 129
         }, 
         "subquest_1": {
-            "objective_num": 24, 
-            "hrp_reward": 255, 
-            "rewards_row_1": [
-                [
-                    307, 
-                    1, 
-                    1
-                ], 
-                [
-                    308, 
-                    1, 
-                    1
-                ], 
-                [
-                    306, 
-                    1, 
-                    1
-                ], 
-                [
-                    309, 
-                    1, 
-                    1
-                ], 
-                [
-                    420, 
-                    1, 
-                    1
-                ], 
-                [
-                    342, 
-                    8, 
-                    1
-                ], 
-                [
-                    41, 
-                    1, 
-                    1
-                ]
-            ], 
-            "description": "Hunt 24 Great Jaggi", 
-            "objective_type": 12, 
-            "zenny_reward": 8000, 
-            "type": 1
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
         }
     }, 
     "small_monsters": [
@@ -862,26 +836,26 @@
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
         "starting_position": 0, 
-        "quest_rank": 1, 
+        "quest_rank": 2, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 23, 
+        "general_enemy_level": 25, 
         "wave_2_transition_type": 0, 
         "location": 2, 
-        "penalty_per_cart": 1400, 
+        "penalty_per_cart": 5200, 
         "resources": 0, 
-        "details": "I'm gonna get so fired for\nthis... The Great Jaggi some\nhunter brought in just\nescaped. Mind going after\nthem? You better hurry,\nthough. Bet they've got some\nincredible materials, too.", 
-        "description": "Hunt 48 Great Jaggi", 
+        "details": "You'll need more than big\nmuscles and bigger weapons to\ncapture two of the fiercest\nmonsters around -- you'll need\nfinesse! If you live for the\nart and craft of the hunt,\nshow me what you got!", 
+        "description": "Capture 2 Barroth", 
         "wave_1_transition_target": 0, 
-        "hrp_restriction": 0, 
-        "quest_fee": 400, 
-        "quest_id": 61001, 
-        "name": "Jump Fourty-Eight Jaggi", 
-        "main_monster_2": 31, 
+        "hrp_restriction": 7, 
+        "quest_fee": 1000, 
+        "quest_id": 61003, 
+        "name": "Animal Attractions", 
+        "main_monster_2": 33, 
         "main_monster_1": 36, 
-        "supply_set_number": 19, 
-        "summon": 1678049817, 
-        "client": "Guild Subcontractor", 
+        "supply_set_number": 14, 
+        "summon": 0, 
+        "client": "Passionate Hunter", 
         "flags": [
             [
                 0, 
@@ -914,7 +888,7 @@
                 0
             ], 
             [
-                1, 
+                0, 
                 0, 
                 1, 
                 0, 
@@ -930,31 +904,31 @@
         "monster_2": {
             "size_spread": 1, 
             "hp_spread": 1, 
-            "level": 23, 
-            "boss_id": 255, 
-            "type": 12, 
-            "starting_area": 0, 
-            "spawn_count": 16, 
+            "level": 25, 
+            "boss_id": 1, 
+            "type": 8, 
+            "starting_area": 1, 
+            "spawn_count": 1, 
             "size": 100
         }, 
         "monster_3": {
-            "size_spread": 1, 
-            "hp_spread": 1, 
-            "level": 23, 
-            "boss_id": 255, 
-            "type": 12, 
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 16, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_1": {
             "size_spread": 1, 
             "hp_spread": 1, 
-            "level": 23, 
-            "boss_id": 255, 
-            "type": 12, 
+            "level": 25, 
+            "boss_id": 1, 
+            "type": 8, 
             "starting_area": 0, 
-            "spawn_count": 16, 
+            "spawn_count": 1, 
             "size": 100
         }
     }

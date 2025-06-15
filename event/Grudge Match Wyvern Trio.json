@@ -21,36 +21,36 @@
     "arena_equipment": [
         [
             [
-                8, 
-                9
+                15, 
+                19
             ], 
             null, 
             null, 
-            72, 
-            77, 
-            70, 
-            78, 
-            77, 
+            134, 
+            41, 
+            38, 
+            42, 
+            41, 
             [
                 [
-                    13, 
-                    10
+                    98, 
+                    20
                 ], 
                 [
                     14, 
                     10
                 ], 
                 [
-                    98, 
-                    20
+                    13, 
+                    10
                 ], 
                 [
                     45, 
                     10
                 ], 
                 [
-                    20, 
-                    2
+                    375, 
+                    5
                 ], 
                 [
                     17, 
@@ -58,7 +58,75 @@
                 ], 
                 [
                     360, 
+                    3
+                ], 
+                [
+                    347, 
                     1
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    50, 
+                    2
+                ], 
+                [
+                    582, 
+                    2
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                7, 
+                48
+            ], 
+            null, 
+            null, 
+            44, 
+            47, 
+            44, 
+            46, 
+            45, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    375, 
+                    5
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    3
                 ], 
                 [
                     347, 
@@ -69,67 +137,19 @@
                     5
                 ], 
                 [
-                    3, 
+                    4, 
                     1
                 ], 
                 [
                     50, 
-                    5
-                ], 
-                [
-                    52, 
-                    1
-                ], 
-                [
-                    1, 
-                    1
-                ]
-            ], 
-            []
-        ], 
-        [
-            [
-                14, 
-                1
-            ], 
-            null, 
-            null, 
-            132, 
-            69, 
-            74, 
-            82, 
-            109, 
-            [
-                [
-                    13, 
-                    10
-                ], 
-                [
-                    14, 
-                    10
-                ], 
-                [
-                    98, 
-                    20
-                ], 
-                [
-                    45, 
-                    10
-                ], 
-                [
-                    17, 
                     2
                 ], 
                 [
-                    360, 
-                    1
+                    582, 
+                    2
                 ], 
                 [
-                    347, 
-                    1
-                ], 
-                [
-                    50, 
+                    1, 
                     2
                 ]
             ], 
@@ -138,84 +158,26 @@
         [
             [
                 10, 
-                55
+                38
             ], 
             null, 
             null, 
-            136, 
-            96, 
-            103, 
-            76, 
-            95, 
+            46, 
+            49, 
+            38, 
+            48, 
+            47, 
             [
-                [
-                    13, 
-                    10
-                ], 
-                [
-                    14, 
-                    10
-                ], 
                 [
                     98, 
                     20
                 ], 
                 [
-                    26, 
+                    14, 
                     10
                 ], 
-                [
-                    17, 
-                    2
-                ], 
-                [
-                    360, 
-                    1
-                ], 
-                [
-                    347, 
-                    1
-                ], 
-                [
-                    9, 
-                    5
-                ], 
-                [
-                    4, 
-                    1
-                ], 
-                [
-                    50, 
-                    1
-                ]
-            ], 
-            []
-        ], 
-        [
-            [
-                11, 
-                6
-            ], 
-            [
-                12, 
-                8
-            ], 
-            [
-                13, 
-                10
-            ], 
-            140, 
-            109, 
-            123, 
-            108, 
-            106, 
-            [
                 [
                     13, 
-                    10
-                ], 
-                [
-                    14, 
                     10
                 ], 
                 [
@@ -223,12 +185,16 @@
                     10
                 ], 
                 [
+                    375, 
+                    5
+                ], 
+                [
                     17, 
                     2
                 ], 
                 [
                     360, 
-                    2
+                    3
                 ], 
                 [
                     347, 
@@ -243,20 +209,78 @@
                     1
                 ], 
                 [
+                    50, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                13
+            ], 
+            [
+                12, 
+                7
+            ], 
+            [
+                13, 
+                8
+            ], 
+            138, 
+            44, 
+            41, 
+            45, 
+            44, 
+            [
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    375, 
+                    5
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    3
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
                     3, 
                     1
                 ], 
                 [
                     582, 
-                    1
+                    2
                 ], 
                 [
-                    2, 
-                    3
+                    50, 
+                    2
                 ], 
                 [
-                    1, 
-                    10
+                    68, 
+                    60
+                ], 
+                [
+                    70, 
+                    60
                 ]
             ], 
             [
@@ -265,20 +289,36 @@
                     99
                 ], 
                 [
-                    55, 
-                    99
+                    57, 
+                    50
                 ], 
                 [
-                    58, 
-                    40
+                    59, 
+                    60
+                ], 
+                [
+                    60, 
+                    60
+                ], 
+                [
+                    66, 
+                    5
+                ], 
+                [
+                    67, 
+                    5
+                ], 
+                [
+                    93, 
+                    10
+                ], 
+                [
+                    77, 
+                    12
                 ], 
                 [
                     84, 
                     5
-                ], 
-                [
-                    70, 
-                    60
                 ]
             ]
         ]
@@ -295,21 +335,21 @@
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
         "starting_position": 0, 
-        "quest_rank": 5, 
+        "quest_rank": 3, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 55, 
+        "general_enemy_level": 40, 
         "wave_2_transition_type": 0, 
         "location": 8, 
-        "penalty_per_cart": 350, 
+        "penalty_per_cart": 1200, 
         "resources": 2, 
         "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
-        "description": "Slay a Rathalos\nand a Rathian", 
+        "description": "Slay all 3 monsters", 
         "wave_1_transition_target": 0, 
-        "hrp_restriction": 9, 
+        "hrp_restriction": 0, 
         "quest_fee": 0, 
-        "quest_id": 60008, 
-        "name": "Grudge Match: The Two Flames", 
+        "quest_id": 60005, 
+        "name": "Grudge Match: Wyvern Trio", 
         "main_monster_2": 0, 
         "main_monster_1": 0, 
         "supply_set_number": 0, 
@@ -318,8 +358,8 @@
         "flags": [
             [
                 0, 
-                1, 
                 0, 
+                1, 
                 0, 
                 0, 
                 1, 
@@ -361,27 +401,32 @@
     }, 
     "objective_details": {
         "subquest_2": {
-            "objective_num": 0, 
+            "objective_num": 1, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 0, 
+            "objective_type": 2, 
             "zenny_reward": 0, 
-            "type": 0
+            "type": 131329
         }, 
         "main_quest": {
             "objective_num": 1, 
             "hrp_reward": 0, 
             "rewards_row_1": [
                 [
-                    584, 
+                    608, 
                     1, 
-                    10
+                    5
                 ], 
                 [
-                    610, 
+                    586, 
                     1, 
-                    24
+                    15
+                ], 
+                [
+                    584, 
+                    1, 
+                    22
                 ], 
                 [
                     431, 
@@ -391,51 +436,41 @@
                 [
                     328, 
                     1, 
-                    10
-                ], 
-                [
-                    444, 
-                    1, 
-                    5
-                ], 
-                [
-                    569, 
-                    1, 
-                    15
+                    12
                 ], 
                 [
                     570, 
                     1, 
-                    5
+                    8
                 ], 
                 [
-                    587, 
+                    615, 
                     1, 
-                    17
+                    24
                 ]
             ], 
             "rewards_row_2": [], 
-            "objective_type": 2, 
-            "zenny_reward": 1000, 
-            "type": 257
+            "objective_type": 8, 
+            "zenny_reward": 3000, 
+            "type": 131329
         }, 
         "subquest_1": {
             "objective_num": 1, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 1, 
+            "objective_type": 5, 
             "zenny_reward": 0, 
-            "type": 257
+            "type": 131329
         }
     }, 
     "large_monsters": {
         "monster_2": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 55, 
+            "level": 40, 
             "boss_id": 1, 
-            "type": 1, 
+            "type": 5, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100
@@ -443,19 +478,19 @@
         "monster_3": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 0, 
-            "boss_id": 0, 
-            "type": 0, 
+            "level": 40, 
+            "boss_id": 2, 
+            "type": 2, 
             "starting_area": 0, 
-            "spawn_count": 0, 
-            "size": 0
+            "spawn_count": 1, 
+            "size": 100
         }, 
         "monster_1": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 55, 
+            "level": 40, 
             "boss_id": 0, 
-            "type": 2, 
+            "type": 8, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100

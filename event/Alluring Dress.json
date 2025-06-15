@@ -1,6 +1,6 @@
 {
     "unknown": {
-        "unk_12": 2, 
+        "unk_12": 3, 
         "unk_4": 0, 
         "unk_5": 0, 
         "unk_6": 0, 
@@ -17,104 +17,104 @@
             "type": 0
         }, 
         "main_quest": {
-            "objective_num": 1, 
-            "hrp_reward": 1760, 
+            "objective_num": 30, 
+            "hrp_reward": 120, 
             "rewards_row_1": [
                 [
-                    479, 
+                    443, 
                     1, 
                     1
                 ], 
                 [
-                    457, 
+                    334, 
                     1, 
-                    14
+                    5
                 ], 
                 [
-                    410, 
+                    562, 
                     1, 
-                    10
+                    16
                 ], 
                 [
-                    296, 
+                    602, 
                     1, 
-                    20
+                    24
                 ], 
                 [
-                    386, 
+                    29, 
+                    2, 
+                    12
+                ], 
+                [
+                    328, 
                     1, 
                     12
                 ], 
                 [
-                    455, 
-                    8, 
-                    9
-                ], 
-                [
-                    412, 
+                    444, 
                     1, 
-                    9
+                    5
                 ], 
                 [
-                    592, 
+                    109, 
                     1, 
                     25
                 ]
             ], 
             "rewards_row_2": [
                 [
-                    479, 
+                    443, 
                     1, 
                     1
                 ], 
                 [
-                    457, 
+                    334, 
                     1, 
-                    14
+                    5
                 ], 
                 [
-                    410, 
+                    562, 
                     1, 
-                    10
+                    16
                 ], 
                 [
-                    296, 
+                    602, 
                     1, 
-                    20
+                    24
                 ], 
                 [
-                    386, 
+                    29, 
+                    2, 
+                    12
+                ], 
+                [
+                    328, 
                     1, 
                     12
                 ], 
                 [
-                    455, 
+                    444, 
                     1, 
-                    9
+                    5
                 ], 
                 [
-                    412, 
-                    1, 
-                    9
-                ], 
-                [
-                    592, 
+                    109, 
                     1, 
                     25
                 ]
             ], 
-            "objective_type": 9, 
-            "zenny_reward": 17600, 
+            "objective_type": 32, 
+            "zenny_reward": 4000, 
             "type": 1
         }, 
         "subquest_1": {
-            "objective_num": 1, 
+            "objective_num": 0, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 6, 
+            "objective_type": 0, 
             "zenny_reward": 0, 
-            "type": 1
+            "type": 0
         }
     }, 
     "small_monsters": [
@@ -124,8 +124,8 @@
                 "variant": 3, 
                 "unk1": 1, 
                 "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
                 "pos_y": -5038.5, 
                 "room": 1, 
                 "rot_z": 0, 
@@ -135,87 +135,73 @@
                 "quantity": -1
             }, 
             {
-                "variant": 8, 
-                "unk1": 3, 
+                "variant": 0, 
+                "unk1": 1, 
                 "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
-                "pos_y": -5038.5, 
+                "pos_z": -1042.7, 
+                "pos_x": -1200.5, 
+                "pos_y": -2538.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 170, 
+                "rot_y": -1, 
                 "rot_x": 0, 
-                "type": 40, 
+                "type": 32, 
                 "quantity": -1
             }, 
             {
-                "variant": 8, 
-                "unk1": 3, 
+                "variant": 0, 
+                "unk1": 1, 
                 "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -1404.5, 
-                "pos_y": -5038.5, 
+                "pos_z": -42.7, 
+                "pos_x": -1400.5, 
+                "pos_y": -1538.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 170, 
+                "rot_y": -161, 
                 "rot_x": 0, 
-                "type": 40, 
+                "type": 32, 
                 "quantity": -1
             }, 
             {
-                "variant": 8, 
-                "unk1": 3, 
+                "variant": 0, 
+                "unk1": 1, 
                 "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -3404.5, 
-                "pos_y": -5038.5, 
+                "pos_z": -2042.7, 
+                "pos_x": -400.5, 
+                "pos_y": -1038.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 170, 
+                "rot_y": -21, 
                 "rot_x": 0, 
-                "type": 40, 
+                "type": 32, 
                 "quantity": -1
             }, 
             {
-                "variant": 8, 
-                "unk1": 3, 
+                "variant": 0, 
+                "unk1": 1, 
                 "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -5404.5, 
-                "pos_y": -5038.5, 
+                "pos_z": -1042.7, 
+                "pos_x": -2200.5, 
+                "pos_y": -2538.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 170, 
+                "rot_y": -1, 
                 "rot_x": 0, 
-                "type": 40, 
+                "type": 32, 
                 "quantity": -1
             }, 
             {
-                "variant": 8, 
-                "unk1": 3, 
+                "variant": 0, 
+                "unk1": 1, 
                 "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -4404.5, 
-                "pos_y": -5038.5, 
+                "pos_z": -1042.7, 
+                "pos_x": 1400.5, 
+                "pos_y": -1038.5, 
                 "room": 1, 
                 "rot_z": 0, 
-                "rot_y": 170, 
+                "rot_y": -21, 
                 "rot_x": 0, 
-                "type": 40, 
-                "quantity": -1
-            }, 
-            {
-                "variant": 8, 
-                "unk1": 3, 
-                "unk2": 255, 
-                "pos_z": -3542.7, 
-                "pos_x": -2404.5, 
-                "pos_y": -4038.5, 
-                "room": 1, 
-                "rot_z": 0, 
-                "rot_y": 170, 
-                "rot_x": 0, 
-                "type": 40, 
+                "type": 32, 
                 "quantity": -1
             }
         ]
@@ -225,49 +211,29 @@
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
         "starting_position": 0, 
-        "quest_rank": 3, 
+        "quest_rank": 1, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
         "general_enemy_level": 29, 
         "wave_2_transition_type": 0, 
-        "location": 8, 
-        "penalty_per_cart": 6000, 
+        "location": 12, 
+        "penalty_per_cart": 1500, 
         "resources": 0, 
-        "details": "Oh, boo! I'm tired of watching\nrun-of-the-mill hunts. The\nDiablos and the Uragaan are\nsupposed to be the ultimate\nmonster duo. I'd love to watch\nthem maim some foolish hunter!\nDo put on a good show...", 
-        "description": "Hunt an Uragaan\nand a Diablos", 
+        "details": "My sister's interest in\nmonsters is beginning to\nbecome scandalous! She simply\nmust find a husband --\nhopefully at the next ball. We\nneed enough Sharqskin for her\ndress, so please slay 30 fish!", 
+        "description": "Hunt 30 Sharq", 
         "wave_1_transition_target": 0, 
-        "hrp_restriction": 8, 
-        "quest_fee": 1750, 
-        "quest_id": 61008, 
-        "name": "Blood Sport", 
-        "main_monster_2": 6, 
-        "main_monster_1": 9, 
-        "supply_set_number": 43, 
-        "summon": 0, 
-        "client": "Spoiled Princess", 
+        "hrp_restriction": 20, 
+        "quest_fee": 400, 
+        "quest_id": 61009, 
+        "name": "Alluring Dress", 
+        "main_monster_2": 0, 
+        "main_monster_1": 32, 
+        "supply_set_number": 48, 
+        "summon": 1677787404, 
+        "client": "Elder Princess", 
         "flags": [
             [
                 0, 
-                1, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0
-            ], 
-            [
-                1, 
-                1, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0, 
-                0
-            ], 
-            [
-                0, 
                 0, 
                 0, 
                 0, 
@@ -278,27 +244,47 @@
             ], 
             [
                 1, 
-                0, 
                 1, 
                 0, 
                 0, 
                 0, 
                 0, 
+                0, 
                 0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
             ]
         ], 
         "success_message": "Complete the Main Quest."
     }, 
     "large_monsters": {
         "monster_2": {
-            "size_spread": 3, 
-            "hp_spread": 1, 
-            "level": 29, 
-            "boss_id": 1, 
-            "type": 6, 
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 1, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_3": {
             "size_spread": 0, 
@@ -311,14 +297,14 @@
             "size": 0
         }, 
         "monster_1": {
-            "size_spread": 3, 
-            "hp_spread": 1, 
-            "level": 29, 
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
             "boss_id": 0, 
-            "type": 9, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 1, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }
     }
 }

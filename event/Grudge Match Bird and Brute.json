@@ -266,7 +266,7 @@
         "quest_rank": 4, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 23, 
+        "general_enemy_level": 55, 
         "wave_2_transition_type": 0, 
         "location": 8, 
         "penalty_per_cart": 350, 
@@ -401,7 +401,7 @@
         "monster_2": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 23, 
+            "level": 55, 
             "boss_id": 1, 
             "type": 8, 
             "starting_area": 0, 
@@ -421,7 +421,7 @@
         "monster_1": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 23, 
+            "level": 55, 
             "boss_id": 0, 
             "type": 3, 
             "starting_area": 0, 

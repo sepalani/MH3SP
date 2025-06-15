@@ -21,35 +21,31 @@
     "arena_equipment": [
         [
             [
-                8, 
-                9
+                15, 
+                46
             ], 
             null, 
             null, 
-            72, 
-            77, 
-            70, 
-            78, 
-            77, 
+            132, 
+            6, 
+            40, 
+            44, 
+            43, 
             [
                 [
-                    13, 
-                    10
+                    98, 
+                    20
                 ], 
                 [
                     14, 
                     10
                 ], 
                 [
-                    98, 
-                    20
-                ], 
-                [
                     45, 
                     10
                 ], 
                 [
-                    20, 
+                    360, 
                     2
                 ], 
                 [
@@ -57,32 +53,20 @@
                     2
                 ], 
                 [
-                    360, 
-                    1
-                ], 
-                [
                     347, 
                     1
                 ], 
                 [
-                    11, 
-                    5
-                ], 
-                [
-                    3, 
-                    1
-                ], 
-                [
                     50, 
-                    5
+                    2
                 ], 
                 [
-                    52, 
+                    582, 
                     1
                 ], 
                 [
                     1, 
-                    1
+                    2
                 ]
             ], 
             []
@@ -94,42 +78,50 @@
             ], 
             null, 
             null, 
-            132, 
-            69, 
-            74, 
-            82, 
-            109, 
+            134, 
+            33, 
+            30, 
+            38, 
+            17, 
             [
                 [
-                    13, 
-                    10
+                    98, 
+                    20
                 ], 
                 [
                     14, 
                     10
                 ], 
                 [
-                    98, 
-                    20
-                ], 
-                [
                     45, 
                     10
+                ], 
+                [
+                    360, 
+                    2
                 ], 
                 [
                     17, 
                     2
                 ], 
                 [
-                    360, 
-                    1
-                ], 
-                [
                     347, 
                     1
                 ], 
                 [
+                    49, 
+                    1
+                ], 
+                [
                     50, 
+                    1
+                ], 
+                [
+                    2, 
+                    2
+                ], 
+                [
+                    1, 
                     2
                 ]
             ], 
@@ -138,81 +130,19 @@
         [
             [
                 10, 
-                55
+                44
             ], 
             null, 
             null, 
-            136, 
-            96, 
-            103, 
-            76, 
-            95, 
+            32, 
+            35, 
+            46, 
+            13, 
+            13, 
             [
-                [
-                    13, 
-                    10
-                ], 
-                [
-                    14, 
-                    10
-                ], 
                 [
                     98, 
                     20
-                ], 
-                [
-                    26, 
-                    10
-                ], 
-                [
-                    17, 
-                    2
-                ], 
-                [
-                    360, 
-                    1
-                ], 
-                [
-                    347, 
-                    1
-                ], 
-                [
-                    9, 
-                    5
-                ], 
-                [
-                    4, 
-                    1
-                ], 
-                [
-                    50, 
-                    1
-                ]
-            ], 
-            []
-        ], 
-        [
-            [
-                11, 
-                6
-            ], 
-            [
-                12, 
-                8
-            ], 
-            [
-                13, 
-                10
-            ], 
-            140, 
-            109, 
-            123, 
-            108, 
-            106, 
-            [
-                [
-                    13, 
-                    10
                 ], 
                 [
                     14, 
@@ -235,28 +165,66 @@
                     1
                 ], 
                 [
-                    4, 
-                    1
+                    391, 
+                    2
                 ], 
                 [
-                    49, 
-                    1
-                ], 
-                [
-                    3, 
-                    1
-                ], 
-                [
-                    582, 
+                    50, 
                     1
                 ], 
                 [
                     2, 
-                    3
+                    1
                 ], 
                 [
                     1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                3
+            ], 
+            [
+                12, 
+                6
+            ], 
+            [
+                13, 
+                3
+            ], 
+            7, 
+            38, 
+            35, 
+            8, 
+            10, 
+            [
+                [
+                    14, 
                     10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    17, 
+                    2
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    347, 
+                    1
+                ], 
+                [
+                    2, 
+                    1
                 ]
             ], 
             [
@@ -265,20 +233,28 @@
                     99
                 ], 
                 [
-                    55, 
-                    99
+                    56, 
+                    60
                 ], 
                 [
-                    58, 
-                    40
-                ], 
-                [
-                    84, 
+                    65, 
                     5
                 ], 
                 [
-                    70, 
-                    60
+                    92, 
+                    9
+                ], 
+                [
+                    77, 
+                    12
+                ], 
+                [
+                    79, 
+                    12
+                ], 
+                [
+                    89, 
+                    10
                 ]
             ]
         ]
@@ -295,21 +271,21 @@
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
         "starting_position": 0, 
-        "quest_rank": 5, 
+        "quest_rank": 2, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 55, 
+        "general_enemy_level": 26, 
         "wave_2_transition_type": 0, 
         "location": 8, 
         "penalty_per_cart": 350, 
         "resources": 2, 
-        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
-        "description": "Slay a Rathalos\nand a Rathian", 
+        "details": "Hey there, fight fanatics!\nTonight's target is the Queen of\nthe Land, Rathian! A fan of\nflame attacks, she also packs a\npotent charge from on high!\nHunters better wear asbestos\nunderwear for this fight!", 
+        "description": "Slay a Rathian", 
         "wave_1_transition_target": 0, 
-        "hrp_restriction": 9, 
+        "hrp_restriction": 0, 
         "quest_fee": 0, 
-        "quest_id": 60008, 
-        "name": "Grudge Match: The Two Flames", 
+        "quest_id": 60002, 
+        "name": "Grudge Match: Rathian", 
         "main_monster_2": 0, 
         "main_monster_1": 0, 
         "supply_set_number": 0, 
@@ -318,7 +294,7 @@
         "flags": [
             [
                 0, 
-                1, 
+                0, 
                 0, 
                 0, 
                 0, 
@@ -374,71 +350,66 @@
             "hrp_reward": 0, 
             "rewards_row_1": [
                 [
-                    584, 
+                    610, 
                     1, 
-                    10
+                    21
                 ], 
                 [
                     610, 
-                    1, 
-                    24
+                    2, 
+                    7
                 ], 
                 [
                     431, 
                     1, 
-                    14
+                    13
                 ], 
                 [
                     328, 
                     1, 
-                    10
+                    8
                 ], 
                 [
-                    444, 
+                    327, 
                     1, 
-                    5
+                    14
                 ], 
                 [
                     569, 
                     1, 
-                    15
+                    19
                 ], 
                 [
-                    570, 
+                    615, 
                     1, 
-                    5
-                ], 
-                [
-                    587, 
-                    1, 
-                    17
+                    18
                 ]
             ], 
             "rewards_row_2": [], 
-            "objective_type": 2, 
+            "objective_type": 1, 
             "zenny_reward": 1000, 
             "type": 257
         }, 
         "subquest_1": {
-            "objective_num": 1, 
+            "objective_num": 0, 
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 1, 
+            "objective_type": 0, 
             "zenny_reward": 0, 
-            "type": 257
+            "type": 0
         }
     }, 
     "large_monsters": {
         "monster_2": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 55, 
-            "boss_id": 1, 
-            "type": 1, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
             "starting_area": 0, 
-            "spawn_count": 1, 
-            "size": 100
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_3": {
             "size_spread": 0, 
@@ -453,9 +424,9 @@
         "monster_1": {
             "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 55, 
+            "level": 26, 
             "boss_id": 0, 
-            "type": 2, 
+            "type": 1, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100

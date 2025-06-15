@@ -18,93 +18,144 @@
         }, 
         "main_quest": {
             "objective_num": 2, 
-            "hrp_reward": 2880, 
+            "hrp_reward": 1100, 
             "rewards_row_1": [
                 [
-                    486, 
+                    501, 
                     1, 
-                    6
+                    5
                 ], 
                 [
-                    485, 
+                    499, 
                     1, 
-                    13
+                    16
                 ], 
                 [
-                    484, 
+                    500, 
                     1, 
-                    26
+                    22
                 ], 
                 [
-                    483, 
+                    313, 
                     1, 
-                    20
+                    8
                 ], 
                 [
-                    441, 
+                    595, 
                     1, 
-                    6
+                    14
                 ], 
                 [
-                    487, 
+                    315, 
                     1, 
-                    4
+                    10
                 ], 
                 [
-                    185, 
+                    503, 
                     1, 
-                    25
+                    2
+                ], 
+                [
+                    540, 
+                    1, 
+                    23
                 ]
             ], 
             "rewards_row_2": [
                 [
-                    486, 
+                    501, 
                     1, 
-                    6
+                    5
                 ], 
                 [
-                    485, 
+                    499, 
                     1, 
-                    13
+                    16
                 ], 
                 [
-                    484, 
+                    500, 
                     1, 
-                    26
+                    22
                 ], 
                 [
-                    483, 
+                    313, 
                     1, 
-                    20
+                    8
                 ], 
                 [
-                    441, 
+                    595, 
                     1, 
-                    6
+                    14
                 ], 
                 [
-                    487, 
+                    315, 
                     1, 
-                    4
+                    10
                 ], 
                 [
-                    185, 
+                    503, 
                     1, 
-                    25
+                    2
+                ], 
+                [
+                    540, 
+                    1, 
+                    23
                 ]
             ], 
-            "objective_type": 7, 
-            "zenny_reward": 36000, 
+            "objective_type": 15, 
+            "zenny_reward": 11400, 
             "type": 1
         }, 
         "subquest_1": {
-            "objective_num": 0, 
-            "hrp_reward": 0, 
-            "rewards_row_1": [], 
-            "description": "None", 
-            "objective_type": 0, 
-            "zenny_reward": 0, 
-            "type": 0
+            "objective_num": 1, 
+            "hrp_reward": 1100, 
+            "rewards_row_1": [
+                [
+                    501, 
+                    1, 
+                    5
+                ], 
+                [
+                    499, 
+                    1, 
+                    16
+                ], 
+                [
+                    500, 
+                    1, 
+                    22
+                ], 
+                [
+                    313, 
+                    1, 
+                    8
+                ], 
+                [
+                    595, 
+                    1, 
+                    14
+                ], 
+                [
+                    315, 
+                    1, 
+                    10
+                ], 
+                [
+                    503, 
+                    1, 
+                    2
+                ], 
+                [
+                    540, 
+                    1, 
+                    23
+                ]
+            ], 
+            "description": "Hunt a Lagiacrus", 
+            "objective_type": 15, 
+            "zenny_reward": 11400, 
+            "type": 1
         }
     }, 
     "small_monsters": [
@@ -116,26 +167,26 @@
         "time_limit": 50, 
         "wave_1_transition_quantity": 0, 
         "starting_position": 0, 
-        "quest_rank": 6, 
+        "quest_rank": 5, 
         "wave_2_transition_target": 0, 
         "wave_2_transition_quantity": 0, 
-        "general_enemy_level": 244, 
+        "general_enemy_level": 54, 
         "wave_2_transition_type": 0, 
-        "location": 8, 
-        "penalty_per_cart": 13000, 
+        "location": 12, 
+        "penalty_per_cart": 3800, 
         "resources": 1, 
-        "details": "We've all heard of that\noutrageous dragon of rage,\nthe Deviljho! Now, we've got\nnot one -- but two -- stalking\nthe Arena! What hunter has the\ncojones to challenge these\npernicious predators? Not me.", 
-        "description": "Hunt 2 Deviljho", 
+        "details": "I once knew a fool of a hunter\nwho found a legendary clue --\nbut paid for it with his life.\nHe left those plans behind.\nThey're useless to a retired\nhunter like me, so I figured\nI'd pass them to another fool.", 
+        "description": "Hunt 2 Lagiacrus\n", 
         "wave_1_transition_target": 0, 
-        "hrp_restriction": 11, 
-        "quest_fee": 3600, 
-        "quest_id": 61018, 
-        "name": "Rage Match", 
+        "hrp_restriction": 10, 
+        "quest_fee": 2250, 
+        "quest_id": 61016, 
+        "name": "Sea Power", 
         "main_monster_2": 0, 
         "main_monster_1": 0, 
-        "supply_set_number": 43, 
+        "supply_set_number": 48, 
         "summon": 0, 
-        "client": "Arena Manager", 
+        "client": "Retired Hunter", 
         "flags": [
             [
                 0, 
@@ -182,14 +233,14 @@
     }, 
     "large_monsters": {
         "monster_2": {
-            "size_spread": 10, 
+            "size_spread": 0, 
             "hp_spread": 0, 
-            "level": 60, 
-            "boss_id": 2, 
-            "type": 7, 
-            "starting_area": 1, 
-            "spawn_count": 1, 
-            "size": 90
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
         }, 
         "monster_3": {
             "size_spread": 0, 
@@ -202,13 +253,13 @@
             "size": 0
         }, 
         "monster_1": {
-            "size_spread": 10, 
+            "size_spread": 3, 
             "hp_spread": 0, 
-            "level": 60, 
-            "boss_id": 1, 
-            "type": 7, 
-            "starting_area": 1, 
-            "spawn_count": 1, 
+            "level": 59, 
+            "boss_id": 0, 
+            "type": 15, 
+            "starting_area": 0, 
+            "spawn_count": 2, 
             "size": 100
         }
     }

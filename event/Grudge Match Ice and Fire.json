@@ -22,15 +22,15 @@
         [
             [
                 8, 
-                9
+                43
             ], 
             null, 
             null, 
-            72, 
-            77, 
-            70, 
-            78, 
-            77, 
+            80, 
+            86, 
+            79, 
+            87, 
+            85, 
             [
                 [
                     13, 
@@ -49,20 +49,88 @@
                     10
                 ], 
                 [
-                    20, 
-                    2
-                ], 
-                [
-                    17, 
-                    2
+                    375, 
+                    5
                 ], 
                 [
                     360, 
+                    2
+                ], 
+                [
+                    9, 
+                    5
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    4, 
                     1
                 ], 
                 [
-                    347, 
+                    5, 
+                    2
+                ], 
+                [
+                    7, 
+                    2
+                ], 
+                [
+                    2, 
+                    2
+                ], 
+                [
+                    1, 
+                    2
+                ], 
+                [
+                    51, 
                     1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                7, 
+                41
+            ], 
+            null, 
+            null, 
+            76, 
+            82, 
+            75, 
+            83, 
+            81, 
+            [
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    375, 
+                    5
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    391, 
+                    2
                 ], 
                 [
                     11, 
@@ -73,15 +141,23 @@
                     1
                 ], 
                 [
-                    50, 
-                    5
-                ], 
-                [
-                    52, 
+                    4, 
                     1
                 ], 
                 [
+                    50, 
+                    1
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
                     1, 
+                    2
+                ], 
+                [
+                    51, 
                     1
                 ]
             ], 
@@ -89,16 +165,16 @@
         ], 
         [
             [
-                14, 
-                1
+                9, 
+                74
             ], 
             null, 
             null, 
-            132, 
-            69, 
-            74, 
-            82, 
-            109, 
+            136, 
+            86, 
+            95, 
+            103, 
+            101, 
             [
                 [
                     13, 
@@ -117,19 +193,35 @@
                     10
                 ], 
                 [
-                    17, 
-                    2
+                    375, 
+                    5
                 ], 
                 [
                     360, 
+                    2
+                ], 
+                [
+                    16, 
+                    2
+                ], 
+                [
+                    10, 
+                    5
+                ], 
+                [
+                    4, 
                     1
                 ], 
                 [
-                    347, 
-                    1
+                    5, 
+                    2
                 ], 
                 [
-                    50, 
+                    7, 
+                    2
+                ], 
+                [
+                    51, 
                     2
                 ]
             ], 
@@ -137,16 +229,16 @@
         ], 
         [
             [
-                10, 
-                55
+                14, 
+                28
             ], 
             null, 
             null, 
-            136, 
-            96, 
+            98, 
+            104, 
+            97, 
+            105, 
             103, 
-            76, 
-            95, 
             [
                 [
                     13, 
@@ -161,20 +253,20 @@
                     20
                 ], 
                 [
-                    26, 
+                    45, 
                     10
                 ], 
                 [
-                    17, 
-                    2
+                    375, 
+                    5
                 ], 
                 [
                     360, 
-                    1
+                    2
                 ], 
                 [
-                    347, 
-                    1
+                    391, 
+                    2
                 ], 
                 [
                     9, 
@@ -186,101 +278,18 @@
                 ], 
                 [
                     50, 
-                    1
-                ]
-            ], 
-            []
-        ], 
-        [
-            [
-                11, 
-                6
-            ], 
-            [
-                12, 
-                8
-            ], 
-            [
-                13, 
-                10
-            ], 
-            140, 
-            109, 
-            123, 
-            108, 
-            106, 
-            [
-                [
-                    13, 
-                    10
-                ], 
-                [
-                    14, 
-                    10
-                ], 
-                [
-                    45, 
-                    10
-                ], 
-                [
-                    17, 
                     2
-                ], 
-                [
-                    360, 
-                    2
-                ], 
-                [
-                    347, 
-                    1
-                ], 
-                [
-                    4, 
-                    1
-                ], 
-                [
-                    49, 
-                    1
-                ], 
-                [
-                    3, 
-                    1
                 ], 
                 [
                     582, 
                     1
                 ], 
                 [
-                    2, 
-                    3
-                ], 
-                [
-                    1, 
-                    10
+                    51, 
+                    2
                 ]
             ], 
-            [
-                [
-                    54, 
-                    99
-                ], 
-                [
-                    55, 
-                    99
-                ], 
-                [
-                    58, 
-                    40
-                ], 
-                [
-                    84, 
-                    5
-                ], 
-                [
-                    70, 
-                    60
-                ]
-            ]
+            []
         ]
     ], 
     "unknown": {
@@ -301,15 +310,15 @@
         "general_enemy_level": 55, 
         "wave_2_transition_type": 0, 
         "location": 8, 
-        "penalty_per_cart": 350, 
+        "penalty_per_cart": 250, 
         "resources": 2, 
-        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
-        "description": "Slay a Rathalos\nand a Rathian", 
+        "details": "Double trouble! The forecast\ntoday calls for a storm of fire\nand ice -- with a 90 percent\nchance of death -- as you take\non both Barioth and Agnaktor at\nonce! Days like this I just\nwanna stay in bed.", 
+        "description": "Slay a Barioth\nand an Agnaktor", 
         "wave_1_transition_target": 0, 
         "hrp_restriction": 9, 
         "quest_fee": 0, 
-        "quest_id": 60008, 
-        "name": "Grudge Match: The Two Flames", 
+        "quest_id": 60009, 
+        "name": "Grudge Match: Ice and Fire", 
         "main_monster_2": 0, 
         "main_monster_1": 0, 
         "supply_set_number": 0, 
@@ -374,14 +383,14 @@
             "hrp_reward": 0, 
             "rewards_row_1": [
                 [
-                    584, 
+                    379, 
                     1, 
-                    10
+                    13
                 ], 
                 [
-                    610, 
+                    586, 
                     1, 
-                    24
+                    20
                 ], 
                 [
                     431, 
@@ -389,34 +398,34 @@
                     14
                 ], 
                 [
-                    328, 
+                    444, 
                     1, 
-                    10
+                    8
                 ], 
                 [
-                    444, 
+                    445, 
                     1, 
                     5
                 ], 
                 [
                     569, 
                     1, 
-                    15
+                    13
                 ], 
                 [
                     570, 
                     1, 
-                    5
+                    8
                 ], 
                 [
                     587, 
                     1, 
-                    17
+                    19
                 ]
             ], 
             "rewards_row_2": [], 
-            "objective_type": 2, 
-            "zenny_reward": 1000, 
+            "objective_type": 5, 
+            "zenny_reward": 1500, 
             "type": 257
         }, 
         "subquest_1": {
@@ -424,7 +433,7 @@
             "hrp_reward": 0, 
             "rewards_row_1": [], 
             "description": "None", 
-            "objective_type": 1, 
+            "objective_type": 19, 
             "zenny_reward": 0, 
             "type": 257
         }
@@ -435,7 +444,7 @@
             "hp_spread": 0, 
             "level": 55, 
             "boss_id": 1, 
-            "type": 1, 
+            "type": 19, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100
@@ -455,7 +464,7 @@
             "hp_spread": 0, 
             "level": 55, 
             "boss_id": 0, 
-            "type": 2, 
+            "type": 5, 
             "starting_area": 0, 
             "spawn_count": 1, 
             "size": 100

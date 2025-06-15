@@ -17,6 +17,7 @@ import mh.time_utils as time_utils
 from mh.constants import \
     LAYER_CHAT_COLORS, TERMS_VERSION, TERMS, SUBTERMS, ANNOUNCE, \
     CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, \
+    MAINTENANCE, UNPATCHED, \
     PatID4, get_pat_binary_from_version
 from mh.session import Session
 import mh.database as db
@@ -39,7 +40,8 @@ class PatServer(server.BasicPatServer, Logger):
     """Generic PAT server class."""
 
     def __init__(self, address, handler_class, max_thread_count=0,
-                 logger=None, debug_mode=False, ssl_cert=None, ssl_key=None):
+                 logger=None, debug_mode=False, ssl_cert=None, ssl_key=None,
+                 no_timeout=False):
         server.BasicPatServer.__init__(
             self, address, handler_class, max_thread_count,
             ssl_cert=ssl_cert, ssl_key=ssl_key
@@ -51,6 +53,7 @@ class PatServer(server.BasicPatServer, Logger):
         self.debug_con = []
         self.debug_mode = debug_mode
         self.binary_loader = g_binary_loader
+        self.no_timeout = no_timeout
 
     def add_to_debug(self, con):
         """Add connection to the debug connection list."""
@@ -75,6 +78,8 @@ class PatServer(server.BasicPatServer, Logger):
 
         return None
 
+    # TODO: Backport broadcasting refactoring if needed
+
     def broadcast(self, players, packet_id, data, seq, to_exclude=None):
         # type: (db.Players, int, bytes, int, Session|None) -> None
         handlers = []
@@ -98,8 +103,8 @@ class PatServer(server.BasicPatServer, Logger):
     def circle_broadcast(self, circle, packet_id, data, seq,
                          session=None):
         # type: (db.Circle, int, bytes, int, Session|None) -> None
-        self.broadcast(circle.players, packet_id, data, seq, session)
-            
+        with circle.lock():
+            self.broadcast(circle.players, packet_id, data, seq, session)
 
 
 class PatRequestHandler(server.BasicPatHandler):
@@ -124,6 +129,10 @@ class PatRequestHandler(server.BasicPatHandler):
         self.ping_timer = time_utils.Timer()
         self.requested_connection = False
         self.line_check = True
+        # TODO: Backport remaining patch check (see OPN server code)
+        self.game_id = None
+        self.natneg_url = b"natneg1.gs.nintendowifi.net"
+        self.game_patched = True
 
     def try_send_packet(self, packet_id=0, data=b'', seq=0):
         """Send PAT packet and catch exceptions."""
@@ -274,6 +283,9 @@ class PatRequestHandler(server.BasicPatHandler):
 
         The games sends the PAT environment properties.
         """
+        BANNED_ONLINE_SUPPORT_CODES = (
+            b"EXAMPLEEXAM",
+        )
         settings = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(settings))
         pat_ticket = b""
@@ -283,7 +295,17 @@ class PatRequestHandler(server.BasicPatHandler):
             _, pat_ticket = pati.unpack_any(settings.online_support_code)
         self.server.info("Client {} Ticket `{}`".format(self.client_address,
                                                         pat_ticket))
-        self.sendNtcLogin(5, settings, seq)
+
+        if not self.game_patched:
+            self.sendNtcLogin(2, settings, seq)
+            return
+
+        has_ban = "online_support_code" in settings and \
+            pat_ticket in BANNED_ONLINE_SUPPORT_CODES
+        if has_ban or len(self.session.get_servers()) == 0:
+            self.sendNtcLogin(2, settings, seq)
+        else:
+            self.sendNtcLogin(5, settings, seq)
 
     def sendNtcLogin(self, server_status, connection_data, seq):
         """NtcLogin packet.
@@ -297,6 +319,41 @@ class PatRequestHandler(server.BasicPatHandler):
         data = struct.pack(">B", server_status)
         self.session = self.session.get(connection_data)
         self.send_packet(PatID4.NtcLogin, data, seq)
+
+    def sendReqMemoryCheck(self, addr, size):
+        """ReqMemoryCheck packet.
+
+        ID: 60810100
+        JP: メモリ内容要求
+        TR: Memory content request
+        """
+        data = pati.MemoryData.pack_from(False, False)
+        data += struct.pack(">II", addr, size)
+        self.send_packet(PatID4.ReqMemoryCheck, data, 0)
+
+    def recvReqMaintenance(self, packet_id, data, seq):
+        """ReqMaintenance packet.
+
+        ID: 62200100
+        JP: メンテナンス情報要求
+        TR: Maintenance information request
+        """
+        if self.game_patched:
+            self.sendAnsMaintenance(MAINTENANCE, seq)
+        else:
+            self.sendAnsMaintenance(UNPATCHED.format(self.natneg_url), seq)
+
+    def sendAnsMaintenance(self, maintenance, seq):
+        """AnsMaintenance packet.
+
+        ID: 62200200
+        JP: メンテナンス情報通知
+        TR: Maintenance information notification
+
+        The server replies with the maintenance information text.
+        """
+        data = pati.lp2_string(maintenance)
+        self.send_packet(PatID4.AnsMaintenance, data, seq)
 
     def recvReqAuthenticationToken(self, packet_id, data, seq):
         """ReqAuthenticationToken packet.
@@ -891,7 +948,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリストバージョン確認応答
         TR: FMP list version acknowledgment
         """
-        data = struct.pack(">I", FMP_VERSION)
+        data = struct.pack(">I", FMP_VERSION)  # TODO: Backport central code
         self.send_packet(PatID4.AnsFmpListVersion, data, seq)
 
     def sendAnsFmpListVersion2(self, seq):
@@ -901,7 +958,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリストバージョン確認応答
         TR: FMP list version acknowledgment
         """
-        data = struct.pack(">I", FMP_VERSION)
+        data = struct.pack(">I", FMP_VERSION)  # TODO: Backport central code
         self.send_packet(PatID4.AnsFmpListVersion2, data, seq)
 
     def recvReqFmpListHead(self, packet_id, data, seq):
@@ -913,6 +970,7 @@ class PatRequestHandler(server.BasicPatHandler):
         """
         # TODO: Might be worth investigating these parameters as
         # they might be useful when using multiple FMP servers.
+        # TODO: Backport preserve server ids logic
         version, first_index, count = struct.unpack_from(
             ">III", data
         )  # noqa: F841
@@ -1083,6 +1141,7 @@ class PatRequestHandler(server.BasicPatHandler):
         fmp_data.server_address = pati.String(server.addr or fmp_addr)
         fmp_data.server_port = pati.Word(server.port or fmp_port)
         fmp_data.assert_fields(fields)
+        # TODO: Backport central logic
         if packet_id == PatID4.ReqFmpInfo:
             self.sendAnsFmpInfo(fmp_data, fields, seq)
         elif packet_id == PatID4.ReqFmpInfo2:
@@ -1154,6 +1213,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 63030100
         JP: バイナリデータ要求
         TR: Binary data request
+
+        TODO: Handle multiple versions of a binary
         """
         binary_type, version, offset, size = struct.unpack(">BIII", data)
         content = get_pat_binary_from_version(binary_type, version)
@@ -2408,6 +2469,8 @@ class PatRequestHandler(server.BasicPatHandler):
                               seq)
             return
         self.send_packet(PatID4.AnsLayerCreateHead, data, seq)
+
+        # TODO: Backport layer refactoring if needed
         path = self.session.get_layer_path()
         path.city_id = number
         self.notify_city_info_set(path)
@@ -2439,6 +2502,7 @@ class PatRequestHandler(server.BasicPatHandler):
         self.session.layer_create(number, layer_set, extra)
         self.send_packet(PatID4.AnsLayerCreateSet, data, seq)
 
+        # TODO: Backport layer refactoring if needed
         path = self.session.get_layer_path()
         self.notify_city_number_set(path)
         
@@ -2463,6 +2527,7 @@ class PatRequestHandler(server.BasicPatHandler):
         data = struct.pack(">H", number)
         self.send_packet(PatID4.AnsLayerCreateFoot, data, seq)
 
+        # TODO: Backport layer refactoring if needed
         path = self.session.get_layer_path()
         path.city_id = number
         self.notify_city_info_set(path)
@@ -2486,6 +2551,7 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤアップ返答
         TR: Layer up response
         """
+        # TODO: Backport layer refactoring if needed
         self.notify_layer_departure(False)
         self.send_packet(PatID4.AnsLayerUp, b"", seq)
 
@@ -2666,6 +2732,8 @@ class PatRequestHandler(server.BasicPatHandler):
         self.server.circle_broadcast(circle, PatID4.NtcCircleHost, data,
                                      seq, self.session)
 
+    # TODO: Backport notify_city change when needed
+
     def notify_city_info_set(self, path):
         # type: (pati.LayerPath) -> None
         city = self.get_layer(path)
@@ -2715,6 +2783,8 @@ class PatRequestHandler(server.BasicPatHandler):
         if self.session.local_info['circle_id'] is not None:
             self.notify_circle_leave(self.session.local_info['circle_id'] + 1,
                                      seq=0)
+
+        # TODO: Backport refactoring with session_layer_end
         if end:
             self.session.layer_end()
         else:
@@ -2753,6 +2823,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
     def on_finish(self):
         self.notify_layer_departure(True)
+        # TODO: Backport session_layer_end
         self.session.disconnect()
         self.session.delete()
 
@@ -2807,7 +2878,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
         # Send a ping with 30 seconds interval
         if self.ping_timer.elapsed() >= 30:
-            if not self.server.debug_enabled() and not self.line_check:
+            if not self.server.no_timeout and not self.line_check:
                 raise Exception("Client timed out.")
             self.line_check = False
             self.sendReqLineCheck()

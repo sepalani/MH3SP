@@ -14,6 +14,7 @@ from other.utils import hexdump, server_base, server_main, to_str
 
 class FmpServer(PatServer):
     """Basic FMP server class."""
+    # TODO: Backport close cache logic
     pass
 
 
@@ -24,6 +25,7 @@ class FmpRequestHandler(PatRequestHandler):
         """AnsConnection packet."""
         connection_data = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(connection_data))
+        # TODO: Backport loaded_session logic
         self.sendNtcLogin(3, connection_data, seq)
 
     def sendAnsLayerDown(self, layer_id, layer_set, seq):
@@ -263,6 +265,7 @@ class FmpRequestHandler(PatRequestHandler):
         Sent by the game when leaving the gate via the entrance:
          - Relocate > Select Server
         """
+        # TODO: Backport notify_layer_departure if needed
         self.sendAnsLayerUp(data, seq)
 
     def recvReqUserSearchInfoMine(self, packet_id, data, seq):
