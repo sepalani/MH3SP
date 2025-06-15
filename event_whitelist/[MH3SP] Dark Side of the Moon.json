@@ -1,0 +1,202 @@
+{
+    "unknown": {
+        "unk_12": 5, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 1500, 
+            "rewards_row_1": [
+                [
+                    463, 
+                    1, 
+                    15
+                ], 
+                [
+                    459, 
+                    1, 
+                    25
+                ], 
+                [
+                    460, 
+                    1, 
+                    14
+                ], 
+                [
+                    464, 
+                    1, 
+                    15
+                ], 
+                [
+                    461, 
+                    1, 
+                    18
+                ], 
+                [
+                    466, 
+                    1, 
+                    13
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    448, 
+                    1, 
+                    12
+                ], 
+                [
+                    459, 
+                    1, 
+                    18
+                ], 
+                [
+                    460, 
+                    1, 
+                    30
+                ], 
+                [
+                    155, 
+                    1, 
+                    15
+                ], 
+                [
+                    447, 
+                    1, 
+                    25
+                ]
+            ], 
+            "objective_type": 20, 
+            "zenny_reward": 30000, 
+            "type": 257
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 1, 
+            "zenny_reward": 0, 
+            "type": 8192
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        [], 
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 15, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 6, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 16, 
+        "wave_2_transition_type": 0, 
+        "location": 7, 
+        "penalty_per_cart": 10000, 
+        "resources": 0, 
+        "details": "Gambala! The sea drake has\nreturned! Moga is barely clinging\nto the island after its last\nappearance -- we need this taken\ncare of FAST! Get a group of your\npeers from Loc Lac and get your\ntail back here! PRONTO!", 
+        "description": "Slay a Ceadeus", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 11, 
+        "quest_fee": 3100, 
+        "quest_id": 61008, 
+        "name": "[MH3SP] Dark Side of the Moon", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 48, 
+        "summon": 0, 
+        "client": "Moga Village Chief", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                1
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 60, 
+            "boss_id": 0, 
+            "type": 20, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}
