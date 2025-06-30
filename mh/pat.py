@@ -8,7 +8,7 @@ import struct
 import traceback
 from datetime import timedelta
 
-from other.utils import Logger, get_config, get_ip, hexdump, to_str
+from other.utils import Logger, get_config, get_external_ip, hexdump, to_str
 
 import mh.pat_item as pati
 import mh.server as server
@@ -583,7 +583,7 @@ class PatRequestHandler(server.BasicPatHandler):
         TODO: I don't think it's related to LMP protocol.
         """
         config = get_config("LMP")
-        self.sendAnsLmpConnect(get_ip(config["IP"]), config["Port"], seq)
+        self.sendAnsLmpConnect(get_external_ip(config), config["Port"], seq)
 
     def sendAnsLmpConnect(self, address, port, seq):
         """AnsLmpConnect packet.
@@ -1071,7 +1071,7 @@ class PatRequestHandler(server.BasicPatHandler):
         fields = pati.unpack_bytes(data, 4)
         server = self.session.join_server(index)
         config = get_config("FMP")
-        fmp_addr = get_ip(config["IP"])
+        fmp_addr = get_external_ip(config)
         fmp_port = config["Port"]
         fmp_data = pati.FmpData()
         fmp_data.server_address = pati.String(server.addr or fmp_addr)

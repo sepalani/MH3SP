@@ -337,7 +337,7 @@ class Server(object):
         self.name = name
         self.parent = None
         self.server_type = server_type
-        self.addr = addr
+        self.addr = addr  # public IP address
         self.port = port
         self.gates = [
             Gate("City Gate{}".format(i), self)

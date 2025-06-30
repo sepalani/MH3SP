@@ -23,6 +23,7 @@ except NameError:
     # Python 3
     basestring = str
     import configparser as ConfigParser
+    from typing import Any  # noqa: F401
 
 CONFIG_FILE = "config.ini"
 LOG_FOLDER = "logs"
@@ -221,6 +222,7 @@ def get_config(name, config_file=CONFIG_FILE):
     config.read(config_file)
     return {
         "IP": config.get(name, "IP"),
+        "ExternalIP": config.get(name, "ExternalIP"),
         "Port": config.getint(name, "Port"),
         "Name": config.get(name, "Name"),
         "MaxThread": config.getint(name, "MaxThread"),
@@ -239,17 +241,29 @@ def get_config(name, config_file=CONFIG_FILE):
 
 
 def get_default_ip():
+    # type: () -> str
     """Get the default IP address"""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
-    ip = s.getsockname()[0]
+    ip = s.getsockname()[0]  # type: str
     s.close()
     return ip
 
 
 def get_ip(ip):
+    # type: (str) -> str
     """Return the IP address that will be used."""
     return get_default_ip() if ip == "0.0.0.0" else ip
+
+
+def get_external_ip(config):
+    # type: (dict[str, Any]) -> str
+    """Return the IP address advertised by the server.
+
+    It's useful when the public IP address can't easily be retrieved.
+    For instance, when behind a NAT or some cloud infrastructures.
+    """
+    return config["ExternalIP"] or get_ip(config["IP"])
 
 
 def argparse_from_config(config):
