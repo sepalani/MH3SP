@@ -69,4 +69,4 @@ jobs:
           pip install ruff
       - name: Lint with ruff
         run: |
-          ruff --output-format=github --exclude externals .
+          ruff check --output-format=github --exclude externals .

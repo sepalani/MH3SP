@@ -8,8 +8,10 @@ import struct
 
 from collections import OrderedDict
 from mh.constants import pad
-from other.utils import to_bytearray, get_config, get_ip, GenericUnpacker
+from other.utils import to_bytearray, get_config, get_external_ip, \
+    GenericUnpacker
 from mh.database import Server, Gate, City
+
 
 class ItemType:
     Custom = 0
@@ -960,7 +962,7 @@ def get_fmp_servers(session, first_index, count):
     assert first_index > 0, "Invalid list index"
 
     config = get_config("FMP")
-    fmp_addr = get_ip(config["IP"])
+    fmp_addr = get_external_ip(config)
     fmp_port = config["Port"]
 
     data = b""
