@@ -447,17 +447,7 @@ class RemoteConnectionHandler(object):
 
 
 WHITELIST_SERVER = 4
-WHITELISTED_CODES = [
-    '6VCCPQIA6V5', # Ze SpyRo's
-    'H3317029739', # Ze SpyRo's (real wiiu)
-    'NF72D8VU1CW', # Ze SpyRo's (android phone)
-    '0QROFX7PF2D', # Ze SpyRo's (steam deck)
-    'H0202691402', # Gale/BillyBobJho's
-    'NK6D8A6ZM79', # Meez's
-    'H1166071562', # Muffin's
-    '0L4QE388NKD',  # InusualZ's
-    'QJIYZ39BZND'  # Goabie's
-]
+WHITELISTED_CODES = []
 
 
 class Cache(Logger):
