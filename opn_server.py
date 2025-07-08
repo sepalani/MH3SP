@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter OPN server."""
 
@@ -30,15 +30,13 @@ class OpnRequestHandler(PatRequestHandler):
         JP: メモリ内容送信
         TR: Memory content transmission
         """
-        # unk = pati.MemoryData.unpack(data)
-        # with pati.Unpacker(data, offset=len(unk.pack())) as unpacker:
         with pati.Unpacker(data) as unpacker:
-            unk = unpacker.MemoryData()
+            unk = unpacker.MemoryData()  # noqa: F841
             address, = unpacker.struct(">I")
             data = unpacker.lp2_string()
 
             if address == 0x80000000:
-                self.game_id = to_str(data) # type: ignore
+                self.game_id = to_str(data)  # type: ignore
                 if self.game_id == 'RMHE08':
                     self.sendReqMemoryCheck(0x806308e8, 56)
                 elif self.game_id == 'RMHP08':

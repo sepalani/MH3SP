@@ -369,7 +369,8 @@ class Session(object):
         return self.get_layer().players
 
     def get_layer_path(self):
-        return pati.LayerPath(self.local_info['server_id'], self.local_info['gate_id'], 
+        return pati.LayerPath(self.local_info['server_id'],
+                              self.local_info['gate_id'],
                               self.local_info['city_id'])
 
     def get_layer_host_data(self):

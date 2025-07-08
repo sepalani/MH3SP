@@ -16,7 +16,7 @@ try:
 except NameError:
     # Python 3
     basestring = str
-    from typing import Any
+    from typing import Any  # noqa: F401
 
 
 class WaveType:
@@ -913,8 +913,8 @@ class QuestRestrictionType:
     RESTRICTION_46_JOIN = 26
 
 
-def make_monster_quest_type(monster_type, starting_area, boss_id, spawn_count, level,
-                            min, size, max):
+def make_monster_quest_type(monster_type, starting_area, boss_id, spawn_count,
+                            level, min, size, max):
     data = b""
     # - id: monster_type
     # type: u1
@@ -1269,7 +1269,7 @@ def make_binary_event_quest(quest_data):
     # - id: flags
     # type: u4
     # offset: 0x0310
-    data += struct.pack(">I", generate_flags(*(quest_info['flags'])))  # Offset 0x310
+    data += struct.pack(">I", generate_flags(*(quest_info['flags'])))
 
     # - id: monsters
     # type: monster_quest_type
@@ -1558,7 +1558,6 @@ def make_binary_event_quest(quest_data):
     # offset: 0x038E
     data += struct.pack(">h", quest_info['wave_2_transition_quantity'])
 
-
     # Unknown 12 (0x00000002 for large monster hunting quests,
     #             0x00000003 for small monster & gathering quests,
     #             0x00000005 for Jhen & Alatreon)
@@ -1652,7 +1651,8 @@ def make_binary_event_quest(quest_data):
         assert len(small_monsters) % location_size == 0
         num_waves = int(len(small_monsters) / location_size)
         assert num_waves <= 3
-        # Pre-preamble: Establishing the locations of each of the waves' preambles
+        # Pre-preamble:
+        # Establishing the locations of each of the waves' preambles
         sm_data += struct.pack('>I', 0x0000000C)
         sm_data += struct.pack('>I', 0x0000000C + 8*location_size)
         if num_waves < 3:
@@ -1661,8 +1661,9 @@ def make_binary_event_quest(quest_data):
             sm_data += struct.pack('>I', 0x0000000C + 2*8*location_size)
 
         monster_data = b""
-        # Preamble: Establishing the location and length of each of the
-        # small monster areas
+        # Preamble:
+        # Establishing the location and length of each of the small monster
+        # areas
         current_sm_index = 0x0C + 8*len(small_monsters)
         for entry, monster_list in enumerate(quest_data['small_monsters']):
             sm_data += struct.pack(">I", current_sm_index)
@@ -1672,7 +1673,7 @@ def make_binary_event_quest(quest_data):
                 assert monster['room'] == area
                 new_monster_data = b""
                 new_monster_data += struct.pack(">I", monster['type'])
-                new_monster_data += 3* b"\0"
+                new_monster_data += 3 * b"\0"
                 new_monster_data += struct.pack(">b", monster['quantity'])
                 new_monster_data += struct.pack(">B", monster['unk2'])
                 new_monster_data += struct.pack(">B", monster['room'])
@@ -1682,13 +1683,19 @@ def make_binary_event_quest(quest_data):
                 new_monster_data += struct.pack(">f", monster['pos_x'])
                 new_monster_data += struct.pack(">f", monster['pos_y'])
                 new_monster_data += struct.pack(">f", monster['pos_z'])
-                new_monster_data += struct.pack('>i', int(180.05 * monster['rot_x']))
-                new_monster_data += struct.pack('>i', int(180.05 * monster['rot_y']))
-                new_monster_data += struct.pack('>i', int(180.05 * monster['rot_z']))
+                new_monster_data += struct.pack(
+                    '>i', int(180.05 * monster['rot_x'])
+                )
+                new_monster_data += struct.pack(
+                    '>i', int(180.05 * monster['rot_y'])
+                )
+                new_monster_data += struct.pack(
+                    '>i', int(180.05 * monster['rot_z'])
+                )
                 new_monster_data += struct.pack('>I', 0xFF000000)
                 new_monster_data += struct.pack('>I', 0x00000000)
                 assert len(new_monster_data) == 0x30
-                
+
                 area_monster_data += new_monster_data
             area_monster_data += 0x30 * b'\0'
             sm_data += struct.pack(">I", len(area_monster_data))
@@ -1827,8 +1834,10 @@ class QuestLoader:
         with open('event/trading_post.json', 'r') as f:
             trading_post_json = byteify(json.load(f))
             self.prev_trading_post_json = trading_post_json
+
             def slot(item, qty):
                 return struct.pack(">HH", item, qty)
+
             for day in trading_post_json:
                 day_encoded = b""
                 for entry in day:
@@ -1968,5 +1977,3 @@ class QuestLoader:
         # Get quests for the day
         true_idx = idx - self.version - 1
         return [quest[0] for _, quest in enumerate(self.quests[true_idx])]
-
-

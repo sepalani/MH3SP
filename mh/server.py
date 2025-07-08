@@ -24,15 +24,9 @@ except ImportError:
     import externals.selectors2 as selectors
 
 
-try:
-    from typing import List, Tuple  # noqa: F401
-except ImportError:
-    pass
-
-
 class BasicPatHandler(object):
     def __init__(self, socket, client_address, server):
-        # type: (socket.socket, Tuple[str, int], BasicPatServer)  -> None
+        # type: (socket.socket, tuple[str, int], BasicPatServer)  -> None
         self.socket = socket
         self.client_address = client_address
         self.server = server
@@ -147,7 +141,7 @@ class BasicPatServer(object):
 
     def __init__(self, server_address, RequestHandlerClass, max_threads,
                  bind_and_activate=True, ssl_cert=None, ssl_key=None):
-        # type: (Tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None
+        # type: (tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None  # noqa: E501
         """Constructor.  May be extended, do not override."""
         self.server_address = server_address
         self.RequestHandlerClass = RequestHandlerClass
@@ -156,8 +150,8 @@ class BasicPatServer(object):
         self.__shutdown_request = False
         self.socket = socket.socket(self.address_family, self.socket_type)
         self._random = random.SystemRandom()  # type: random.SystemRandom
-        self.handlers = []  # type: List[BasicPatHandler]
-        self.worker_threads = []  # type: List[threading.Thread]
+        self.handlers = []  # type: list[BasicPatHandler]
+        self.worker_threads = []  # type: list[threading.Thread]
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
         self.max_threads = max_threads or multiprocessing.cpu_count()
@@ -239,7 +233,7 @@ class BasicPatServer(object):
                                     selected.on_exception(e)
                                     if selected.is_finished():
                                         self.remove_handler(selected)
-                    except:
+                    except Exception:
                         self.error(traceback.format_exc())
 
                     if write_watch.elapsed() >= write_timeout:
@@ -252,11 +246,11 @@ class BasicPatServer(object):
 
                                 if handler.is_finished():
                                     self.remove_handler(handler)
-                        except:
+                        except Exception:
                             self.error(traceback.format_exc())
                         finally:
                             write_watch.restart()
-        except:
+        except Exception:
             self.error(traceback.format_exc())
         finally:
             self.__is_shut_down.set()
@@ -286,7 +280,7 @@ class BasicPatServer(object):
 
                 if handler.is_finished():
                     self.remove_handler(handler)
-            except:
+            except Exception:
                 self.error(traceback.format_exc())
 
     def accept_new_connection(self):

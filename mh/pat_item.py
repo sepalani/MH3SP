@@ -587,6 +587,7 @@ class UserSearchInfo(PatData):
         (0x10, "info_mine_0x10"),
     )
 
+
 class LayerPath(object):
     STRUCT = struct.Struct(">IIHHH")
 
@@ -595,7 +596,7 @@ class LayerPath(object):
         self.server_id = server_id or 0
         self.gate_id = gate_id or 0
         self.city_id = city_id or 0
-    
+
     def get_depth(self):
         # type: () -> int
         if self.city_id > 0:
@@ -611,8 +612,8 @@ class LayerPath(object):
         depth = self.get_depth()
         unk = 1
         return self.STRUCT.pack(depth, self.server_id, unk, self.gate_id,
-                                        self.city_id)
-    
+                                self.city_id)
+
     @staticmethod
     def unpack(data):
         # type: (bytes) -> LayerPath
@@ -624,7 +625,7 @@ class LayerPath(object):
             gate_id = 0
             city_id = 0
             for i in range(field_count):
-                if i == 0:    
+                if i == 0:
                     _ = unpacker.struct(">H")
                 elif i == 1:
                     gate_id = unpacker.struct(">H")
@@ -648,7 +649,7 @@ class LayerData(PatData):
         (0x0c, "unk_long_0x0c"),
         (0x0d, "unk_word_0x0d"),
         (0x10, "state"),  # 0 = Joinable / 1 = Empty / 2 = Full
-        (0x11, "positionInterval"), # player position synchronization timer
+        (0x11, "positionInterval"),  # player position synchronization timer
         (0x12, "unk_byte_0x12"),
         (0x15, "layer_depth"),
         (0x16, "layer_pathname"),
@@ -689,7 +690,7 @@ class LayerData(PatData):
             data.size2 = Long(layer.get_population())
             data.capacity = Long(layer.get_capacity())
             data.child_population = Long(layer.in_quest_players())
-            data.unk_long_0x0c = Long(0xc) # TODO: Reverse
+            data.unk_long_0x0c = Long(0xc)  # TODO: Reverse
             data.state = Byte(layer.get_state())
             data.layer_depth = Byte(layer.LAYER_DEPTH)
             data.layer_pathname = String(layer.get_pathname())

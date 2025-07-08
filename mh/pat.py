@@ -23,9 +23,9 @@ from mh.session import Session
 import mh.database as db
 
 try:
-    from typing import Literal, List, Union, Optional  # noqa: F401
+    from typing import Literal
 
-    LayerUserNumUpdate = Literal[1,2,3,4,5]
+    LayerUserNumUpdate = Literal[1, 2, 3, 4, 5]
 except ImportError:
     pass
 
@@ -97,7 +97,7 @@ class PatServer(server.BasicPatServer, Logger):
     def layer_broadcast(self, session, packet_id, data, seq,
                         exclude_self=True):
         # type: (Session, int, bytes, int, bool) -> None
-        self.broadcast(session.get_layer_players(), packet_id, data, seq, 
+        self.broadcast(session.get_layer_players(), packet_id, data, seq,
                        session if exclude_self else None)
 
     def circle_broadcast(self, circle, packet_id, data, seq,
@@ -1109,12 +1109,14 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: NtcLayerUserNum
         JP: レイヤ人数通知
         TR: Layer number notification
-        
+
         UPDATE TYPE:
             1 - Update numbers in the current layer
-            2 - Update numbers in the current layer plus fire an event (unknown)
+            2 - Update numbers in the current layer
+                plus fire an event (unknown)
             3 - Update numbers in an unknown struct in an array
-            4 - Update numbers to the current layer's child (child_id=layer_path)
+            4 - Update numbers to the current layer's child
+                (child_id=layer_path)
             5 - Update numbers in unk fields in the NetworkLayerPat struct
         """
 
@@ -2474,7 +2476,6 @@ class PatRequestHandler(server.BasicPatHandler):
         path = self.session.get_layer_path()
         path.city_id = number
         self.notify_city_info_set(path)
-        
 
     def recvReqLayerCreateSet(self, packet_id, data, seq):
         """ReqLayerCreateSet packet.
@@ -2505,7 +2506,7 @@ class PatRequestHandler(server.BasicPatHandler):
         # TODO: Backport layer refactoring if needed
         path = self.session.get_layer_path()
         self.notify_city_number_set(path)
-        
+
     def recvReqLayerCreateFoot(self, packet_id, data, seq):
         """ReqLayerCreateFoot packet.
 
@@ -2557,7 +2558,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
     @staticmethod
     def packNtcLayerInfoSet(layer_path, layer_data, optional_fields):
-        # type: (pati.LayerPath, pati.LayerData, List[int]) -> bytes
+        # type: (pati.LayerPath, pati.LayerData, list[int]) -> bytes
         """NtcLayerInfoSet packet.
 
         ID: 64201000
@@ -2568,7 +2569,6 @@ class PatRequestHandler(server.BasicPatHandler):
         data += layer_data.pack()
         data += pati.pack_optional_fields(optional_fields)
         return data
-
 
     def recvReqLayerMediationList(self, packet_id, data, seq):
         """ReqLayerMediationList packet.
@@ -2743,9 +2743,9 @@ class PatRequestHandler(server.BasicPatHandler):
         layer_data = pati.LayerData.create_from(path.city_id, city, path)
         info_set = self.packNtcLayerInfoSet(path, layer_data,
                                             city.optional_fields)
-        self.server.broadcast(gate.players, PatID4.NtcLayerInfoSet, info_set, 0, 
-                              self.session)
-        
+        self.server.broadcast(gate.players, PatID4.NtcLayerInfoSet,
+                              info_set, 0, self.session)
+
     def notify_city_number_set(self, path):
         # type: (pati.LayerPath) -> None
         city = self.get_layer(path)
@@ -2754,15 +2754,16 @@ class PatRequestHandler(server.BasicPatHandler):
         gate = city.parent
         layer_data = pati.LayerData.create_from(path.city_id, city, path)
         number_set = self.packNtcLayerUserNum(4, layer_data)
-        self.server.broadcast(gate.players, PatID4.NtcLayerUserNum, number_set, 0, 
-                              self.session)
-    
+        self.server.broadcast(gate.players, PatID4.NtcLayerUserNum,
+                              number_set, 0, self.session)
+
     @staticmethod
     def get_layer(path):
-        # type: (pati.LayerPath) -> Optional[db.Server | db.Gate | db.City]
+        # type: (pati.LayerPath) -> db.Server | db.Gate | db.City | None
         database = db.get_instance()
         if path.city_id > 0:
-            return database.get_city(path.server_id, path.gate_id, path.city_id)
+            return database.get_city(path.server_id, path.gate_id,
+                                     path.city_id)
         elif path.gate_id > 0:
             return database.get_gate(path.server_id, path.gate_id)
         elif path.server_id > 0:
@@ -2797,7 +2798,6 @@ class PatRequestHandler(server.BasicPatHandler):
             self.notify_city_number_set(path)
             if city.leader is None:
                 self.notify_city_info_set(path)
-
 
     def notify_circle_leave(self, circle_index, seq):
         circle = self.session.get_circle()

@@ -242,7 +242,7 @@ class City(Lockable):
     def get_state(self):
         if self.reserved:
             return LayerState.FULL
-    
+
         size = self.get_population()
         if size == 0:
             return LayerState.EMPTY

@@ -13,11 +13,12 @@ from mh.quest_utils import make_binary_event_quest
 from res.trading_post import CURRENT_TRADES
 
 try:
-    from collections.abc import Callable
+    from collections.abc import Callable  # noqa: F401
     from typing import ParamSpec
     QuestLoader = ParamSpec("QuestLoader", bound="mh.quest_utils.QuestLoader")
 except ImportError:
     pass
+
 
 def make_binary_type_time_events(binary_loader):
     return struct.pack(">III", *get_jhen_event_times())
@@ -28,9 +29,11 @@ def make_event_slot(event):
 
 
 def get_event_slot(slot_num, temporal_slot):
-    return lambda quest_loader, slot_num=slot_num, temporal_slot=temporal_slot: \
+    return \
+        lambda quest_loader, slot_num=slot_num, temporal_slot=temporal_slot: \
         quest_loader[temporal_slot][slot_num] \
-        if slot_num < len(quest_loader[temporal_slot]) else b'\0' * 0x4B4
+        if slot_num < len(quest_loader[temporal_slot]) \
+        else b'\0' * 0x4B4
 
 
 def make_binary_server_type_list(is_jap=False):
@@ -193,7 +196,8 @@ def make_binary_npc_greeters(binary_loader, is_jap=False, temporal_slot=None):
         material_shop = b"Prices are normal."
         event_quests = b""
 
-    quest_list, arena_list = binary_loader.get_separated_quest_dicts(temporal_slot)
+    quest_list, arena_list = \
+        binary_loader.get_separated_quest_dicts(temporal_slot)
 
     event_quests += b"\n".join([
         quest['quest_info']['name']
@@ -281,20 +285,24 @@ IS_JAP = False
 
 
 def get_binary_loader_assisted_version(binary_loader):
-    return current_event_time_slot(binary_loader) + 1 + binary_loader.version
+    return current_event_time_slot(binary_loader) + \
+        1 + binary_loader.version
 
 
 def get_binary_quest_content_from_quest_slot(quest_slot):
-    return lambda temporal_slot, quest_slot=quest_slot: get_event_slot(quest_slot, temporal_slot)
+    return lambda temporal_slot, quest_slot=quest_slot: \
+        get_event_slot(quest_slot, temporal_slot)
 
 
 def get_binary_loader_assisted_trading_post_version(binary_loader):
-    return current_trading_post_time_slot(binary_loader) + 1 + binary_loader.trading_post_version
+    return current_trading_post_time_slot(binary_loader) + \
+          1 + binary_loader.trading_post_version
 
 
 def get_binary_trading_post(temporal_slot):
     return lambda binary_loader, temporal_slot=temporal_slot: \
         binary_loader.get_trading_post_day(temporal_slot)
+
 
 # Dummy PAT_BINARY
 PAT_BINARIES = {
@@ -307,8 +315,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x03: {
-        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
-        "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, is_jap=IS_JAP, temporal_slot=temporal_slot)
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader, is_jap=IS_JAP,
+                                     temporal_slot=temporal_slot)
     },
     0x04: {
         "version": get_binary_loader_assisted_trading_post_version,
@@ -369,8 +381,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x12: {  # French
-        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
-        "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x13: {  # French
         "version": get_binary_loader_assisted_trading_post_version,
@@ -429,8 +445,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x21: {  # German
-        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
-        "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x22: {  # German
         "version": get_binary_loader_assisted_trading_post_version,
@@ -489,8 +509,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x30: {  # Italian
-        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
-        "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x31: {  # Italian
         "version": get_binary_loader_assisted_trading_post_version,
@@ -549,8 +573,12 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x3f: {  # Spanish
-        "version": lambda binary_loader: current_event_time_slot(binary_loader) + 1,
-        "content": lambda temporal_slot: lambda binary_loader: make_binary_npc_greeters(binary_loader, temporal_slot=temporal_slot)
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x40: {  # Spanish
         "version": get_binary_loader_assisted_trading_post_version,
@@ -602,6 +630,7 @@ PAT_BINARIES = {
     },
 }
 
+
 def get_pat_binary_from_version(binary_type, version):
     # type: (int, int) -> bytes|Callable[QuestLoader, bytes]
     """Helper to retrieve binary data.
@@ -612,9 +641,11 @@ def get_pat_binary_from_version(binary_type, version):
 
     TODO: Refactor this and the get_binary_* functions.
     """
-    static_binaries = (0x01, 0x02, 0x05, 0x10, 0x11,
+    static_binaries = (
+        0x01, 0x02, 0x05, 0x10, 0x11,
         0x14, 0x1f, 0x20, 0x23, 0x2e, 0x2f,
-        0x32, 0x3d, 0x3e, 0x41)
+        0x32, 0x3d, 0x3e, 0x41
+    )
     if binary_type in static_binaries:
         return PAT_BINARIES[binary_type]["content"]
     return PAT_BINARIES[binary_type]["content"](version)
