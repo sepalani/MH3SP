@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter database module."""
 
+import inspect
 import random
 import sqlite3
 import time
@@ -966,3 +967,46 @@ CURRENT_DB = TempSQLiteDatabase()
 
 def get_instance():
     return CURRENT_DB
+
+
+def implementation_check(cls, base=TempDatabase):
+    """Debug implementation check allowing to see methods dependencies.
+
+    Example:
+    $> python -im mh.database
+    >>> implementation_check(TempSQLiteDatabase)
+    """
+    def is_method(obj):
+        """Python3's missing unbound methods workaround."""
+        if inspect.ismethod(obj):
+            return True
+        # Python 3 codepath:
+        # Should work in most cases (excluding module and static functions)
+        if inspect.isfunction(obj) and hasattr(obj, "__qualname__"):
+            return "." in obj.__qualname__
+        return False
+
+    mros = inspect.getmro(cls)
+    missing_methods = [
+        name for name, _ in inspect.getmembers(base, is_method)
+    ]
+
+    print("class {}:".format(cls.__name__))
+
+    for name, obj in inspect.getmembers(cls, is_method):
+        if name in missing_methods:
+            missing_methods.remove(name)
+        for c in mros:
+            if name in c.__dict__:
+                print("    {}.{}".format(c.__name__, name))
+                break
+        else:
+            # Should never happen
+            print("    (ERROR).{}".format(name))
+
+    if missing_methods:
+        print("\nMissing methods:"
+              "\n    {}".format("\n    ".join(missing_methods)))
+        return False
+
+    return True
