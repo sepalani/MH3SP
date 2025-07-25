@@ -1,0 +1,880 @@
+{
+    "small_monsters": [
+        [],
+        [
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 1,
+                "quantity": 3,
+                "pos_x": -494.25,
+                "pos_y": 47.01,
+                "pos_z": -947.91,
+                "rot_x": 0,
+                "rot_y": 20186,
+                "rot_z": 0
+            },
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 1,
+                "quantity": 2,
+                "pos_x": -1361.42,
+                "pos_y": 20.6,
+                "pos_z": -712.51,
+                "rot_x": 0,
+                "rot_y": 14302,
+                "rot_z": 0
+            },
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 1,
+                "quantity": 1,
+                "pos_x": 1031.98,
+                "pos_y": 26.73,
+                "pos_z": -1406.32,
+                "rot_x": 0,
+                "rot_y": 27535,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 27,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 0,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -1219.73,
+                "pos_y": 52.23,
+                "pos_z": 1102.22,
+                "rot_x": 0,
+                "rot_y": 3873,
+                "rot_z": 0
+            },
+            {
+                "type": 27,
+                "unk1": 0,
+                "unk2": 2,
+                "variant": 1,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -830.32,
+                "pos_y": 39.56,
+                "pos_z": 1065.16,
+                "rot_x": 0,
+                "rot_y": 1246,
+                "rot_z": 0
+            },
+            {
+                "type": 27,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 2,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -682.64,
+                "pos_y": 60.8,
+                "pos_z": 1535.78,
+                "rot_x": 0,
+                "rot_y": 7451,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 31,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 3,
+                "quantity": 3,
+                "pos_x": 8039.85,
+                "pos_y": 47.82,
+                "pos_z": 3794.23,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 31,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 3,
+                "quantity": 2,
+                "pos_x": 8331.77,
+                "pos_y": 77.59,
+                "pos_z": 4271.11,
+                "rot_x": 0,
+                "rot_y": -1024,
+                "rot_z": 0
+            },
+            {
+                "type": 31,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 3,
+                "quantity": 1,
+                "pos_x": 7572.76,
+                "pos_y": 52.89,
+                "pos_z": 4356.53,
+                "rot_x": 0,
+                "rot_y": 21,
+                "rot_z": 0
+            },
+            {
+                "type": 39,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 3,
+                "quantity": -1,
+                "pos_x": 8572.88,
+                "pos_y": 655.41,
+                "pos_z": 2454.55,
+                "rot_x": 49152,
+                "rot_y": -3379,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 21,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 2,
+                "room": 4,
+                "quantity": 3,
+                "pos_x": -436.87,
+                "pos_y": 19.31,
+                "pos_z": 2521.63,
+                "rot_x": 0,
+                "rot_y": 9128,
+                "rot_z": 0
+            },
+            {
+                "type": 21,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 4,
+                "quantity": 2,
+                "pos_x": 360.05,
+                "pos_y": 38.55,
+                "pos_z": -800.35,
+                "rot_x": 0,
+                "rot_y": 4909,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 4,
+                "quantity": -1,
+                "pos_x": -214.61,
+                "pos_y": 28.25,
+                "pos_z": 268.69,
+                "rot_x": 0,
+                "rot_y": 5120,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 4,
+                "quantity": -1,
+                "pos_x": 1350.31,
+                "pos_y": 23.18,
+                "pos_z": 3610.13,
+                "rot_x": 0,
+                "rot_y": 5120,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 4,
+                "quantity": -1,
+                "pos_x": 1800.4,
+                "pos_y": 1.84,
+                "pos_z": 1993.37,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 4,
+                "quantity": -1,
+                "pos_x": -1425.29,
+                "pos_y": -2.37,
+                "pos_z": 2930.67,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 4,
+                "quantity": -1,
+                "pos_x": 3000.62,
+                "pos_y": -0.47,
+                "pos_z": 2984.86,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 4,
+                "quantity": -1,
+                "pos_x": -1057.0,
+                "pos_y": 6.53,
+                "pos_z": 1521.1,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 39,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 2,
+                "room": 5,
+                "quantity": 2,
+                "pos_x": 39.52,
+                "pos_y": 285.05,
+                "pos_z": -1288.28,
+                "rot_x": 0,
+                "rot_y": 1577,
+                "rot_z": 0
+            },
+            {
+                "type": 39,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 2,
+                "room": 5,
+                "quantity": 5,
+                "pos_x": 458.1,
+                "pos_y": 260.19,
+                "pos_z": -1249.2,
+                "rot_x": 0,
+                "rot_y": 10340,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 5,
+                "quantity": -1,
+                "pos_x": 2045.92,
+                "pos_y": 82.8,
+                "pos_z": -3002.76,
+                "rot_x": 0,
+                "rot_y": 1630,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 5,
+                "quantity": -1,
+                "pos_x": -875.85,
+                "pos_y": 74.14,
+                "pos_z": 555.11,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 5,
+                "quantity": -1,
+                "pos_x": 2418.12,
+                "pos_y": 83.55,
+                "pos_z": -184.33,
+                "rot_x": 0,
+                "rot_y": 1294,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 5,
+                "quantity": -1,
+                "pos_x": -3313.92,
+                "pos_y": 65.96,
+                "pos_z": -1106.93,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 5,
+                "quantity": -1,
+                "pos_x": -2297.87,
+                "pos_y": 59.38,
+                "pos_z": -2214.42,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 5,
+                "quantity": -1,
+                "pos_x": 1184.39,
+                "pos_y": 56.88,
+                "pos_z": -71.72,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 6,
+                "quantity": -1,
+                "pos_x": 393.15,
+                "pos_y": -35.75,
+                "pos_z": 1076.53,
+                "rot_x": 0,
+                "rot_y": -1536,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 6,
+                "quantity": -1,
+                "pos_x": -1170.83,
+                "pos_y": -30.77,
+                "pos_z": 447.51,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 6,
+                "quantity": -1,
+                "pos_x": 1020.1,
+                "pos_y": 4.72,
+                "pos_z": -202.83,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 6,
+                "quantity": -1,
+                "pos_x": -435.28,
+                "pos_y": -28.37,
+                "pos_z": -1280.39,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 40,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 4,
+                "room": 7,
+                "quantity": 1,
+                "pos_x": -208.7,
+                "pos_y": 15.76,
+                "pos_z": 1154.55,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 4,
+                "room": 7,
+                "quantity": 1,
+                "pos_x": -1469.04,
+                "pos_y": 23.53,
+                "pos_z": -284.28,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 7,
+                "quantity": -1,
+                "pos_x": -290.52,
+                "pos_y": 8.16,
+                "pos_z": -1374.79,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 7,
+                "quantity": -1,
+                "pos_x": 2503.26,
+                "pos_y": 19.35,
+                "pos_z": 429.29,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 7,
+                "quantity": -1,
+                "pos_x": 651.25,
+                "pos_y": -9.45,
+                "pos_z": 761.42,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 7,
+                "quantity": -1,
+                "pos_x": -948.43,
+                "pos_y": 25.56,
+                "pos_z": -516.55,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 7,
+                "quantity": -1,
+                "pos_x": -2485.25,
+                "pos_y": 25.6,
+                "pos_z": 268.96,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            },
+            {
+                "type": 40,
+                "unk1": 3,
+                "unk2": 255,
+                "variant": 8,
+                "room": 7,
+                "quantity": -1,
+                "pos_x": -37.88,
+                "pos_y": 12.46,
+                "pos_z": -2799.27,
+                "rot_x": 0,
+                "rot_y": 0,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 8,
+                "quantity": 4,
+                "pos_x": -1064.65,
+                "pos_y": 0.19,
+                "pos_z": 133.11,
+                "rot_x": 0,
+                "rot_y": 8277,
+                "rot_z": 0
+            },
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 8,
+                "quantity": 3,
+                "pos_x": -1816.16,
+                "pos_y": 43.38,
+                "pos_z": -316.74,
+                "rot_x": 0,
+                "rot_y": 7354,
+                "rot_z": 0
+            },
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 8,
+                "quantity": 2,
+                "pos_x": -834.16,
+                "pos_y": 51.62,
+                "pos_z": -1062.45,
+                "rot_x": 0,
+                "rot_y": 1069,
+                "rot_z": 0
+            },
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 8,
+                "quantity": 1,
+                "pos_x": -818.82,
+                "pos_y": 32.27,
+                "pos_z": -671.25,
+                "rot_x": 0,
+                "rot_y": 4459,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 21,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 2,
+                "room": 9,
+                "quantity": 2,
+                "pos_x": 1226.78,
+                "pos_y": 14.44,
+                "pos_z": -971.03,
+                "rot_x": 0,
+                "rot_y": 8842,
+                "rot_z": 0
+            },
+            {
+                "type": 21,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 9,
+                "quantity": 4,
+                "pos_x": 30.91,
+                "pos_y": 11.0,
+                "pos_z": -556.52,
+                "rot_x": 0,
+                "rot_y": 3576,
+                "rot_z": 0
+            }
+        ],
+        []
+    ],
+    "quest_info": {
+        "quest_id": 61007,
+        "name": "The Phantom Uragaan",
+        "client": "Spoiled Princess",
+        "description": "Hunt an Uragaan",
+        "details": "Oooh, I just heard they've\nspotted the cutest, tiniest,\nmost adorable little Uragaan\non the Volcano. Hunt me one\nthis instant or I will get\nvery angry. And if I'm angry,\nDaddy's angry. Now go!",
+        "success_message": "Complete the Main Quest.",
+        "failure_message": "Reward hits 0, or time\nexpires.",
+        "flags": [
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1
+            ]
+        ],
+        "penalty_per_cart": 3000,
+        "quest_fee": 850,
+        "time_limit": 50,
+        "main_monster_1": 21,
+        "main_monster_2": 27,
+        "location": 5,
+        "quest_rank": 3,
+        "hrp_restriction": 8,
+        "resources": 0,
+        "supply_set_number": 15,
+        "starting_position": 0,
+        "general_enemy_level": 29,
+        "summon": 0,
+        "wave_1_transition_type": 0,
+        "wave_1_transition_target": 0,
+        "wave_1_transition_quantity": 0,
+        "wave_2_transition_type": 0,
+        "wave_2_transition_target": 0,
+        "wave_2_transition_quantity": 0
+    },
+    "large_monsters": {
+        "monster_1": {
+            "type": 9,
+            "starting_area": 0,
+            "boss_id": 0,
+            "spawn_count": 1,
+            "level": 29,
+            "size": 19,
+            "hp_spread": 0,
+            "size_spread": 0
+        },
+        "monster_2": {
+            "type": 0,
+            "starting_area": 0,
+            "boss_id": 0,
+            "spawn_count": 0,
+            "level": 0,
+            "size": 0,
+            "hp_spread": 0,
+            "size_spread": 0
+        },
+        "monster_3": {
+            "type": 0,
+            "starting_area": 0,
+            "boss_id": 0,
+            "spawn_count": 0,
+            "level": 0,
+            "size": 0,
+            "hp_spread": 0,
+            "size_spread": 0
+        }
+    },
+    "objective_details": {
+        "main_quest": {
+            "type": 1,
+            "objective_type": 9,
+            "objective_num": 1,
+            "zenny_reward": 8800,
+            "hrp_reward": 1100,
+            "rewards_row_1": [
+                [
+                    440,
+                    1,
+                    1
+                ],
+                [
+                    410,
+                    1,
+                    16
+                ],
+                [
+                    479,
+                    1,
+                    20
+                ],
+                [
+                    412,
+                    1,
+                    10
+                ],
+                [
+                    155,
+                    1,
+                    10
+                ],
+                [
+                    343,
+                    15,
+                    13
+                ],
+                [
+                    441,
+                    1,
+                    5
+                ],
+                [
+                    110,
+                    1,
+                    25
+                ]
+            ],
+            "rewards_row_2": [
+                [
+                    440,
+                    1,
+                    1
+                ],
+                [
+                    410,
+                    1,
+                    16
+                ],
+                [
+                    479,
+                    1,
+                    20
+                ],
+                [
+                    412,
+                    1,
+                    10
+                ],
+                [
+                    155,
+                    1,
+                    10
+                ],
+                [
+                    343,
+                    15,
+                    13
+                ],
+                [
+                    441,
+                    1,
+                    5
+                ],
+                [
+                    110,
+                    1,
+                    25
+                ]
+            ]
+        },
+        "subquest_1": {
+            "description": "None",
+            "type": 0,
+            "objective_type": 0,
+            "objective_num": 0,
+            "zenny_reward": 0,
+            "hrp_reward": 0,
+            "rewards_row_1": []
+        },
+        "subquest_2": {
+            "description": "None",
+            "type": 0,
+            "objective_type": 0,
+            "objective_num": 0,
+            "zenny_reward": 0,
+            "hrp_reward": 0,
+            "rewards_row_1": []
+        }
+    },
+    "unknown": {
+        "unk_12": 2,
+        "unk_4": 0,
+        "unk_5": 0,
+        "unk_6": 0,
+        "unk_7": 0,
+        "unkInt0": 0,
+        "unkShort0": 0,
+        "unkByte0": 0,
+        "unkBytes0_0": 0,
+        "unkBytes0_1": 0,
+        "unkBytes0_2": 0,
+        "unkBytes1_0": 0,
+        "unkBytes1_1": 0,
+        "unkBytes1_2": 0,
+        "unkBytes2_0": 0,
+        "unkBytes2_1": 0,
+        "unkUintAlways15": 15,
+        "unkShort1": 0,
+        "unkShort2": 0,
+        "unkByte1": 0,
+        "unkByte2": 0,
+        "unkByte3": 0,
+        "unkByte4": 0,
+        "unkByte7": 0,
+        "unkByte8": 0
+    }
+}

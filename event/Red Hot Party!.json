@@ -1,0 +1,871 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 19, 
+            "zenny_reward": 0, 
+            "type": 1
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 3870, 
+            "rewards_row_1": [
+                [
+                    177, 
+                    1, 
+                    8
+                ], 
+                [
+                    176, 
+                    1, 
+                    8
+                ], 
+                [
+                    171, 
+                    1, 
+                    8
+                ], 
+                [
+                    507, 
+                    1, 
+                    10
+                ], 
+                [
+                    505, 
+                    1, 
+                    10
+                ], 
+                [
+                    412, 
+                    1, 
+                    10
+                ], 
+                [
+                    482, 
+                    1, 
+                    10
+                ], 
+                [
+                    111, 
+                    1, 
+                    10
+                ], 
+                [
+                    285, 
+                    1, 
+                    8
+                ], 
+                [
+                    481, 
+                    1, 
+                    6
+                ], 
+                [
+                    174, 
+                    1, 
+                    6
+                ], 
+                [
+                    183, 
+                    1, 
+                    6
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    177, 
+                    1, 
+                    8
+                ], 
+                [
+                    176, 
+                    1, 
+                    8
+                ], 
+                [
+                    171, 
+                    1, 
+                    8
+                ], 
+                [
+                    507, 
+                    1, 
+                    10
+                ], 
+                [
+                    505, 
+                    1, 
+                    10
+                ], 
+                [
+                    412, 
+                    1, 
+                    10
+                ], 
+                [
+                    482, 
+                    1, 
+                    10
+                ], 
+                [
+                    111, 
+                    1, 
+                    10
+                ], 
+                [
+                    285, 
+                    1, 
+                    8
+                ], 
+                [
+                    481, 
+                    1, 
+                    6
+                ], 
+                [
+                    174, 
+                    1, 
+                    6
+                ], 
+                [
+                    183, 
+                    1, 
+                    6
+                ]
+            ], 
+            "objective_type": 2, 
+            "zenny_reward": 41000, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 9, 
+            "zenny_reward": 0, 
+            "type": 1
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -947.91, 
+                "pos_x": -494.25, 
+                "pos_y": 47.01, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 112147, 
+                "rot_x": 0, 
+                "type": 34, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -712.51, 
+                "pos_x": -1361.42, 
+                "pos_y": 20.6, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 79456, 
+                "rot_x": 0, 
+                "type": 34, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -1406.32, 
+                "pos_x": 1031.98, 
+                "pos_y": 26.73, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 152977, 
+                "rot_x": 0, 
+                "type": 34, 
+                "quantity": 1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1809.58, 
+                "pos_x": 3139.21, 
+                "pos_y": -16.41, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 14105, 
+                "rot_x": 0, 
+                "type": 33, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 2280.01, 
+                "pos_x": 2598.0, 
+                "pos_y": 64.57, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 14478, 
+                "rot_x": 0, 
+                "type": 33, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 2453.7, 
+                "pos_x": 2184.05, 
+                "pos_y": 66.73, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 11582, 
+                "rot_x": 0, 
+                "type": 33, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1680.05, 
+                "pos_x": 2741.8, 
+                "pos_y": -53.82, 
+                "room": 2, 
+                "rot_z": 0, 
+                "rot_y": 14128, 
+                "rot_x": 0, 
+                "type": 33, 
+                "quantity": 1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 4494.92, 
+                "pos_x": 6982.8, 
+                "pos_y": 73.73, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": 5856, 
+                "rot_x": 0, 
+                "type": 27, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 4957.68, 
+                "pos_x": 7778.32, 
+                "pos_y": 66.41, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": 2872, 
+                "rot_x": 0, 
+                "type": 27, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 5160.52, 
+                "pos_x": 8087.79, 
+                "pos_y": 83.54, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": 5774, 
+                "rot_x": 0, 
+                "type": 27, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 2473.3, 
+                "pos_x": 8676.94, 
+                "pos_y": 515.74, 
+                "room": 3, 
+                "rot_z": 0, 
+                "rot_y": 6351, 
+                "rot_x": 273, 
+                "type": 39, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 639.95, 
+                "pos_x": 672.08, 
+                "pos_y": 25.43, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 2264, 
+                "rot_x": 0, 
+                "type": 29, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 0, 
+                "unk2": 255, 
+                "pos_z": 2402.83, 
+                "pos_x": -1151.12, 
+                "pos_y": -43.31, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": -39, 
+                "rot_x": 0, 
+                "type": 29, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 3042.75, 
+                "pos_x": 1580.62, 
+                "pos_y": 129.42, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 39, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 2633.18, 
+                "pos_x": 1743.0, 
+                "pos_y": 339.42, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 91, 
+                "rot_x": 0, 
+                "type": 39, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 2724.68, 
+                "pos_x": 1303.26, 
+                "pos_y": 189.42, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": -28, 
+                "rot_x": 0, 
+                "type": 39, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 104.92, 
+                "pos_x": -1485.68, 
+                "pos_y": 36.65, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 3032, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -27.96, 
+                "pos_x": 897.01, 
+                "pos_y": 25.14, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 56, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 1861.15, 
+                "pos_x": 2948.85, 
+                "pos_y": 7.51, 
+                "room": 4, 
+                "rot_z": 0, 
+                "rot_y": 20656, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 542.2, 
+                "pos_x": -775.56, 
+                "pos_y": 73.07, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 1828, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1218.55, 
+                "pos_x": -3498.99, 
+                "pos_y": 67.5, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 4835, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -422.06, 
+                "pos_x": 486.74, 
+                "pos_y": 38.66, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 1331, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1059.79, 
+                "pos_x": 2864.76, 
+                "pos_y": 49.34, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 7296, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1571.42, 
+                "pos_x": 1202.49, 
+                "pos_y": 57.63, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1510.18, 
+                "pos_x": -1733.55, 
+                "pos_y": 56.88, 
+                "room": 5, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 1076.53, 
+                "pos_x": 393.15, 
+                "pos_y": -35.75, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": -85, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 447.51, 
+                "pos_x": -1170.83, 
+                "pos_y": -30.77, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -202.83, 
+                "pos_x": 1020.1, 
+                "pos_y": 4.72, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1280.39, 
+                "pos_x": -435.28, 
+                "pos_y": -28.37, 
+                "room": 6, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 228.22, 
+                "pos_x": 95.05, 
+                "pos_y": -6.35, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 1399, 
+                "rot_x": 0, 
+                "type": 21, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 268.38, 
+                "pos_x": -2114.33, 
+                "pos_y": 17.37, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 19692, 
+                "rot_x": 0, 
+                "type": 21, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1532.47, 
+                "pos_x": -1877.72, 
+                "pos_y": -22.42, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 32312, 
+                "rot_x": 0, 
+                "type": 21, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -496.28, 
+                "pos_x": 625.43, 
+                "pos_y": 3.37, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 6283, 
+                "rot_x": 0, 
+                "type": 21, 
+                "quantity": 1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 61.89, 
+                "pos_x": -1447.72, 
+                "pos_y": 21.43, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -1209.27, 
+                "pos_x": 316.55, 
+                "pos_y": -3.36, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": 1099.8, 
+                "pos_x": 1008.65, 
+                "pos_y": -9.18, 
+                "room": 7, 
+                "rot_z": 0, 
+                "rot_y": 0, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1581.6, 
+                "pos_x": 728.75, 
+                "pos_y": -19.44, 
+                "room": 8, 
+                "rot_z": 0, 
+                "rot_y": 1581.6, 
+                "rot_x": 0, 
+                "type": 30, 
+                "quantity": 4
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 301.92, 
+                "pos_x": -375.43, 
+                "pos_y": 6.66, 
+                "room": 8, 
+                "rot_z": 0, 
+                "rot_y": 40860, 
+                "rot_x": 0, 
+                "type": 30, 
+                "quantity": 3
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -50.4, 
+                "pos_x": 479.45, 
+                "pos_y": 30.53, 
+                "room": 8, 
+                "rot_z": 0, 
+                "rot_y": 59178, 
+                "rot_x": 0, 
+                "type": 30, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": 1552.73, 
+                "pos_x": 2190.05, 
+                "pos_y": -6.53, 
+                "room": 8, 
+                "rot_z": 0, 
+                "rot_y": 24814, 
+                "rot_x": 0, 
+                "type": 30, 
+                "quantity": 1
+            }
+        ], 
+        [
+            {
+                "variant": 2, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -971.03, 
+                "pos_x": 1226.78, 
+                "pos_y": 14.44, 
+                "room": 9, 
+                "rot_z": 0, 
+                "rot_y": 49126, 
+                "rot_x": 0, 
+                "type": 21, 
+                "quantity": 2
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -556.52, 
+                "pos_x": 30.91, 
+                "pos_y": 11.0, 
+                "room": 9, 
+                "rot_z": 0, 
+                "rot_y": 19871, 
+                "rot_x": 0, 
+                "type": 21, 
+                "quantity": 3
+            }
+        ], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 1, 
+        "quest_rank": 5, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 52, 
+        "wave_2_transition_type": 0, 
+        "location": 5, 
+        "penalty_per_cart": 15000, 
+        "resources": 1, 
+        "details": "You're back! While you were\naway, three wyverns moved into\nthe volcano and are reeking\nhavoc throughout the area!\nWe haven't a moment to spare!\nPlease get rid of all three\nof them for me and my people!", 
+        "description": "Hunt a Ratha., Urag. & Agnak.", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 10, 
+        "quest_fee": 4050, 
+        "quest_id": 61022, 
+        "name": "Red Hot Party!", 
+        "main_monster_2": 30, 
+        "main_monster_1": 36, 
+        "supply_set_number": 27, 
+        "summon": 0, 
+        "client": "Deserted Island Chief", 
+        "flags": [
+            [
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                1
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 1, 
+            "hp_spread": 1, 
+            "level": 56, 
+            "boss_id": 1, 
+            "type": 9, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 1, 
+            "hp_spread": 1, 
+            "level": 56, 
+            "boss_id": 2, 
+            "type": 19, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_1": {
+            "size_spread": 1, 
+            "hp_spread": 0, 
+            "level": 56, 
+            "boss_id": 0, 
+            "type": 2, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

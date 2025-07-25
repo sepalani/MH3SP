@@ -1,0 +1,353 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 950, 
+            "rewards_row_1": [
+                [
+                    291, 
+                    1, 
+                    18
+                ], 
+                [
+                    292, 
+                    1, 
+                    6
+                ], 
+                [
+                    294, 
+                    1, 
+                    11
+                ], 
+                [
+                    293, 
+                    1, 
+                    15
+                ], 
+                [
+                    414, 
+                    1, 
+                    10
+                ], 
+                [
+                    418, 
+                    1, 
+                    16
+                ], 
+                [
+                    415, 
+                    1, 
+                    13
+                ], 
+                [
+                    416, 
+                    1, 
+                    6
+                ], 
+                [
+                    419, 
+                    1, 
+                    5
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    291, 
+                    1, 
+                    13
+                ], 
+                [
+                    292, 
+                    1, 
+                    6
+                ], 
+                [
+                    294, 
+                    1, 
+                    11
+                ], 
+                [
+                    293, 
+                    1, 
+                    10
+                ], 
+                [
+                    414, 
+                    1, 
+                    9
+                ], 
+                [
+                    418, 
+                    1, 
+                    10
+                ], 
+                [
+                    415, 
+                    1, 
+                    10
+                ], 
+                [
+                    416, 
+                    1, 
+                    6
+                ], 
+                [
+                    419, 
+                    1, 
+                    5
+                ], 
+                [
+                    565, 
+                    1, 
+                    20
+                ]
+            ], 
+            "objective_type": 4, 
+            "zenny_reward": 7000, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 19, 
+            "zenny_reward": 0, 
+            "type": 1
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 0, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 26, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 1, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3042.7, 
+                "pos_x": -0.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 35, 
+                "quantity": -1
+            }
+        ]
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 3, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 27, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 2400, 
+        "resources": 0, 
+        "details": "Why do we live, only to suffer?\nOnly slayers of pig meat know\nthese things. Take care, Hunter,\nfor those who look to antidote\nherbs may find their breath\nstolen away.", 
+        "description": "Hunt a Gigginox\nand an Agnaktor", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 8, 
+        "quest_fee": 200, 
+        "quest_id": 61050, 
+        "name": "[MH3SP] Green Eggs and...", 
+        "main_monster_2": 19, 
+        "main_monster_1": 4, 
+        "supply_set_number": 43, 
+        "summon": 0, 
+        "client": "Ze SpyRo", 
+        "flags": [
+            [
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 27, 
+            "boss_id": 1, 
+            "type": 19, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 2, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 3, 
+            "hp_spread": 0, 
+            "level": 27, 
+            "boss_id": 0, 
+            "type": 4, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

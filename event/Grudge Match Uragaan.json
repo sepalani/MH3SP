@@ -1,0 +1,503 @@
+{
+    "small_monsters": [
+        [], 
+        [
+            {
+                "variant": 3, 
+                "unk1": 1, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -1404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -3404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -5404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -4404.5, 
+                "pos_y": -5038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }, 
+            {
+                "variant": 8, 
+                "unk1": 3, 
+                "unk2": 255, 
+                "pos_z": -3542.7, 
+                "pos_x": -2404.5, 
+                "pos_y": -4038.5, 
+                "room": 1, 
+                "rot_z": 0, 
+                "rot_y": 170, 
+                "rot_x": 0, 
+                "type": 40, 
+                "quantity": -1
+            }
+        ]
+    ], 
+    "arena_equipment": [
+        [
+            [
+                8, 
+                6
+            ], 
+            null, 
+            null, 
+            30, 
+            12, 
+            32, 
+            13, 
+            13, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    391, 
+                    2
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    4, 
+                    1
+                ], 
+                [
+                    50, 
+                    2
+                ], 
+                [
+                    2, 
+                    3
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                14, 
+                10
+            ], 
+            null, 
+            null, 
+            129, 
+            49, 
+            120, 
+            42, 
+            47, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    11, 
+                    5
+                ], 
+                [
+                    3, 
+                    1
+                ], 
+                [
+                    50, 
+                    1
+                ], 
+                [
+                    582, 
+                    2
+                ], 
+                [
+                    1, 
+                    2
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                9, 
+                48
+            ], 
+            null, 
+            null, 
+            42, 
+            45, 
+            124, 
+            5, 
+            45, 
+            [
+                [
+                    98, 
+                    20
+                ], 
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    15, 
+                    1
+                ], 
+                [
+                    50, 
+                    1
+                ], 
+                [
+                    582, 
+                    1
+                ], 
+                [
+                    1, 
+                    1
+                ]
+            ], 
+            []
+        ], 
+        [
+            [
+                11, 
+                5
+            ], 
+            [
+                12, 
+                5
+            ], 
+            [
+                13, 
+                6
+            ], 
+            130, 
+            34, 
+            31, 
+            35, 
+            34, 
+            [
+                [
+                    14, 
+                    10
+                ], 
+                [
+                    13, 
+                    10
+                ], 
+                [
+                    45, 
+                    10
+                ], 
+                [
+                    360, 
+                    2
+                ], 
+                [
+                    2, 
+                    2
+                ]
+            ], 
+            [
+                [
+                    54, 
+                    99
+                ], 
+                [
+                    56, 
+                    60
+                ], 
+                [
+                    57, 
+                    50
+                ], 
+                [
+                    63, 
+                    9
+                ], 
+                [
+                    69, 
+                    30
+                ]
+            ]
+        ]
+    ], 
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 2, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 23, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 600, 
+        "resources": 2, 
+        "details": "Riled up, fight fans? Here comes\na dragon whose name is\nsynonymous with pain: Uragaan!\nOh, and we've added a time limit\nto make the fight extra fun. Are\nthe hunters up to the challenge?\nOutlook not good!", 
+        "description": "Slay an Uragaan", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 0, 
+        "quest_fee": 0, 
+        "quest_id": 60004, 
+        "name": "Grudge Match: Uragaan", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 0, 
+        "summon": 0, 
+        "client": "Announcer/Receptionist", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0, 
+                1, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [
+                [
+                    612, 
+                    1, 
+                    19
+                ], 
+                [
+                    612, 
+                    2, 
+                    7
+                ], 
+                [
+                    431, 
+                    1, 
+                    14
+                ], 
+                [
+                    328, 
+                    1, 
+                    8
+                ], 
+                [
+                    327, 
+                    1, 
+                    12
+                ], 
+                [
+                    569, 
+                    1, 
+                    20
+                ], 
+                [
+                    615, 
+                    1, 
+                    20
+                ]
+            ], 
+            "rewards_row_2": [], 
+            "objective_type": 9, 
+            "zenny_reward": 1500, 
+            "type": 257
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 23, 
+            "boss_id": 0, 
+            "type": 9, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

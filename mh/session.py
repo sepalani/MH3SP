@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter session module."""
 
@@ -52,6 +52,7 @@ class Session(object):
         self.state = SessionState.UNKNOWN
         self.binary_setting = b""
         self.search_payload = None
+        # TODO: Backport the server_id and serialisation logic
         self.hunter_info = pati.HunterSettings()
 
     def get(self, connection_data):
@@ -60,6 +61,7 @@ class Session(object):
             self.pat_ticket = to_str(
                 pati.unpack_binary(connection_data.pat_ticket)
             )
+        # TODO: Backport state change
         if hasattr(connection_data, "online_support_code"):
             self.online_support_code = to_str(
                 pati.unpack_string(connection_data.online_support_code)
@@ -77,6 +79,8 @@ class Session(object):
             not ("pat_ticket" in connection_data or
                  "online_support_code" in connection_data)
         return session
+
+    # TODO: Backport session_ready logic
 
     def get_support_code(self):
         """Return the online support code."""
@@ -113,6 +117,8 @@ class Session(object):
 
     def use_user(self, index, name):
         DB.use_user(self, index, name)
+
+    # TODO: server_index and recall logic
 
     def get_servers(self):
         return DB.get_servers()
@@ -363,7 +369,8 @@ class Session(object):
         return self.get_layer().players
 
     def get_layer_path(self):
-        return pati.LayerPath(self.local_info['server_id'], self.local_info['gate_id'], 
+        return pati.LayerPath(self.local_info['server_id'],
+                              self.local_info['gate_id'],
                               self.local_info['city_id'])
 
     def get_layer_host_data(self):

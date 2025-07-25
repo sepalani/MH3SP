@@ -1,0 +1,205 @@
+{
+    "unknown": {
+        "unk_12": 5, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 4200, 
+            "rewards_row_1": [
+                [
+                    433, 
+                    1, 
+                    40
+                ], 
+                [
+                    510, 
+                    1, 
+                    30
+                ], 
+                [
+                    435, 
+                    1, 
+                    10
+                ], 
+                [
+                    434, 
+                    1, 
+                    10
+                ], 
+                [
+                    437, 
+                    1, 
+                    5
+                ], 
+                [
+                    436, 
+                    1, 
+                    5
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    434, 
+                    1, 
+                    11
+                ], 
+                [
+                    510, 
+                    1, 
+                    34
+                ], 
+                [
+                    435, 
+                    1, 
+                    39
+                ], 
+                [
+                    466, 
+                    1, 
+                    6
+                ], 
+                [
+                    437, 
+                    1, 
+                    5
+                ], 
+                [
+                    436, 
+                    1, 
+                    5
+                ]
+            ], 
+            "objective_type": 24, 
+            "zenny_reward": 42000, 
+            "type": 257
+        }, 
+        "subquest_1": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 2, 
+        "quest_rank": 6, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 64, 
+        "wave_2_transition_type": 0, 
+        "location": 11, 
+        "penalty_per_cart": 14000, 
+        "resources": 1, 
+        "details": "I've been waiting, hunter. Now\ncomes your final challenge:\nAlatreon, a dragon of darkness\nand light. Can mere mortals\nfell an elder dragon feared\neven by the gods? Don't even\nbother saying your prayers...", 
+        "description": "Slay the Alatreon", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 11, 
+        "quest_fee": 4200, 
+        "quest_id": 61021, 
+        "name": "Where Gods Fear to Tread", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 0, 
+        "summon": 0, 
+        "client": "Scarlet Mystery Man", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                1, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 64, 
+            "boss_id": 0, 
+            "type": 24, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 125
+        }
+    }
+}

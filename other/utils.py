@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2024 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Utils helper module."""
 
@@ -240,6 +240,9 @@ def get_config(name, config_file=CONFIG_FILE):
     }
 
 
+# TODO: Backport MySQL, latest_patch and central config code
+
+
 def get_default_ip():
     # type: () -> str
     """Get the default IP address"""
@@ -323,6 +326,9 @@ def argparse_from_config(config):
     parser.add_argument("--dry-run", action="store_true",
                         dest="dry_run",
                         help="dry run to test the server")
+    parser.add_argument("-t", "--no-timeout", action="store_true",
+                        dest="no_timeout",
+                        help="disable player timeouts")
     return parser
 
 
@@ -366,7 +372,8 @@ def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
-                  log_to_console=True, log_to_window=False, debug_mode=False):
+                  log_to_console=True, log_to_window=False, legacy_ssl=False,
+                  debug_mode=False, no_timeout=False):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG if debug_mode else logging.INFO,
@@ -377,7 +384,8 @@ def create_server(server_class, server_handler,
         ssl_cert = None
         ssl_key = None
     return server_class((address, port), server_handler, max_thread, logger,
-                        debug_mode, ssl_cert=ssl_cert, ssl_key=ssl_key)
+                        debug_mode, ssl_cert=ssl_cert, ssl_key=ssl_key,
+                        no_timeout=no_timeout)
 
 
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
@@ -389,6 +397,7 @@ def create_server_from_base(name, server_class, server_handler, args=None):
     If args is None, sys.argv is used (see ArgumentParser.parser_args).
     """
     config = get_config(name)
+    # TODO: Backport central config code if needed
     parser = argparse_from_config(config)
     args = parser.parse_args(args)
     kwargs = {

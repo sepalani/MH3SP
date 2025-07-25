@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2022-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2022-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter PAT Server module."""
 
@@ -9,6 +9,7 @@ import random
 import socket
 import struct
 import threading
+import traceback
 
 from mh.time_utils import Timer
 from other.utils import wii_ssl_wrap_socket
@@ -23,15 +24,9 @@ except ImportError:
     import externals.selectors2 as selectors
 
 
-try:
-    from typing import List, Tuple  # noqa: F401
-except ImportError:
-    pass
-
-
 class BasicPatHandler(object):
     def __init__(self, socket, client_address, server):
-        # type: (socket.socket, Tuple[str, int], BasicPatServer)  -> None
+        # type: (socket.socket, tuple[str, int], BasicPatServer)  -> None
         self.socket = socket
         self.client_address = client_address
         self.server = server
@@ -121,7 +116,7 @@ class BasicPatHandler(object):
         try:
             self.on_finish()
         except Exception:
-            pass
+            self.server.error(traceback.format_exc())
 
         self.finished = True
 
@@ -146,7 +141,7 @@ class BasicPatServer(object):
 
     def __init__(self, server_address, RequestHandlerClass, max_threads,
                  bind_and_activate=True, ssl_cert=None, ssl_key=None):
-        # type: (Tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None
+        # type: (tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None  # noqa: E501
         """Constructor.  May be extended, do not override."""
         self.server_address = server_address
         self.RequestHandlerClass = RequestHandlerClass
@@ -155,13 +150,14 @@ class BasicPatServer(object):
         self.__shutdown_request = False
         self.socket = socket.socket(self.address_family, self.socket_type)
         self._random = random.SystemRandom()  # type: random.SystemRandom
-        self.handlers = []  # type: List[BasicPatHandler]
-        self.worker_threads = []  # type: List[threading.Thread]
+        self.handlers = []  # type: list[BasicPatHandler]
+        self.worker_threads = []  # type: list[threading.Thread]
         self.worker_queues = []  # type: list[queue.queue]
         self.selector = selectors.DefaultSelector()
         self.max_threads = max_threads or multiprocessing.cpu_count()
         self.ssl_cert = ssl_cert
         self.ssl_key = ssl_key
+        # TODO: Backport change required by central/cache if any
 
         if bind_and_activate:
             try:
@@ -218,24 +214,28 @@ class BasicPatServer(object):
                     if self.__shutdown_request:
                         break
 
-                    for (key, event) in ready:
-                        selected = key.fileobj
-                        if selected == self:
-                            self.accept_new_connection()
-                        else:
-                            assert event == selectors.EVENT_READ
-                            try:
-                                packet = selected.on_recv()
-                                if packet is None:
+                    try:
+                        for (key, event) in ready:
+                            selected = key.fileobj
+                            if selected == self:
+                                self.accept_new_connection()
+                            else:
+                                assert event == selectors.EVENT_READ
+                                try:
+                                    packet = selected.on_recv()
+                                    if packet is None:
+                                        if selected.is_finished():
+                                            self.remove_handler(selected)
+                                        continue
+
+                                    self._queue_work(selected, packet, event)
+                                except Exception as e:
+                                    selected.on_exception(e)
                                     if selected.is_finished():
                                         self.remove_handler(selected)
-                                    continue
+                    except Exception:
+                        self.error(traceback.format_exc())
 
-                                self._queue_work(selected, packet, event)
-                            except Exception as e:
-                                selected.on_exception(e)
-                                if selected.is_finished():
-                                    self.remove_handler(selected)
                     if write_watch.elapsed() >= write_timeout:
                         try:
                             for handler in self.handlers:
@@ -246,8 +246,12 @@ class BasicPatServer(object):
 
                                 if handler.is_finished():
                                     self.remove_handler(handler)
+                        except Exception:
+                            self.error(traceback.format_exc())
                         finally:
                             write_watch.restart()
+        except Exception:
+            self.error(traceback.format_exc())
         finally:
             self.__is_shut_down.set()
 
@@ -269,12 +273,15 @@ class BasicPatServer(object):
             assert event == selectors.EVENT_READ
 
             try:
-                handler.on_packet(packet)
-            except Exception as e:
-                handler.on_exception(e)
+                try:
+                    handler.on_packet(packet)
+                except Exception as e:
+                    handler.on_exception(e)
 
-            if handler.is_finished():
-                self.remove_handler(handler)
+                if handler.is_finished():
+                    self.remove_handler(handler)
+            except Exception:
+                self.error(traceback.format_exc())
 
     def accept_new_connection(self):
         # type: () -> None

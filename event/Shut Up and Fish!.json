@@ -1,0 +1,765 @@
+{
+    "small_monsters": [
+        [],
+        [
+            {
+                "type": 17,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 1,
+                "quantity": 1,
+                "pos_x": -1169.23,
+                "pos_y": -50.0,
+                "pos_z": -423.3,
+                "rot_x": 0,
+                "rot_y": -25600,
+                "rot_z": 0
+            },
+            {
+                "type": 17,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 1,
+                "quantity": 3,
+                "pos_x": 1367.09,
+                "pos_y": -50.0,
+                "pos_z": -1500.72,
+                "rot_x": 0,
+                "rot_y": 59392,
+                "rot_z": 0
+            },
+            {
+                "type": 36,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 1,
+                "quantity": -1,
+                "pos_x": 1019.5,
+                "pos_y": 120.0,
+                "pos_z": -3357.52,
+                "rot_x": 49152,
+                "rot_y": 32768,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 23,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 0,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -2518.64,
+                "pos_y": -470.0,
+                "pos_z": 620.06,
+                "rot_x": 0,
+                "rot_y": 27648,
+                "rot_z": 0
+            },
+            {
+                "type": 23,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 0,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -1786.72,
+                "pos_y": -230.0,
+                "pos_z": 24.74,
+                "rot_x": 0,
+                "rot_y": 51200,
+                "rot_z": 0
+            },
+            {
+                "type": 32,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 6,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -2127.59,
+                "pos_y": -479.91,
+                "pos_z": -1175.97,
+                "rot_x": 0,
+                "rot_y": -7168,
+                "rot_z": 0
+            },
+            {
+                "type": 32,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 6,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -2231.54,
+                "pos_y": -751.13,
+                "pos_z": -1060.03,
+                "rot_x": 0,
+                "rot_y": -7168,
+                "rot_z": 0
+            },
+            {
+                "type": 32,
+                "unk1": 1,
+                "unk2": 2,
+                "variant": 6,
+                "room": 2,
+                "quantity": -1,
+                "pos_x": -2037.48,
+                "pos_y": -628.68,
+                "pos_z": -957.11,
+                "rot_x": 0,
+                "rot_y": -7168,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 36,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 3,
+                "quantity": 3,
+                "pos_x": -1084.83,
+                "pos_y": 283.44,
+                "pos_z": -815.51,
+                "rot_x": 0,
+                "rot_y": -9216,
+                "rot_z": 0
+            },
+            {
+                "type": 36,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 3,
+                "quantity": 2,
+                "pos_x": -737.17,
+                "pos_y": 163.44,
+                "pos_z": -1328.84,
+                "rot_x": 0,
+                "rot_y": -39936,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 32,
+                "unk1": 4,
+                "unk2": 255,
+                "variant": 5,
+                "room": 4,
+                "quantity": 3,
+                "pos_x": 1295.68,
+                "pos_y": -1334.54,
+                "pos_z": -1102.45,
+                "rot_x": 0,
+                "rot_y": -22528,
+                "rot_z": 0
+            },
+            {
+                "type": 32,
+                "unk1": 4,
+                "unk2": 255,
+                "variant": 5,
+                "room": 4,
+                "quantity": 1,
+                "pos_x": 2116.25,
+                "pos_y": -1371.63,
+                "pos_z": 1500.92,
+                "rot_x": 0,
+                "rot_y": -38912,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 5,
+                "quantity": 3,
+                "pos_x": 2381.23,
+                "pos_y": 3.57,
+                "pos_z": 5454.15,
+                "rot_x": 0,
+                "rot_y": 14336,
+                "rot_z": 0
+            },
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 5,
+                "quantity": 2,
+                "pos_x": 2530.36,
+                "pos_y": 5.0,
+                "pos_z": 4637.36,
+                "rot_x": 0,
+                "rot_y": 27648,
+                "rot_z": 0
+            },
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 5,
+                "quantity": 1,
+                "pos_x": -399.12,
+                "pos_y": 0.87,
+                "pos_z": -1183.24,
+                "rot_x": 0,
+                "rot_y": 63488,
+                "rot_z": 0
+            },
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 5,
+                "quantity": 1,
+                "pos_x": -941.2,
+                "pos_y": 9.76,
+                "pos_z": -1589.08,
+                "rot_x": 0,
+                "rot_y": 26624,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 17,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 6,
+                "quantity": 1,
+                "pos_x": 2376.71,
+                "pos_y": -1090.0,
+                "pos_z": 74.87,
+                "rot_x": 0,
+                "rot_y": -38912,
+                "rot_z": 0
+            },
+            {
+                "type": 17,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 6,
+                "quantity": 3,
+                "pos_x": 341.73,
+                "pos_y": -453.9,
+                "pos_z": 722.12,
+                "rot_x": 0,
+                "rot_y": -120832,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 7,
+                "quantity": 4,
+                "pos_x": 1787.81,
+                "pos_y": 71.74,
+                "pos_z": -65.12,
+                "rot_x": 0,
+                "rot_y": 132096,
+                "rot_z": 0
+            },
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 7,
+                "quantity": 2,
+                "pos_x": 1060.48,
+                "pos_y": 50.13,
+                "pos_z": 805.32,
+                "rot_x": 0,
+                "rot_y": 137216,
+                "rot_z": 0
+            },
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 7,
+                "quantity": 2,
+                "pos_x": 700.34,
+                "pos_y": 50.0,
+                "pos_z": -197.27,
+                "rot_x": 0,
+                "rot_y": 155648,
+                "rot_z": 0
+            },
+            {
+                "type": 34,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 7,
+                "quantity": 1,
+                "pos_x": 2239.39,
+                "pos_y": 71.92,
+                "pos_z": 647.27,
+                "rot_x": 0,
+                "rot_y": 120832,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 23,
+                "unk1": 1,
+                "unk2": 8,
+                "variant": 0,
+                "room": 8,
+                "quantity": -1,
+                "pos_x": 561.24,
+                "pos_y": -355.07,
+                "pos_z": -2312.24,
+                "rot_x": 0,
+                "rot_y": 125952,
+                "rot_z": 0
+            },
+            {
+                "type": 23,
+                "unk1": 0,
+                "unk2": 8,
+                "variant": 0,
+                "room": 8,
+                "quantity": -1,
+                "pos_x": -112.72,
+                "pos_y": -655.07,
+                "pos_z": -2436.54,
+                "rot_x": 0,
+                "rot_y": 137216,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 9,
+                "quantity": 5,
+                "pos_x": 1578.47,
+                "pos_y": 0.56,
+                "pos_z": -1719.01,
+                "rot_x": 0,
+                "rot_y": -2048,
+                "rot_z": 0
+            },
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 9,
+                "quantity": 4,
+                "pos_x": 1820.89,
+                "pos_y": 1.5,
+                "pos_z": -1833.48,
+                "rot_x": 0,
+                "rot_y": 12288,
+                "rot_z": 0
+            },
+            {
+                "type": 33,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 9,
+                "quantity": 2,
+                "pos_x": 1800.76,
+                "pos_y": 0.0,
+                "pos_z": -2222.79,
+                "rot_x": 0,
+                "rot_y": 25600,
+                "rot_z": 0
+            },
+            {
+                "type": 36,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 1,
+                "room": 9,
+                "quantity": -1,
+                "pos_x": 1072.78,
+                "pos_y": 191.26,
+                "pos_z": -4962.6,
+                "rot_x": 49152,
+                "rot_y": -31744,
+                "rot_z": 0
+            }
+        ],
+        [
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 10,
+                "quantity": 3,
+                "pos_x": -3822.84,
+                "pos_y": 153.28,
+                "pos_z": -436.94,
+                "rot_x": 0,
+                "rot_y": -26624,
+                "rot_z": 0
+            },
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 10,
+                "quantity": 2,
+                "pos_x": -3609.85,
+                "pos_y": 151.4,
+                "pos_z": -233.0,
+                "rot_x": 0,
+                "rot_y": -46080,
+                "rot_z": 0
+            },
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 10,
+                "quantity": 2,
+                "pos_x": -4182.17,
+                "pos_y": 167.72,
+                "pos_z": -152.06,
+                "rot_x": 0,
+                "rot_y": -22528,
+                "rot_z": 0
+            },
+            {
+                "type": 30,
+                "unk1": 1,
+                "unk2": 255,
+                "variant": 0,
+                "room": 10,
+                "quantity": 1,
+                "pos_x": -3677.0,
+                "pos_y": 201.89,
+                "pos_z": 290.37,
+                "rot_x": 0,
+                "rot_y": 5120,
+                "rot_z": 0
+            }
+        ]
+    ],
+    "quest_info": {
+        "quest_id": 61004,
+        "name": "Shut Up and Fish!",
+        "client": "MH3SP Dev Team",
+        "description": "Hunt a Gobul",
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!",
+        "success_message": "Complete the Main Quest\nand both Subquests.",
+        "failure_message": "Reward hits 0, or time\nexpires.",
+        "flags": [
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        ],
+        "penalty_per_cart": 1900,
+        "quest_fee": 550,
+        "time_limit": 25,
+        "main_monster_1": 17,
+        "main_monster_2": 34,
+        "location": 3,
+        "quest_rank": 2,
+        "hrp_restriction": 7,
+        "resources": 0,
+        "supply_set_number": 35,
+        "starting_position": 0,
+        "general_enemy_level": 25,
+        "summon": 0,
+        "wave_1_transition_type": 0,
+        "wave_1_transition_target": 0,
+        "wave_1_transition_quantity": 0,
+        "wave_2_transition_type": 0,
+        "wave_2_transition_target": 0,
+        "wave_2_transition_quantity": 0
+    },
+    "large_monsters": {
+        "monster_1": {
+            "type": 18,
+            "starting_area": 0,
+            "boss_id": 0,
+            "spawn_count": 1,
+            "level": 25,
+            "size": 100,
+            "hp_spread": 1,
+            "size_spread": 1
+        },
+        "monster_2": {
+            "type": 0,
+            "starting_area": 0,
+            "boss_id": 0,
+            "spawn_count": 0,
+            "level": 0,
+            "size": 0,
+            "hp_spread": 0,
+            "size_spread": 0
+        },
+        "monster_3": {
+            "type": 0,
+            "starting_area": 0,
+            "boss_id": 0,
+            "spawn_count": 0,
+            "level": 0,
+            "size": 0,
+            "hp_spread": 0,
+            "size_spread": 0
+        }
+    },
+    "objective_details": {
+        "main_quest": {
+            "type": 1,
+            "objective_type": 18,
+            "objective_num": 1,
+            "zenny_reward": 5600,
+            "hrp_reward": 820,
+            "rewards_row_1": [
+                [
+                    149,
+                    3,
+                    15
+                ],
+                [
+                    150,
+                    1,
+                    5
+                ],
+                [
+                    214,
+                    2,
+                    10
+                ],
+                [
+                    210,
+                    3,
+                    20
+                ],
+                [
+                    212,
+                    2,
+                    7
+                ],
+                [
+                    213,
+                    2,
+                    10
+                ],
+                [
+                    215,
+                    2,
+                    13
+                ],
+                [
+                    216,
+                    1,
+                    20
+                ]
+            ],
+            "rewards_row_2": [
+                [
+                    440,
+                    1,
+                    35
+                ],
+                [
+                    447,
+                    1,
+                    5
+                ],
+                [
+                    441,
+                    1,
+                    15
+                ],
+                [
+                    327,
+                    1,
+                    20
+                ],
+                [
+                    328,
+                    1,
+                    25
+                ]
+            ]
+        },
+        "subquest_1": {
+            "description": "Deliver 4 Goldenfish",
+            "type": 2,
+            "objective_type": 217,
+            "objective_num": 4,
+            "zenny_reward": 2400,
+            "hrp_reward": 70,
+            "rewards_row_1": [
+                [
+                    440,
+                    1,
+                    35
+                ],
+                [
+                    447,
+                    1,
+                    5
+                ],
+                [
+                    441,
+                    1,
+                    15
+                ],
+                [
+                    327,
+                    1,
+                    20
+                ],
+                [
+                    328,
+                    1,
+                    25
+                ]
+            ]
+        },
+        "subquest_2": {
+            "description": "Fish out Gobul once",
+            "type": 4096,
+            "objective_type": 18,
+            "objective_num": 2,
+            "zenny_reward": 1200,
+            "hrp_reward": 60,
+            "rewards_row_1": [
+                [
+                    149,
+                    3,
+                    15
+                ],
+                [
+                    150,
+                    1,
+                    5
+                ],
+                [
+                    214,
+                    2,
+                    10
+                ],
+                [
+                    210,
+                    3,
+                    20
+                ],
+                [
+                    212,
+                    2,
+                    7
+                ],
+                [
+                    213,
+                    2,
+                    10
+                ],
+                [
+                    215,
+                    2,
+                    13
+                ],
+                [
+                    216,
+                    1,
+                    20
+                ]
+            ]
+        }
+    },
+    "unknown": {
+        "unk_12": 2,
+        "unk_4": 0,
+        "unk_5": 0,
+        "unk_6": 0,
+        "unk_7": 0,
+        "unkInt0": 0,
+        "unkShort0": 0,
+        "unkByte0": 0,
+        "unkBytes0_0": 0,
+        "unkBytes0_1": 0,
+        "unkBytes0_2": 0,
+        "unkBytes1_0": 0,
+        "unkBytes1_1": 0,
+        "unkBytes1_2": 0,
+        "unkBytes2_0": 0,
+        "unkBytes2_1": 0,
+        "unkUintAlways15": 15,
+        "unkShort1": 0,
+        "unkShort2": 0,
+        "unkByte1": 0,
+        "unkByte2": 0,
+        "unkByte3": 0,
+        "unkByte4": 0,
+        "unkByte7": 0,
+        "unkByte8": 0
+    }
+}

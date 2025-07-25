@@ -1,26 +1,39 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2021-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter constants."""
 
 import struct
 from other.utils import pad
 from mh.time_utils import current_server_time, TICKS_PER_CYCLE, \
-    get_jhen_event_times, is_jhen_active
-from mh.quest_utils import \
-    QUEST_EVENT_JUMP_FOUR_JAGGI, QUEST_EVENT_BLOOD_SPORT, \
-    QUEST_EVENT_MERCY_MISSION, QUEST_EVENT_THE_PHANTOM_URAGAAN, \
-    QUEST_EVENT_WORLD_EATER, QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD, \
-    make_binary_event_quest
-from mh.arena_utils import \
-    GRUDGE_MATCH_ROYAL_LUDROTH, GRUDGE_MATCH_BIRD_BRUTE, \
-    GRUDGE_MATCH_TWO_FLAMES, GRUDGE_MATCH_LAND_LORDS
+    get_jhen_event_times, is_jhen_active, current_event_time_slot, \
+    current_trading_post_time_slot
+from mh.quest_utils import make_binary_event_quest
 from res.trading_post import CURRENT_TRADES
 
+try:
+    from collections.abc import Callable  # noqa: F401
+    from typing import ParamSpec
+    QuestLoader = ParamSpec("QuestLoader", bound="mh.quest_utils.QuestLoader")
+except ImportError:
+    pass
 
-def make_binary_type_time_events():
+
+def make_binary_type_time_events(binary_loader):
     return struct.pack(">III", *get_jhen_event_times())
+
+
+def make_event_slot(event):
+    return (make_binary_event_quest(event), event)
+
+
+def get_event_slot(slot_num, temporal_slot):
+    return \
+        lambda quest_loader, slot_num=slot_num, temporal_slot=temporal_slot: \
+        quest_loader[temporal_slot][slot_num] \
+        if slot_num < len(quest_loader[temporal_slot]) \
+        else b'\0' * 0x4B4
 
 
 def make_binary_server_type_list(is_jap=False):
@@ -149,7 +162,7 @@ def make_binary_server_type_list(is_jap=False):
     return data
 
 
-def make_binary_npc_greeters(is_jap=False):
+def make_binary_npc_greeters(binary_loader, is_jap=False, temporal_slot=None):
     """Binary with NPC City Greeter.
 
     Data offset:
@@ -171,6 +184,8 @@ def make_binary_npc_greeters(is_jap=False):
     US_OFFSET = 0x180
     JP_OFFSET = 0x100
     offset = JP_OFFSET if is_jap else US_OFFSET
+    if temporal_slot is None:
+        temporal_slot = current_event_time_slot(binary_loader)
 
     if is_jhen_active():
         tool_shop = b"Half-off sale!"
@@ -181,30 +196,17 @@ def make_binary_npc_greeters(is_jap=False):
         material_shop = b"Prices are normal."
         event_quests = b""
 
-    QUEST_LIST = (
-        QUEST_EVENT_JUMP_FOUR_JAGGI,
-        QUEST_EVENT_BLOOD_SPORT,
-        QUEST_EVENT_MERCY_MISSION,
-        QUEST_EVENT_THE_PHANTOM_URAGAAN,
-        QUEST_EVENT_WORLD_EATER,
-        QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
-    )
-
-    ARENA_LIST = (
-        GRUDGE_MATCH_ROYAL_LUDROTH,
-        GRUDGE_MATCH_BIRD_BRUTE,
-        GRUDGE_MATCH_TWO_FLAMES,
-        GRUDGE_MATCH_LAND_LORDS
-    )
+    quest_list, arena_list = \
+        binary_loader.get_separated_quest_dicts(temporal_slot)
 
     event_quests += b"\n".join([
-        quest['quest_info']['name'].encode("ascii")
-        for quest in QUEST_LIST
+        quest['quest_info']['name']
+        for quest in quest_list
     ])
 
     arena_quests = b"\n".join([
-        quest['quest_info']['name'].encode("ascii")
-        for quest in ARENA_LIST
+        quest['quest_info']['name']
+        for quest in arena_list
     ])
 
     guildmaster_str = (
@@ -258,13 +260,49 @@ ANNOUNCE = b"<BR><BODY>".join([
     b"Roadmap for a list of features we are working on.",
     b"<BR><CENTER><C=2>Welcome to Loc Lac!<END>"
 ])
+MAINTENANCE = b"<BR><BODY>".join([
+    b"<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
+    b"<BR><CENTER><SIZE=4>MH3SP is currently down for maintenance.",
+    b"<BR><CENTER><C=2>Please check back later!<END>"
+])
+UNPATCHED = b"<BR><BODY>".join([
+    b"<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
+    b"<BR><BR><CENTER><C=1><SIZE=7>NEW PATCH ARRIVED",
+    b"<BR><LEFT><SIZE=4><C=7>Please see the discord server for the new patch.",
+    b"New patch is required in order to play with the other",
+    b"hunters.",
+    b"<BR><CENTER><C=3>{}",
+    b"<END>"
+])
 CHARGE = b"""<BODY><CENTER>MH3 Server Project - No charge.<END>"""
 # VULGARITY_INFO = b"""MH3 Server Project - Vulgarity info (low)."""
 VULGARITY_INFO = b""
 FMP_VERSION = 1
+# TODO: Backport central and NATNEG constants
 
 TIME_STATE = 0
 IS_JAP = False
+
+
+def get_binary_loader_assisted_version(binary_loader):
+    return current_event_time_slot(binary_loader) + \
+        1 + binary_loader.version
+
+
+def get_binary_quest_content_from_quest_slot(quest_slot):
+    return lambda temporal_slot, quest_slot=quest_slot: \
+        get_event_slot(quest_slot, temporal_slot)
+
+
+def get_binary_loader_assisted_trading_post_version(binary_loader):
+    return current_trading_post_time_slot(binary_loader) + \
+          1 + binary_loader.trading_post_version
+
+
+def get_binary_trading_post(temporal_slot):
+    return lambda binary_loader, temporal_slot=temporal_slot: \
+        binary_loader.get_trading_post_day(temporal_slot)
+
 
 # Dummy PAT_BINARY
 PAT_BINARIES = {
@@ -277,12 +315,16 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x03: {
-        "version": 1,
-        "content": lambda: make_binary_npc_greeters(is_jap=IS_JAP)
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader, is_jap=IS_JAP,
+                                     temporal_slot=temporal_slot)
     },
     0x04: {
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post  # make_binary_trading_post()
     },
     0x05: {  # English
         "version": 1,
@@ -291,46 +333,44 @@ PAT_BINARIES = {
         # "content": b"TEST_BINARY"
     },
     0x06: {  # English
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(0)
     },
     0x07: {  # English
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(1)
     },
     0x08: {  # English
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(2)
     },
     0x09: {  # English
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(3)
     },
     0x0a: {  # Japanese(?)English
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(4)
     },
     0x0b: {  # Japanese(?)English
-        "version": 1,
-        "content": make_binary_event_quest(
-            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
-        )
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(5)
     },
     0x0c: {  # Japanese(?)English
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_ROYAL_LUDROTH)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(6)
     },
     0x0d: {  # Japanese(?)English
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_BIRD_BRUTE)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(7)
     },
     0x0e: {  # Japanese(?)English
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_TWO_FLAMES)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(8)
     },
     0x0f: {  # Japanese(?)English
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_LAND_LORDS)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(9)
     },
     0x10: {  # French
         "version": 1,
@@ -341,58 +381,60 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x12: {  # French
-        "version": 1,
-        "content": make_binary_npc_greeters
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x13: {  # French
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post  # make_binary_trading_post()
     },
     0x14: {  # French
         "version": 1,
         "content": b"dummy_14\0"
     },
     0x15: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(0)
     },
     0x16: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(1)
     },
     0x17: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(2)
     },
     0x18: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(3)
     },
     0x19: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(4)
     },
     0x1a: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(
-            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
-        )
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(5)
     },
     0x1b: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_ROYAL_LUDROTH)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(6)
     },
     0x1c: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_BIRD_BRUTE)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(7)
     },
     0x1d: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_TWO_FLAMES)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(8)
     },
     0x1e: {  # French
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_LAND_LORDS)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(9)
     },
     0x1f: {  # German
         "version": 1,
@@ -403,58 +445,60 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x21: {  # German
-        "version": 1,
-        "content": make_binary_npc_greeters
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x22: {  # German
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post  # make_binary_trading_post()
     },
     0x23: {  # German
         "version": 1,
         "content": b"dummy_23\0"
     },
     0x24: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(0)
     },
     0x25: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(1)
     },
     0x26: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(2)
     },
     0x27: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(3)
     },
     0x28: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(4)
     },
     0x29: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(
-            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
-        )
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(5)
     },
     0x2a: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_ROYAL_LUDROTH)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(6)
     },
     0x2b: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_BIRD_BRUTE)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(7)
     },
     0x2c: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_TWO_FLAMES)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(8)
     },
     0x2d: {  # German
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_LAND_LORDS)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(9)
     },
     0x2e: {  # Italian
         "version": 1,
@@ -465,58 +509,60 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x30: {  # Italian
-        "version": 1,
-        "content": make_binary_npc_greeters
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x31: {  # Italian
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post  # make_binary_trading_post()
     },
     0x32: {  # Italian
         "version": 1,
         "content": b"dummy_32\0"
     },
     0x33: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(0)
     },
     0x34: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(1)
     },
     0x35: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(2)
     },
     0x36: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(3)
     },
     0x37: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(4)
     },
     0x38: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(
-            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
-        )
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(5)
     },
     0x39: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_ROYAL_LUDROTH)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(6)
     },
     0x3a: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_BIRD_BRUTE)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(7)
     },
     0x3b: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_TWO_FLAMES)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(8)
     },
     0x3c: {  # Italian
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_LAND_LORDS)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(9)
     },
     0x3d: {  # Spanish
         "version": 1,
@@ -527,60 +573,83 @@ PAT_BINARIES = {
         "content": make_binary_type_time_events
     },
     0x3f: {  # Spanish
-        "version": 1,
-        "content": make_binary_npc_greeters
+        "version":
+            lambda binary_loader: current_event_time_slot(binary_loader) + 1,
+        "content":
+            lambda temporal_slot: lambda binary_loader:
+            make_binary_npc_greeters(binary_loader,
+                                     temporal_slot=temporal_slot)
     },
     0x40: {  # Spanish
-        "version": 1,
-        "content": make_binary_trading_post()
+        "version": get_binary_loader_assisted_trading_post_version,
+        "content": get_binary_trading_post  # make_binary_trading_post()
     },
     0x41: {  # Spanish
         "version": 1,
         "content": b"dummy_41\0"
     },
     0x42: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_JUMP_FOUR_JAGGI)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(0)
     },
     0x43: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_BLOOD_SPORT)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(1)
     },
     0x44: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_MERCY_MISSION)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(2)
     },
     0x45: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_THE_PHANTOM_URAGAAN)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(3)
     },
     0x46: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(QUEST_EVENT_WORLD_EATER)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(4)
     },
     0x47: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(
-            QUEST_EVENT_WHERE_GODS_FEAR_TO_TREAD
-        )
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(5)
     },
     0x48: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_ROYAL_LUDROTH)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(6)
     },
     0x49: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_BIRD_BRUTE)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(7)
     },
     0x4a: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_TWO_FLAMES)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(8)
     },
     0x4b: {  # Spanish
-        "version": 1,
-        "content": make_binary_event_quest(GRUDGE_MATCH_LAND_LORDS)
+        "version": get_binary_loader_assisted_version,
+        "content": get_binary_quest_content_from_quest_slot(9)
     },
 }
+
+
+def get_pat_binary_from_version(binary_type, version):
+    # type: (int, int) -> bytes|Callable[QuestLoader, bytes]
+    """Helper to retrieve binary data.
+
+    Used by the following packets:
+     - BinaryHead
+     - BinaryData
+
+    TODO: Refactor this and the get_binary_* functions.
+    """
+    static_binaries = (
+        0x01, 0x02, 0x05, 0x10, 0x11,
+        0x14, 0x1f, 0x20, 0x23, 0x2e, 0x2f,
+        0x32, 0x3d, 0x3e, 0x41
+    )
+    if binary_type in static_binaries:
+        return PAT_BINARIES[binary_type]["content"]
+    return PAT_BINARIES[binary_type]["content"](version)
+
 
 PAT_CATEGORIES = {
     0x60: "Opn",

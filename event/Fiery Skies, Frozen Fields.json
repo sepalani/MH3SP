@@ -1,0 +1,205 @@
+{
+    "unknown": {
+        "unk_12": 2, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "objective_details": {
+        "subquest_2": {
+            "objective_num": 0, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 0, 
+            "zenny_reward": 0, 
+            "type": 0
+        }, 
+        "main_quest": {
+            "objective_num": 1, 
+            "hrp_reward": 4290, 
+            "rewards_row_1": [
+                [
+                    177, 
+                    2, 
+                    25
+                ], 
+                [
+                    451, 
+                    2, 
+                    24
+                ], 
+                [
+                    445, 
+                    2, 
+                    17
+                ], 
+                [
+                    446, 
+                    1, 
+                    15
+                ], 
+                [
+                    174, 
+                    1, 
+                    10
+                ], 
+                [
+                    183, 
+                    1, 
+                    9
+                ]
+            ], 
+            "rewards_row_2": [
+                [
+                    177, 
+                    2, 
+                    25
+                ], 
+                [
+                    451, 
+                    2, 
+                    24
+                ], 
+                [
+                    445, 
+                    2, 
+                    17
+                ], 
+                [
+                    446, 
+                    1, 
+                    15
+                ], 
+                [
+                    174, 
+                    1, 
+                    10
+                ], 
+                [
+                    183, 
+                    1, 
+                    9
+                ]
+            ], 
+            "objective_type": 5, 
+            "zenny_reward": 42000, 
+            "type": 1
+        }, 
+        "subquest_1": {
+            "objective_num": 1, 
+            "hrp_reward": 0, 
+            "rewards_row_1": [], 
+            "description": "None", 
+            "objective_type": 2, 
+            "zenny_reward": 0, 
+            "type": 1
+        }
+    }, 
+    "small_monsters": [
+        [], 
+        []
+    ], 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 50, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 6, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 60, 
+        "wave_2_transition_type": 0, 
+        "location": 8, 
+        "penalty_per_cart": 14000, 
+        "resources": 1, 
+        "details": "It's time for a FESTIVAL!\nPresenting the King of the\nSkies and the Knight of the\nTundra -- the flash of fire\nand ice from above and\nbelow -- only at the arena!\nDo you have what it takes?", 
+        "description": "Hunt a Barioth and\na Rathalos", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 11, 
+        "quest_fee": 4200, 
+        "quest_id": 61023, 
+        "name": "Fiery Skies, Frozen Fields", 
+        "main_monster_2": 0, 
+        "main_monster_1": 0, 
+        "supply_set_number": 43, 
+        "summon": 0, 
+        "client": "Deserted Island Maiden", 
+        "flags": [
+            [
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest."
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 10, 
+            "hp_spread": 0, 
+            "level": 59, 
+            "boss_id": 1, 
+            "type": 2, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 11, 
+            "hp_spread": 0, 
+            "level": 60, 
+            "boss_id": 0, 
+            "type": 5, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
+    }
+}

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# SPDX-FileCopyrightText: Copyright (C) 2023 MH3SP Server Project
+# SPDX-FileCopyrightText: Copyright (C) 2023-2025 MH3SP Server Project
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Equipment utils module."""
 
@@ -24,7 +24,7 @@ def item_slot(item_id, quantity):
 def create_arena_equipment_set(sets):
     arena_equipment_set = b""
     for set_num in range(4):
-        weapon1, weapon2, weapon3, helm, chestpiece, gauntlets,\
+        weapon1, weapon2, weapon3, helm, chestpiece, gauntlets, \
             faulds, leggings, items, gunner_pouch = sets[set_num]
         # Weapon
         arena_equipment_set += slot(*weapon1)
