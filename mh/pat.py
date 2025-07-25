@@ -19,8 +19,8 @@ from mh.constants import \
     CHARGE, VULGARITY_INFO, FMP_VERSION, PAT_BINARIES, PAT_NAMES, \
     MAINTENANCE, UNPATCHED, \
     PatID4, get_pat_binary_from_version
-from mh.session import Session
-import mh.database as db
+from mh.session import Session, FMPSession
+from mh.state_models import Server, Gate, City, Circle, Players  # noqa: F401
 
 try:
     from typing import Literal
@@ -81,7 +81,7 @@ class PatServer(server.BasicPatServer, Logger):
     # TODO: Backport broadcasting refactoring if needed
 
     def broadcast(self, players, packet_id, data, seq, to_exclude=None):
-        # type: (db.Players, int, bytes, int, Session|None) -> None
+        # type: (Players, int, bytes, int, Session|None) -> None
         handlers = []
         with players.lock():
             for _, player in players:
@@ -102,7 +102,7 @@ class PatServer(server.BasicPatServer, Logger):
 
     def circle_broadcast(self, circle, packet_id, data, seq,
                          session=None):
-        # type: (db.Circle, int, bytes, int, Session|None) -> None
+        # type: (Circle, int, bytes, int, Session|None) -> None
         with circle.lock():
             self.broadcast(circle.players, packet_id, data, seq, session)
 
@@ -302,6 +302,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
         has_ban = "online_support_code" in settings and \
             pat_ticket in BANNED_ONLINE_SUPPORT_CODES
+        # Used by OPN server, not sure we should rely on session at this point
         if has_ban or len(self.session.get_servers()) == 0:
             self.sendNtcLogin(2, settings, seq)
         else:
@@ -932,6 +933,8 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: FMPリストバージョン確認
         TR: FMP list version check
 
+        NB: This packet is also used by the LMP server.
+
         TODO:
          - Find why there are 2 versions of FMP packets.
          - Find why most of the 2 versions are ignored.
@@ -967,6 +970,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 61310100 / 63110100
         JP: FMPリスト数送信 / FMPリスト数要求
         TR: Send FMP list count / FMP list count request
+
+        NB: This packet is also used by the LMP server.
         """
         # TODO: Might be worth investigating these parameters as
         # they might be useful when using multiple FMP servers.
@@ -987,6 +992,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 61310200
         JP: FMPリスト数応答
         TR: FMP list count response
+
+        NB: This packet is also used by the LMP server.
         """
         unused = 0
         count = len(self.session.get_servers())
@@ -1013,6 +1020,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 61320100 / 63120100
         JP: FMPリスト送信 / FMPリスト要求
         TR: Send FMP list / FMP list response
+
+        NB: This packet is also used by the LMP server.
         """
         first_index, count = struct.unpack_from(">II", data)
         if packet_id == PatID4.ReqFmpListData:
@@ -1058,6 +1067,8 @@ class PatRequestHandler(server.BasicPatHandler):
         ID: 61330100 / 63130100
         JP: FMPリスト送信終了 / FMPリスト終了送信
         TR: FMP list end of transmission / FMP list transmission end
+
+        NB: This packet is also used by the LMP server.
         """
         if packet_id == PatID4.ReqFmpListFoot:
             self.sendAnsFmpListFoot(seq)
@@ -1132,21 +1143,26 @@ class PatRequestHandler(server.BasicPatHandler):
         TR: FMP data request
 
         TODO: Do not hardcode the data and find the meaning of all fields.
+
+        NB: This packet is also used by the LMP server.
         """
         index, = struct.unpack_from(">I", data)
         fields = pati.unpack_bytes(data, 4)
-        server = self.session.join_server(index)
+        # FIXME: Doesn't seem to make sense here,
+        # e.g. on LMP server, as "FmpInfo" packet
+        # server = self.session.join_server(index)
         config = get_config("FMP")
         fmp_addr = get_external_ip(config)
         fmp_port = config["Port"]
         fmp_data = pati.FmpData()
-        fmp_data.server_address = pati.String(server.addr or fmp_addr)
-        fmp_data.server_port = pati.Word(server.port or fmp_port)
+        fmp_data.server_address = pati.String(fmp_addr)
+        fmp_data.server_port = pati.Word(fmp_port)
         fmp_data.assert_fields(fields)
         # TODO: Backport central logic
-        if packet_id == PatID4.ReqFmpInfo:
+        if packet_id == PatID4.ReqFmpInfo:  # LMP version
             self.sendAnsFmpInfo(fmp_data, fields, seq)
-        elif packet_id == PatID4.ReqFmpInfo2:
+        elif packet_id == PatID4.ReqFmpInfo2:  # FMP version
+            self.session.join_server(index)
             self.sendAnsFmpInfo2(fmp_data, fields, seq)
 
         # Preserve session in database, due to server selection
@@ -1416,8 +1432,9 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ開始要求
         TR: Layer start request
         """
-        unk1 = pati.unpack_bytes(data)
-        unk2 = pati.unpack_bytes(data, len(unk1) + 1)
+        with pati.Unpacker(data) as unpacker:
+            unk1 = unpacker.bytes()
+            unk2 = unpacker.bytes()
         self.sendAnsLayerStart(unk1, unk2, seq)
 
     def sendAnsLayerStart(self, unk1, unk2, seq):
@@ -2402,7 +2419,17 @@ class PatRequestHandler(server.BasicPatHandler):
         for i, city in enumerate(cities):
             with city.lock():
                 layer_data = pati.LayerData.create_from(i, city)
-                layer_data.assert_fields(self.search_info["layer_fields"])
+                layer_fields = self.search_info["layer_fields"]
+                filtered_fields = layer_data.filter_fields(layer_fields)  # noqa: F841
+                """
+                # During testing / TODO: Investigate
+                filtered_fields = [
+                    (5, 'index', Word(0))
+                    (17, 'positionInterval', Long(500))
+                    (18, 'unk_byte_0x12', Byte(1))
+                ]
+                """
+                layer_data.assert_fields(layer_fields)
                 data += layer_data.pack()
                 data += pati.pack_optional_fields(city.optional_fields)
                 with city.players.lock():
@@ -2737,7 +2764,7 @@ class PatRequestHandler(server.BasicPatHandler):
     def notify_city_info_set(self, path):
         # type: (pati.LayerPath) -> None
         city = self.get_layer(path)
-        assert isinstance(city, db.City)
+        assert isinstance(city, City)
 
         gate = city.parent
         layer_data = pati.LayerData.create_from(path.city_id, city, path)
@@ -2749,7 +2776,7 @@ class PatRequestHandler(server.BasicPatHandler):
     def notify_city_number_set(self, path):
         # type: (pati.LayerPath) -> None
         city = self.get_layer(path)
-        assert isinstance(city, db.City)
+        assert isinstance(city, City)
 
         gate = city.parent
         layer_data = pati.LayerData.create_from(path.city_id, city, path)
@@ -2757,17 +2784,16 @@ class PatRequestHandler(server.BasicPatHandler):
         self.server.broadcast(gate.players, PatID4.NtcLayerUserNum,
                               number_set, 0, self.session)
 
-    @staticmethod
-    def get_layer(path):
-        # type: (pati.LayerPath) -> db.Server | db.Gate | db.City | None
-        database = db.get_instance()
+    def get_layer(self, path):
+        # type: (pati.LayerPath) -> Server | Gate | City | None
+        fmp_state = self.session.FMP()
         if path.city_id > 0:
-            return database.get_city(path.server_id, path.gate_id,
-                                     path.city_id)
+            return fmp_state.get_city(path.server_id, path.gate_id,
+                                      path.city_id)
         elif path.gate_id > 0:
-            return database.get_gate(path.server_id, path.gate_id)
+            return fmp_state.get_gate(path.server_id, path.gate_id)
         elif path.server_id > 0:
-            return database.get_server(path.server_id)
+            return fmp_state.get_server(path.server_id)
         return None
 
     def notify_layer_departure(self, end):
@@ -2793,7 +2819,7 @@ class PatRequestHandler(server.BasicPatHandler):
 
         if path.city_id > 0:
             city = self.get_layer(path)
-            assert isinstance(city, db.City)
+            assert isinstance(city, City)
 
             self.notify_city_number_set(path)
             if city.leader is None:
@@ -2822,7 +2848,8 @@ class PatRequestHandler(server.BasicPatHandler):
         self.send_error("{}: {}".format(type(e).__name__, str(e)))
 
     def on_finish(self):
-        self.notify_layer_departure(True)
+        if isinstance(self.session, FMPSession):
+            self.notify_layer_departure(True)
         # TODO: Backport session_layer_end
         self.session.disconnect()
         self.session.delete()
