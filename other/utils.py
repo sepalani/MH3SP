@@ -240,7 +240,33 @@ def get_config(name, config_file=CONFIG_FILE):
     }
 
 
-# TODO: Backport MySQL, latest_patch and central config code
+def get_mysql_config(name, config_file=CONFIG_FILE):
+    """Get MySQL config."""
+    config = ConfigParser.RawConfigParser(allow_no_value=True)
+    config.read(config_file)
+    ssl_ca = config.get(name, "ssl_ca") or None
+    from mysql.connector.constants import ClientFlag
+    return {
+        "charset": "utf8",
+        "autocommit": True,
+        "user": config.get(name, "User"),
+        "password": config.get(name, "Password"),
+        "host": config.get(name, "Host"),
+        "database": config.get(name, "database"),
+        "client_flags": [ClientFlag.SSL] if ssl_ca else None,
+        "ssl_ca": ssl_ca,
+        "ssl_cert": config.get(name, "ssl_cert") or None,
+        "ssl_key": config.get(name, "ssl_key") or None
+    }
+
+
+def is_mysql_enabled(name, config_file=CONFIG_FILE):
+    config = ConfigParser.RawConfigParser(allow_no_value=True)
+    config.read(config_file)
+    return config.getboolean(name, "Enabled")
+
+
+# TODO: Backport latest_patch and central config code
 
 
 def get_default_ip():

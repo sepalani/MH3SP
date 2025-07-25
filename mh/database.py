@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter database module."""
 
+import inspect
 import random
 import sqlite3
 import time
@@ -885,7 +886,190 @@ class TempSQLiteDatabase(TempDatabase):
         return self.parent.delete_friend(capcom_id, friend_id)
 
 
-# TODO: Backport MySQLDatabase
+class MySQLDatabase(TempDatabase):
+    """Hybrid MySQL/TempDatabase.
+
+    Requires mysql-connector-python:
+     - 8.0.23 (latest Python2 version)
+     - Python3 users can pick more recent versions
+
+    TODO:
+     - Add reconnect wrapper
+     - Backport methods used by central/state if needed
+    """
+
+    def __init__(self):
+        self.parent = super(MySQLDatabase, self)
+        self.parent.__init__()
+        from mysql import connector
+        self.connection = connector.connect(
+            **utils.get_mysql_config("MYSQL")
+        )
+        self.create_database()
+        self.populate_database()
+
+    def create_database(self):
+        with self.connection.cursor() as cursor:
+            # Consoles creation
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS consoles"
+                " (support_code VARCHAR(11) NOT NULL,"
+                " slot_index TINYINT NOT NULL,"
+                " capcom_id VARCHAR(6) NOT NULL,"
+                " name VARCHAR(8),"
+                " PRIMARY KEY(capcom_id),"
+                " UNIQUE profiles_uniq_idx (support_code, slot_index));"
+            )
+
+            # Friends creation
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS friend_lists"
+                " (id MEDIUMINT NOT NULL AUTO_INCREMENT,"
+                " capcom_id VARCHAR(6) NOT NULL,"
+                " friend_id VARCHAR(6) NOT NULL,"
+                " PRIMARY KEY (id),"
+                " UNIQUE friends_uniq_idx (capcom_id, friend_id));"
+            )
+
+    def populate_database(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM consoles")
+            rows = cursor.fetchall()
+            for support_code, slot_index, capcom_id, name in rows:
+                support_code = str(support_code)
+                capcom_id = str(capcom_id)
+                name = utils.to_bytes(name)
+                if support_code not in self.consoles:
+                    self.consoles[support_code] = [BLANK_CAPCOM_ID] * 6
+                self.consoles[support_code][slot_index - 1] = capcom_id
+                self.capcom_ids[capcom_id] = {"name": name, "session": None}
+                self.friend_lists[capcom_id] = []
+
+            cursor.execute("SELECT capcom_id, friend_id FROM friend_lists")
+            rows = cursor.fetchall()
+            for capcom_id, friend_id in rows:
+                capcom_id = str(capcom_id)
+                friend_id = str(friend_id)
+                self.friend_lists[capcom_id].append(friend_id)
+
+    def force_update(self):
+        """For debugging purpose."""
+        with self.connection.cursor() as cursor:
+            for support_code, capcom_ids in self.consoles.items():
+                for slot_index, capcom_id in enumerate(capcom_ids, 1):
+                    info = self.capcom_ids.get(capcom_id, {"name": b""})
+                    cursor.execute(
+                        "INSERT IGNORE INTO consoles"
+                        " (support_code, slot_index, capcom_id, name)"
+                        " VALUES (%s, %s, %s, %s);",
+                        (support_code, slot_index, capcom_id, info["name"])
+                    )
+
+            for capcom_id, friend_ids in self.friend_lists.items():
+                for friend_id in friend_ids:
+                    cursor.execute(
+                       "INSERT IGNORE INTO friend_lists"
+                       " (capcom_id, friend_id)"
+                       " VALUES (%s, %s);",
+                       (capcom_id, friend_id)
+                    )
+
+    def assign_capcom_id(self, online_support_code, index, capcom_id):
+        # TODO: Backport only
+        """Assign a Capcom ID to an online support code."""
+        self.consoles[online_support_code][index] = capcom_id
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "REPLACE INTO consoles"
+                " (support_code, slot_index, capcom_id, name)"
+                " VALUES (%s, %s, %s, %s);",
+                (online_support_code, index, capcom_id, "????")
+            )
+
+    def get_capcom_ids(self, online_support_code):  # TODO: Backport only
+        """Get list of associated Capcom IDs from an online support code."""
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT slot_index, capcom_id FROM consoles"
+                " WHERE support_code = %s;",
+                (online_support_code,)
+            )
+            rows = cursor.fetchall()
+            ids = []
+            for index, capcom_id in rows:
+                while len(ids) < index:
+                    ids.append(BLANK_CAPCOM_ID)
+                ids.append(str(capcom_id))
+            while len(ids) < 6:
+                ids.append(BLANK_CAPCOM_ID)
+            return ids
+
+    def get_name(self, capcom_id):
+        # TODO: Backport only (but get_user_name exists in upstream...)
+        """Get the hunter name associated with a valid Capcom ID."""
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT name FROM consoles WHERE capcom_id = %s;",
+                (capcom_id,)
+            )
+            name = cursor.fetchone()
+            if not name:
+                return b""
+            return utils.to_bytes(name)
+
+    def use_user(self, session, index, name):
+        """Insert the current hunter's info into a selected Capcom ID slot."""
+        result = self.parent.use_user(session, index, name)
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "REPLACE INTO consoles VALUES (%s,%s,%s,%s);",
+                (session.online_support_code, index,
+                 session.capcom_id, session.hunter_name)
+            )
+        return result
+
+    def accept_friend(self, capcom_id, friend_id, accepted):
+        if accepted:
+            with self.connection.cursor() as cursor:
+                query = \
+                    "REPLACE INTO friend_lists (capcom_id, friend_id)" \
+                    " VALUES (%s,%s);"
+                cursor.execute(
+                    query,
+                    (capcom_id, friend_id)
+                )
+                cursor.execute(
+                    query,
+                    (friend_id, capcom_id)
+                )
+        return self.parent.accept_friend(capcom_id, friend_id, accepted)
+
+    def delete_friend(self, capcom_id, friend_id):
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM friend_lists"
+                " WHERE capcom_id = %s AND friend_id = %s;",
+                (capcom_id, friend_id)
+            )
+        return self.parent.delete_friend(capcom_id, friend_id)
+
+    def get_friends(self, capcom_id, first_index=None, count=None):
+        begin = 0 if first_index is None else (first_index - 1)
+        end = count if count is None else (begin + count)
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT friend_id, name FROM friend_lists"
+                " INNER JOIN consoles"
+                " ON friend_lists.friend_id = consoles.capcom_id"
+                " WHERE friend_lists.capcom_id = %s;",
+                (capcom_id,)
+            )
+            rows = cursor.fetchall()
+            friends = [
+                (str(friend_id), str(name))
+                for friend_id, name in rows
+            ]
+            return friends[begin:end]
 
 
 class DebugDatabase(TempSQLiteDatabase):
@@ -961,8 +1145,54 @@ class DebugDatabase(TempSQLiteDatabase):
             self.force_update()
 
 
-CURRENT_DB = TempSQLiteDatabase()
+CURRENT_DB = \
+    MySQLDatabase() \
+    if utils.is_mysql_enabled("MYSQL") \
+    else TempSQLiteDatabase()
 
 
 def get_instance():
     return CURRENT_DB
+
+
+def implementation_check(cls, base=TempDatabase):
+    """Debug implementation check allowing to see methods dependencies.
+
+    Example:
+    $> python -im mh.database
+    >>> implementation_check(TempSQLiteDatabase)
+    """
+    def is_method(obj):
+        """Python3's missing unbound methods workaround."""
+        if inspect.ismethod(obj):
+            return True
+        # Python 3 codepath:
+        # Should work in most cases (excluding module and static functions)
+        if inspect.isfunction(obj) and hasattr(obj, "__qualname__"):
+            return "." in obj.__qualname__
+        return False
+
+    mros = inspect.getmro(cls)
+    missing_methods = [
+        name for name, _ in inspect.getmembers(base, is_method)
+    ]
+
+    print("class {}:".format(cls.__name__))
+
+    for name, obj in inspect.getmembers(cls, is_method):
+        if name in missing_methods:
+            missing_methods.remove(name)
+        for c in mros:
+            if name in c.__dict__:
+                print("    {}.{}".format(c.__name__, name))
+                break
+        else:
+            # Should never happen
+            print("    (ERROR).{}".format(name))
+
+    if missing_methods:
+        print("\nMissing methods:"
+              "\n    {}".format("\n    ".join(missing_methods)))
+        return False
+
+    return True
