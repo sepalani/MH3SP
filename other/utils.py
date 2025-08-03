@@ -13,19 +13,18 @@ import traceback
 from collections import namedtuple
 from functools import partial
 from logging.handlers import TimedRotatingFileHandler
+from other.config import ServerConfig, argparse_from_config
 from other.debug import register_debug_signal, dry_run
 
 try:
     # Python 2
     basestring  # str, unicode
-    import ConfigParser
 except NameError:
     # Python 3
     basestring = str
-    import configparser as ConfigParser
     from typing import Any  # noqa: F401
 
-CONFIG_FILE = "config.ini"
+
 LOG_FOLDER = "logs"
 
 
@@ -216,59 +215,6 @@ def create_logger(name, level=logging.DEBUG, log_to_file="",
     return logger
 
 
-def get_config(name, config_file=CONFIG_FILE):
-    """Get server config."""
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read(config_file)
-    return {
-        "IP": config.get(name, "IP"),
-        "ExternalIP": config.get(name, "ExternalIP"),
-        "Port": config.getint(name, "Port"),
-        "Name": config.get(name, "Name"),
-        "MaxThread": config.getint(name, "MaxThread"),
-        "UseSSL": config.getboolean(name, "UseSSL"),
-        "SSLCert":
-            config.get(name, "SSLCert") or
-            config.get("SSL", "DefaultCert"),
-        "SSLKey":
-            config.get(name, "SSLKey") or
-            config.get("SSL", "DefaultKey"),
-        "LogFilename": config.get(name, "LogFilename"),
-        "LogToConsole": config.getboolean(name, "LogToConsole"),
-        "LogToFile": config.getboolean(name, "LogToFile"),
-        "LogToWindow": config.getboolean(name, "LogToWindow"),
-    }
-
-
-def get_mysql_config(name, config_file=CONFIG_FILE):
-    """Get MySQL config."""
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read(config_file)
-    ssl_ca = config.get(name, "ssl_ca") or None
-    from mysql.connector.constants import ClientFlag
-    return {
-        "charset": "utf8",
-        "autocommit": True,
-        "user": config.get(name, "User"),
-        "password": config.get(name, "Password"),
-        "host": config.get(name, "Host"),
-        "database": config.get(name, "database"),
-        "client_flags": [ClientFlag.SSL] if ssl_ca else None,
-        "ssl_ca": ssl_ca,
-        "ssl_cert": config.get(name, "ssl_cert") or None,
-        "ssl_key": config.get(name, "ssl_key") or None
-    }
-
-
-def is_mysql_enabled(name, config_file=CONFIG_FILE):
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read(config_file)
-    return config.getboolean(name, "Enabled")
-
-
-# TODO: Backport latest_patch and central config code
-
-
 def get_default_ip():
     # type: () -> str
     """Get the default IP address"""
@@ -293,69 +239,6 @@ def get_external_ip(config):
     For instance, when behind a NAT or some cloud infrastructures.
     """
     return config["ExternalIP"] or get_ip(config["IP"])
-
-
-def argparse_from_config(config):
-    """Argument parser from config."""
-    import argparse
-
-    def typebool(s):
-        if isinstance(s, bool):
-            return s
-        s = s.lower()
-        if s in ("on", "yes", "y", "true", "t", "1"):
-            return True
-        elif s in ("off", "no", "n", "false", "f", "0"):
-            return False
-        else:
-            raise argparse.ArgumentTypeError("Boolean value expected.")
-
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-i", "--interactive", action="store_true",
-                        dest="interactive",
-                        help="create an interactive shell")
-    parser.add_argument("-d", "--debug_mode", action="store_true",
-                        dest="debug_mode",
-                        help="enable debug mode, disabling timeouts and \
-                        lower logging verbosity level")
-    parser.add_argument("-a", "--address", action="store", type=str,
-                        default=config["IP"], dest="address",
-                        help="set server address")
-    parser.add_argument("-p", "--port", action="store", type=int,
-                        default=config["Port"], dest="port",
-                        help="set server port")
-    parser.add_argument("-n", "--name", action="store", type=str,
-                        default=config["Name"], dest="name",
-                        help="set server name")
-    parser.add_argument("-s", "--use-ssl", action="store", type=typebool,
-                        default=config["UseSSL"], dest="use_ssl",
-                        help="use SSL protocol")
-    parser.add_argument("-c", "--ssl-cert", action="store", type=str,
-                        default=config["SSLCert"], dest="ssl_cert",
-                        help="set server SSL certificate")
-    parser.add_argument("-k", "--ssl-key", action="store", type=str,
-                        default=config["SSLKey"], dest="ssl_key",
-                        help="set server SSL private key")
-    parser.add_argument("-l", "--log-filename", action="store", type=str,
-                        default=config["LogFilename"], dest="log_filename",
-                        help="set server log filename")
-    parser.add_argument("--log-to-file", action="store", type=typebool,
-                        default=config["LogToFile"], dest="log_to_file",
-                        help="log output to file")
-    parser.add_argument("--log-to-console", action="store", type=typebool,
-                        default=config["LogToConsole"], dest="log_to_console",
-                        help="log output to console")
-    parser.add_argument("--log-to-window", action="store", type=typebool,
-                        default=config["LogToWindow"], dest="log_to_window",
-                        help="log output to a new window")
-    parser.add_argument("--dry-run", action="store_true",
-                        dest="dry_run",
-                        help="dry run to test the server")
-    parser.add_argument("-t", "--no-timeout", action="store_true",
-                        dest="no_timeout",
-                        help="disable player timeouts")
-    return parser
 
 
 def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
@@ -398,7 +281,7 @@ def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
-                  log_to_console=True, log_to_window=False, legacy_ssl=False,
+                  log_to_console=True, log_to_window=False,
                   debug_mode=False, no_timeout=False):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
@@ -409,9 +292,11 @@ def create_server(server_class, server_handler,
     if not use_ssl:
         ssl_cert = None
         ssl_key = None
-    return server_class((address, port), server_handler, max_thread, logger,
-                        debug_mode, ssl_cert=ssl_cert, ssl_key=ssl_key,
-                        no_timeout=no_timeout)
+    return server_class(
+        (address, port), server_handler,
+        max_thread_count=max_thread, logger=logger, debug_mode=debug_mode,
+        ssl_cert=ssl_cert, ssl_key=ssl_key, no_timeout=no_timeout
+    )
 
 
 server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
@@ -422,7 +307,7 @@ def create_server_from_base(name, server_class, server_handler, args=None):
 
     If args is None, sys.argv is used (see ArgumentParser.parser_args).
     """
-    config = get_config(name)
+    config = ServerConfig(name)
     # TODO: Backport central config code if needed
     parser = argparse_from_config(config)
     args = parser.parse_args(args)

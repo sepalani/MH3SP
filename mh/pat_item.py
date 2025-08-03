@@ -10,8 +10,8 @@ from collections import OrderedDict
 
 from mh.constants import pad
 from mh.state_models import Server, Gate, City
-from other.utils import to_bytearray, get_config, get_external_ip, \
-    GenericUnpacker
+from other.config import ServerConfig
+from other.utils import to_bytearray, get_external_ip, GenericUnpacker
 
 
 class ItemType:
@@ -1027,7 +1027,7 @@ class HunterSettings(object):
 def get_fmp_servers(session, first_index, count):
     assert first_index > 0, "Invalid list index"
 
-    config = get_config("FMP")
+    config = ServerConfig("FMP")
     fmp_addr = get_external_ip(config)
     fmp_port = config["Port"]
 

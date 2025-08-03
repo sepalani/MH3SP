@@ -7,8 +7,11 @@
 import inspect
 import random
 import sqlite3
-from other import utils
+
 from threading import local as thread_local
+
+from other import utils
+from other.config import MySQLConfig
 
 
 CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -415,7 +418,7 @@ class MySQLDatabase(TempDatabase):
         self.parent.__init__()
         from mysql import connector
         self.connection = connector.connect(
-            **utils.get_mysql_config("MYSQL")
+            **MySQLConfig().connect_kwargs()
         )
         self.create_database()
         self.populate_database()
@@ -659,7 +662,7 @@ class DebugDatabase(TempSQLiteDatabase):
 
 CURRENT_DB = \
     MySQLDatabase() \
-    if utils.is_mysql_enabled("MYSQL") \
+    if MySQLConfig().is_enabled() \
     else TempSQLiteDatabase()  # type: TempDatabase
 
 
