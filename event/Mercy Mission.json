@@ -1,784 +1,264 @@
 {
-    "small_monsters": [
-        [],
-        [
-            {
-                "type": 34,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 1,
-                "quantity": 1,
-                "pos_x": 247.42,
-                "pos_y": 560.37,
-                "pos_z": -3613.8,
-                "rot_x": 0,
-                "rot_y": -21504,
-                "rot_z": 0
-            },
-            {
-                "type": 34,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 1,
-                "quantity": 3,
-                "pos_x": -474.9,
-                "pos_y": 491.91,
-                "pos_z": -3857.25,
-                "rot_x": 0,
-                "rot_y": -48128,
-                "rot_z": 0
-            },
-            {
-                "type": 34,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 1,
-                "quantity": 3,
-                "pos_x": 897.01,
-                "pos_y": 418.6,
-                "pos_z": -4931.83,
-                "rot_x": 0,
-                "rot_y": -51200,
-                "rot_z": 0
-            },
-            {
-                "type": 34,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 1,
-                "quantity": 2,
-                "pos_x": 219.95,
-                "pos_y": 402.97,
-                "pos_z": -4449.25,
-                "rot_x": 0,
-                "rot_y": 44032,
-                "rot_z": 0
-            }
-        ],
-        [
-            {
-                "type": 33,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 2,
-                "quantity": 3,
-                "pos_x": -6654.1,
-                "pos_y": 23.12,
-                "pos_z": 117.64,
-                "rot_x": 0,
-                "rot_y": 81920,
-                "rot_z": 0
-            }
-        ],
-        [
-            {
-                "type": 27,
-                "unk1": 0,
-                "unk2": 3,
-                "variant": 0,
-                "room": 3,
-                "quantity": -1,
-                "pos_x": 2567.38,
-                "pos_y": -4.58,
-                "pos_z": -1280.44,
-                "rot_x": 0,
-                "rot_y": 63488,
-                "rot_z": 0
-            },
-            {
-                "type": 27,
-                "unk1": 1,
-                "unk2": 3,
-                "variant": 2,
-                "room": 3,
-                "quantity": -1,
-                "pos_x": 2119.14,
-                "pos_y": -14.21,
-                "pos_z": -787.0,
-                "rot_x": 0,
-                "rot_y": 60416,
-                "rot_z": 0
-            }
-        ],
-        [
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 4,
-                "quantity": 2,
-                "pos_x": 39.65,
-                "pos_y": 2.0,
-                "pos_z": 2631.32,
-                "rot_x": 0,
-                "rot_y": 20480,
-                "rot_z": 0
-            },
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 4,
-                "quantity": 2,
-                "pos_x": -538.14,
-                "pos_y": 2.0,
-                "pos_z": 2165.99,
-                "rot_x": 0,
-                "rot_y": -16384,
-                "rot_z": 0
-            },
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 4,
-                "quantity": 1,
-                "pos_x": 360.98,
-                "pos_y": 2.0,
-                "pos_z": 820.71,
-                "rot_x": 0,
-                "rot_y": -33792,
-                "rot_z": 0
-            },
-            {
-                "type": 36,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 4,
-                "quantity": -1,
-                "pos_x": -5671.42,
-                "pos_y": 466.03,
-                "pos_z": 3071.35,
-                "rot_x": 49152,
-                "rot_y": 54871,
-                "rot_z": 0
-            }
-        ],
-        [],
-        [],
-        [
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 4,
-                "room": 7,
-                "quantity": 2,
-                "pos_x": 1103.05,
-                "pos_y": -2050.0,
-                "pos_z": -1429.32,
-                "rot_x": 0,
-                "rot_y": -19456,
-                "rot_z": 0
-            },
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 4,
-                "room": 7,
-                "quantity": 1,
-                "pos_x": -3054.79,
-                "pos_y": -3047.85,
-                "pos_z": 3126.22,
-                "rot_x": 0,
-                "rot_y": -11264,
-                "rot_z": 0
-            },
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 4,
-                "room": 7,
-                "quantity": 1,
-                "pos_x": 1268.03,
-                "pos_y": -2470.0,
-                "pos_z": -557.22,
-                "rot_x": 0,
-                "rot_y": -19456,
-                "rot_z": 0
-            },
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 7,
-                "quantity": 3,
-                "pos_x": 1742.13,
-                "pos_y": -3820.0,
-                "pos_z": -1993.49,
-                "rot_x": 0,
-                "rot_y": -19456,
-                "rot_z": 0
-            },
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 7,
-                "quantity": 2,
-                "pos_x": 1732.89,
-                "pos_y": -3580.0,
-                "pos_z": -4462.32,
-                "rot_x": 0,
-                "rot_y": -50176,
-                "rot_z": 0
-            }
-        ],
-        [],
-        [
-            {
-                "type": 11,
-                "unk1": 1,
-                "unk2": 9,
-                "variant": 0,
-                "room": 9,
-                "quantity": 2,
-                "pos_x": -482.31,
-                "pos_y": 16.39,
-                "pos_z": 5.01,
-                "rot_x": 0,
-                "rot_y": 45056,
-                "rot_z": 0
-            }
-        ],
-        [
-            {
-                "type": 10,
-                "unk1": 1,
-                "unk2": 10,
-                "variant": 0,
-                "room": 10,
-                "quantity": 2,
-                "pos_x": -1949.45,
-                "pos_y": -276.13,
-                "pos_z": 1228.73,
-                "rot_x": 0,
-                "rot_y": 38912,
-                "rot_z": 0
-            },
-            {
-                "type": 31,
-                "unk1": 3,
-                "unk2": 255,
-                "variant": 0,
-                "room": 10,
-                "quantity": -1,
-                "pos_x": -1552.64,
-                "pos_y": -186.42,
-                "pos_z": 1504.3,
-                "rot_x": 0,
-                "rot_y": -5120,
-                "rot_z": 0
-            },
-            {
-                "type": 31,
-                "unk1": 3,
-                "unk2": 255,
-                "variant": 0,
-                "room": 10,
-                "quantity": -1,
-                "pos_x": -1352.11,
-                "pos_y": -174.8,
-                "pos_z": 1441.92,
-                "rot_x": 0,
-                "rot_y": 30720,
-                "rot_z": 0
-            },
-            {
-                "type": 36,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 10,
-                "quantity": 1,
-                "pos_x": -653.75,
-                "pos_y": 306.58,
-                "pos_z": 2295.24,
-                "rot_x": 0,
-                "rot_y": 39936,
-                "rot_z": 0
-            },
-            {
-                "type": 36,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 10,
-                "quantity": 4,
-                "pos_x": -615.28,
-                "pos_y": 96.58,
-                "pos_z": 2086.81,
-                "rot_x": 0,
-                "rot_y": 21504,
-                "rot_z": 0
-            }
-        ],
-        [
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 11,
-                "quantity": 1,
-                "pos_x": 4363.26,
-                "pos_y": 426.27,
-                "pos_z": 5818.19,
-                "rot_x": 0,
-                "rot_y": 30939,
-                "rot_z": 0
-            },
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 11,
-                "quantity": 1,
-                "pos_x": 4782.14,
-                "pos_y": 426.27,
-                "pos_z": 5556.53,
-                "rot_x": 0,
-                "rot_y": 29696,
-                "rot_z": 0
-            },
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 11,
-                "quantity": 1,
-                "pos_x": 4617.08,
-                "pos_y": 426.27,
-                "pos_z": 6208.15,
-                "rot_x": 0,
-                "rot_y": 51186,
-                "rot_z": 0
-            },
-            {
-                "type": 30,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 1,
-                "room": 11,
-                "quantity": 1,
-                "pos_x": 5099.46,
-                "pos_y": 426.27,
-                "pos_z": 5456.15,
-                "rot_x": 0,
-                "rot_y": 28996,
-                "rot_z": 0
-            },
-            {
-                "type": 36,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 11,
-                "quantity": 4,
-                "pos_x": 2767.15,
-                "pos_y": 611.59,
-                "pos_z": 4297.09,
-                "rot_x": 0,
-                "rot_y": -54272,
-                "rot_z": 0
-            },
-            {
-                "type": 36,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 11,
-                "quantity": 2,
-                "pos_x": 2793.18,
-                "pos_y": 1205.81,
-                "pos_z": 5908.79,
-                "rot_x": 0,
-                "rot_y": -53248,
-                "rot_z": 0
-            },
-            {
-                "type": 36,
-                "unk1": 1,
-                "unk2": 255,
-                "variant": 0,
-                "room": 11,
-                "quantity": 1,
-                "pos_x": 3210.49,
-                "pos_y": 845.81,
-                "pos_z": 5369.26,
-                "rot_x": 0,
-                "rot_y": -71680,
-                "rot_z": 0
-            }
-        ],
-        [
-            {
-                "type": 23,
-                "unk1": 1,
-                "unk2": 12,
-                "variant": 0,
-                "room": 12,
-                "quantity": -1,
-                "pos_x": -1624.63,
-                "pos_y": -888.12,
-                "pos_z": -2880.06,
-                "rot_x": 0,
-                "rot_y": 30720,
-                "rot_z": 0
-            },
-            {
-                "type": 23,
-                "unk1": 1,
-                "unk2": 12,
-                "variant": 2,
-                "room": 12,
-                "quantity": 3,
-                "pos_x": -2352.88,
-                "pos_y": -523.55,
-                "pos_z": -7478.2,
-                "rot_x": 0,
-                "rot_y": -16384,
-                "rot_z": 0
-            },
-            {
-                "type": 23,
-                "unk1": 1,
-                "unk2": 12,
-                "variant": 2,
-                "room": 12,
-                "quantity": 1,
-                "pos_x": -1957.86,
-                "pos_y": -1228.41,
-                "pos_z": -7734.46,
-                "rot_x": 0,
-                "rot_y": -16384,
-                "rot_z": 0
-            },
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 12,
-                "variant": 2,
-                "room": 12,
-                "quantity": -1,
-                "pos_x": -2821.8,
-                "pos_y": -988.41,
-                "pos_z": -8174.07,
-                "rot_x": 0,
-                "rot_y": -16384,
-                "rot_z": 0
-            },
-            {
-                "type": 32,
-                "unk1": 1,
-                "unk2": 12,
-                "variant": 2,
-                "room": 12,
-                "quantity": -1,
-                "pos_x": -2435.99,
-                "pos_y": -988.41,
-                "pos_z": -7780.24,
-                "rot_x": 0,
-                "rot_y": -16384,
-                "rot_z": 0
-            }
-        ]
-    ],
-    "quest_info": {
-        "quest_id": 61002,
-        "name": "Mercy Mission",
-        "client": "MH3SP Dev Team",
-        "description": "Deliver 10 Monster Guts",
-        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!",
-        "success_message": "Complete the Main Quest\nand both Subquests.",
-        "failure_message": "Reward hits 0, or time\nexpires.",
-        "flags": [
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                1,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-        ],
-        "penalty_per_cart": 600,
-        "quest_fee": 150,
-        "time_limit": 15,
-        "main_monster_1": 17,
-        "main_monster_2": 23,
-        "location": 1,
-        "quest_rank": 1,
-        "hrp_restriction": 0,
-        "resources": 0,
-        "supply_set_number": 35,
-        "starting_position": 0,
-        "general_enemy_level": 23,
-        "summon": 1677787404,
-        "wave_1_transition_type": 0,
-        "wave_1_transition_target": 0,
-        "wave_1_transition_quantity": 0,
-        "wave_2_transition_type": 0,
-        "wave_2_transition_target": 0,
-        "wave_2_transition_quantity": 0
-    },
-    "large_monsters": {
-        "monster_1": {
-            "type": 0,
-            "starting_area": 0,
-            "boss_id": 0,
-            "spawn_count": 0,
-            "level": 0,
-            "size": 0,
-            "hp_spread": 0,
-            "size_spread": 0
-        },
-        "monster_2": {
-            "type": 0,
-            "starting_area": 0,
-            "boss_id": 0,
-            "spawn_count": 0,
-            "level": 0,
-            "size": 0,
-            "hp_spread": 0,
-            "size_spread": 0
-        },
-        "monster_3": {
-            "type": 0,
-            "starting_area": 0,
-            "boss_id": 0,
-            "spawn_count": 0,
-            "level": 0,
-            "size": 0,
-            "hp_spread": 0,
-            "size_spread": 0
-        }
-    },
     "objective_details": {
-        "main_quest": {
-            "type": 2,
-            "objective_type": 429,
-            "objective_num": 10,
-            "zenny_reward": 1500,
-            "hrp_reward": 70,
+        "subquest_2": {
+            "objective_num": 3, 
+            "hrp_reward": 70, 
             "rewards_row_1": [
                 [
-                    440,
-                    1,
+                    440, 
+                    1, 
+                    35
+                ], 
+                [
+                    447, 
+                    1, 
+                    5
+                ], 
+                [
+                    441, 
+                    1, 
+                    15
+                ], 
+                [
+                    327, 
+                    1, 
+                    20
+                ], 
+                [
+                    328, 
+                    1, 
+                    25
+                ]
+            ], 
+            "description": "Deliver 3 Goldenfish", 
+            "objective_type": 217, 
+            "zenny_reward": 2000, 
+            "type": 2
+        }, 
+        "main_quest": {
+            "objective_num": 10, 
+            "hrp_reward": 70, 
+            "rewards_row_1": [
+                [
+                    440, 
+                    1, 
                     8
-                ],
+                ], 
                 [
-                    149,
-                    1,
+                    149, 
+                    1, 
                     20
-                ],
+                ], 
                 [
-                    141,
-                    2,
+                    141, 
+                    2, 
                     20
-                ],
+                ], 
                 [
-                    327,
-                    1,
+                    327, 
+                    1, 
                     18
-                ],
+                ], 
                 [
-                    216,
-                    1,
+                    216, 
+                    1, 
                     8
-                ],
+                ], 
                 [
-                    101,
-                    8,
+                    101, 
+                    8, 
                     14
-                ],
+                ], 
                 [
-                    569,
-                    1,
+                    569, 
+                    1, 
                     12
                 ]
-            ],
+            ], 
             "rewards_row_2": [
                 [
-                    440,
-                    1,
+                    440, 
+                    1, 
                     35
-                ],
+                ], 
                 [
-                    447,
-                    1,
+                    447, 
+                    1, 
                     5
-                ],
+                ], 
                 [
-                    441,
-                    1,
+                    441, 
+                    1, 
                     15
-                ],
+                ], 
                 [
-                    327,
-                    1,
+                    327, 
+                    1, 
                     20
-                ],
+                ], 
                 [
-                    328,
-                    1,
+                    328, 
+                    1, 
                     25
                 ]
-            ]
-        },
+            ], 
+            "objective_type": 429, 
+            "zenny_reward": 1500, 
+            "type": 2
+        }, 
         "subquest_1": {
-            "description": "Deliver 12 Red Coral Stones",
-            "type": 2,
-            "objective_type": 430,
-            "objective_num": 12,
-            "zenny_reward": 1200,
-            "hrp_reward": 55,
+            "objective_num": 12, 
+            "hrp_reward": 55, 
             "rewards_row_1": [
                 [
-                    440,
-                    1,
+                    440, 
+                    1, 
                     8
-                ],
+                ], 
                 [
-                    149,
-                    1,
+                    149, 
+                    1, 
                     20
-                ],
+                ], 
                 [
-                    141,
-                    2,
+                    141, 
+                    2, 
                     20
-                ],
+                ], 
                 [
-                    327,
-                    1,
+                    327, 
+                    1, 
                     18
-                ],
+                ], 
                 [
-                    216,
-                    1,
+                    216, 
+                    1, 
                     8
-                ],
+                ], 
                 [
-                    101,
-                    1,
+                    101, 
+                    1, 
                     14
-                ],
+                ], 
                 [
-                    569,
-                    1,
+                    569, 
+                    1, 
                     12
                 ]
-            ]
-        },
-        "subquest_2": {
-            "description": "Deliver 3 Goldenfish",
-            "type": 2,
-            "objective_type": 217,
-            "objective_num": 3,
-            "zenny_reward": 2000,
-            "hrp_reward": 70,
-            "rewards_row_1": [
-                [
-                    440,
-                    1,
-                    35
-                ],
-                [
-                    447,
-                    1,
-                    5
-                ],
-                [
-                    441,
-                    1,
-                    15
-                ],
-                [
-                    327,
-                    1,
-                    20
-                ],
-                [
-                    328,
-                    1,
-                    25
-                ]
-            ]
+            ], 
+            "description": "Deliver 12 Red Coral Stones", 
+            "objective_type": 430, 
+            "zenny_reward": 1200, 
+            "type": 2
         }
-    },
+    }, 
+    "quest_info": {
+        "wave_1_transition_type": 0, 
+        "time_limit": 15, 
+        "wave_1_transition_quantity": 0, 
+        "starting_position": 0, 
+        "quest_rank": 1, 
+        "wave_2_transition_target": 0, 
+        "wave_2_transition_quantity": 0, 
+        "general_enemy_level": 23, 
+        "wave_2_transition_type": 0, 
+        "location": 1, 
+        "penalty_per_cart": 600, 
+        "resources": 0, 
+        "details": "Wanted:\nThe description for this\nquest! If you can find\nit, please let us know!\nThanks!", 
+        "description": "Deliver 10 Monster Guts", 
+        "smallmonster_data_file": "sm_mercymission.dat", 
+        "wave_1_transition_target": 0, 
+        "hrp_restriction": 0, 
+        "quest_fee": 150, 
+        "quest_id": 61002, 
+        "name": "Mercy Mission", 
+        "main_monster_2": 23, 
+        "main_monster_1": 17, 
+        "supply_set_number": 35, 
+        "summon": 1677918979, 
+        "client": "MH3SP Dev Team", 
+        "flags": [
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                1, 
+                1, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ], 
+            [
+                0, 
+                1, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ]
+        ], 
+        "success_message": "Complete the Main Quest\nand both Subquests."
+    }, 
     "unknown": {
-        "unk_12": 3,
-        "unk_4": 0,
-        "unk_5": 0,
-        "unk_6": 0,
-        "unk_7": 0,
-        "unkInt0": 0,
-        "unkShort0": 0,
-        "unkByte0": 0,
-        "unkBytes0_0": 0,
-        "unkBytes0_1": 0,
-        "unkBytes0_2": 0,
-        "unkBytes1_0": 0,
-        "unkBytes1_1": 0,
-        "unkBytes1_2": 0,
-        "unkBytes2_0": 0,
-        "unkBytes2_1": 0,
-        "unkUintAlways15": 15,
-        "unkShort1": 0,
-        "unkShort2": 0,
-        "unkByte1": 0,
-        "unkByte2": 0,
-        "unkByte3": 0,
-        "unkByte4": 0,
-        "unkByte7": 0,
-        "unkByte8": 0
+        "unk_12": 3, 
+        "unk_4": 0, 
+        "unk_5": 0, 
+        "unk_6": 0, 
+        "unk_7": 0
+    }, 
+    "large_monsters": {
+        "monster_2": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_3": {
+            "size_spread": 0, 
+            "hp_spread": 0, 
+            "level": 0, 
+            "boss_id": 0, 
+            "type": 0, 
+            "starting_area": 0, 
+            "spawn_count": 0, 
+            "size": 0
+        }, 
+        "monster_1": {
+            "size_spread": 3, 
+            "hp_spread": 1, 
+            "level": 23, 
+            "boss_id": 0, 
+            "type": 16, 
+            "starting_area": 0, 
+            "spawn_count": 1, 
+            "size": 100
+        }
     }
 }
