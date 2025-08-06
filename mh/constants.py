@@ -306,10 +306,11 @@ MAINTENANCE = b"<BR><BODY>".join([
 ])
 UNPATCHED = "<BR><BODY>".join([
     "<BR><CENTER><BODY><SIZE=6>Monster Hunter 3 (Tri) Server Project",
-    "<BR><BR><CENTER><C=1><SIZE=7>NEW PATCH ARRIVED",
+    "<BR><BR><CENTER><C=1><SIZE=7>NEW PATCH REQUIRED",
     "<BR><LEFT><SIZE=4><C=7>Please see the discord server for the new patch.",
-    "New patch is required in order to play with the other",
-    "hunters.",
+    "The new patch is required in order to play online",
+    "with other hunters.",
+    "<BR><CENTER><SIZE=5><C=2>https://discord.gg/QZYZafjMwy",
     "<BR><CENTER><C=3>{}",
     "<END>"
 ])
