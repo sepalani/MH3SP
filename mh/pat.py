@@ -1839,6 +1839,46 @@ class PatRequestHandler(server.BasicPatHandler):
         self.server.layer_broadcast(self.session, PatID4.NtcLayerChat, data,
                                     seq)
 
+    def generateAnnouncement(self, announcement):
+        self.server.debug("Generating an announcement: {}".format(announcement))
+        text_color = 0x00fffff0
+        sender_id = "000000"
+        sender_name = "[MH3SP]"
+        MAX_CHAR_LENGTH = 30
+        broadcast_segments = []
+        words = announcement.split(" ")
+        mod_words = []
+
+        for word in words:
+            curr_word = word
+            while len(curr_word) > MAX_CHAR_LENGTH:
+                mod_words.append(curr_word[0:MAX_CHAR_LENGTH])
+                curr_word = curr_word[MAX_CHAR_LENGTH:]
+            if len(curr_word) > 0:
+                mod_words.append(curr_word)
+    
+        curr_broadcast = mod_words[0]
+        for word in mod_words[1:]:
+            if len(curr_broadcast) + 1 + len(word) <= MAX_CHAR_LENGTH:
+                curr_broadcast += " "
+                curr_broadcast += word
+            else:
+                broadcast_segments.append(curr_broadcast)
+                curr_broadcast = word
+        if len(curr_broadcast) > 0:
+            broadcast_segments.append(curr_broadcast)
+    
+        broadcasts = []
+        for broadcast_text in broadcast_segments:
+            data = struct.pack(">B", 0x01)
+            info = pati.MessageInfo()
+            info.text_color = pati.Long(text_color)
+            info.sender_id = pati.String(sender_id)
+            info.sender_name = pati.String(sender_name)
+            data += info.pack()
+            data += pati.lp2_string(broadcast_text)
+            self.send_packet(PatID4.NtcLayerChat, data, 0)
+
     def recvReqLayerTell(self, packet_id, data, seq):
         """ReqLayerTell packet.
 

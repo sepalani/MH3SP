@@ -26,6 +26,7 @@ from other.utils import Logger, create_logger, get_remote_config, \
         get_central_config, get_config, get_ip
 
 from threading import Lock, Event
+import os
 import socket
 import struct
 import logging
@@ -56,6 +57,7 @@ class PacketTypes(object):
     SessionDisconnect = 0x0008
     EventsData = 0x0009
     TradingPostData = 0x000A
+    Announcement = 0x000B
 
 
 class CentralConnectionHandler(object):
@@ -225,6 +227,11 @@ class CentralConnectionHandler(object):
         tp_binary = self.cache.get_updated_trading_post_binary()
         self.send_packet(PacketTypes.TradingPostData, tp_binary)
 
+    def SendAnnouncement(self, announcement):
+        # type: (String) -> None
+        self.cache.debug("Sending announcement {}".format(announcement))
+        self.send_packet(PacketTypes.Announcement, announcement.encode('utf-8'))
+
     def finish(self):
         # type: () -> None
         if self.finished:
@@ -267,7 +274,8 @@ class RemoteConnectionHandler(object):
             PacketTypes.SessionInfo: self.RecvSessionInfo,
             PacketTypes.ServerIDList: self.RecvServerIDList,
             PacketTypes.EventsData: self.RecvEventsData,
-            PacketTypes.TradingPostData: self.RecvTradingPostData
+            PacketTypes.TradingPostData: self.RecvTradingPostData,
+            PacketTypes.Announcement: self.RecvAnnouncement
         }  # type: Dict[int, Callable[[bytes], None]]
 
     def fileno(self):
@@ -423,6 +431,17 @@ class RemoteConnectionHandler(object):
             print(e)
             print(traceback.format_exc())
 
+    def RecvAnnouncement(self, data):
+        self.cache.info("Got new announcement!")
+        try:
+            message = data.decode('utf-8')
+            self.cache.info(message)
+            self.cache.announce_to_players(message)
+        except Exception as e:
+            import traceback
+            print(e)
+            print(traceback.format_exc())
+
     def finish(self):
         # type: () -> None
         if self.finished:
@@ -572,6 +591,13 @@ class Cache(Logger):
             if server_id != self.server_id:
                 players = players + server.get_all_players()
         return players
+
+    def announce_to_players(self, announcement):
+        # type: (String) -> None
+        sessions = get_instance().sessions
+        for id in sessions:
+            session = sessions[id]
+            session.connection.generateAnnouncement(announcement)
 
     def update_servers_version(self, servers_version):
         # type: (int) -> None
@@ -744,6 +770,20 @@ class Cache(Logger):
         self.sel.register(self.socket, selectors.EVENT_READ)
 
         while not self.shut_down:
+            # Distribute announcements
+            file_path = "./announce.txt"
+            if os.path.isfile(file_path):
+                message = ""
+                with open(file_path, 'r') as file:
+                    message = file.read()
+                if len(message) > 0:
+                    open(file_path, 'w').close()
+                    for _, handler in self.handlers.items():
+                        try:
+                            handler.SendAnnouncement(message)
+                        except Exception as exc:
+                            handler.on_exception(exc)
+                
             events = self.sel.select(timeout=1)
             # Respond to incoming packets
             for key, event in events:
