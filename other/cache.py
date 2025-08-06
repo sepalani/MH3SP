@@ -466,7 +466,6 @@ class RemoteConnectionHandler(object):
 
 
 WHITELIST_SERVER = 4
-WHITELISTED_CODES = []
 
 
 class Cache(Logger):
@@ -605,6 +604,16 @@ class Cache(Logger):
 
     def get_server_list(self, include_ids=False, code=''):
         # type: (bool) -> Union[List[Server], Tuple[List[int], List[Server]]]
+        WHITELISTED_CODES = []
+        file_path = "./whitelist.txt"
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if len(line) < 11:
+                        continue
+                    line = line[:12].strip()
+                    WHITELISTED_CODES.append(line)
         servers = {
             k:v for (k, v) in self.servers.items() if \
             (k != WHITELIST_SERVER or code in WHITELISTED_CODES)

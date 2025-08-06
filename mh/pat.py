@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Monster Hunter PAT module."""
 
+import os
 import struct
 import traceback
 from datetime import timedelta
@@ -266,9 +267,16 @@ class PatRequestHandler(server.BasicPatHandler):
 
         The games sends the PAT environment properties.
         """
-        BANNED_ONLINE_SUPPORT_CODES = (
-            'EXAMPLEEXAM',
-        )
+        BANNED_ONLINE_SUPPORT_CODES = []
+        file_path = "./ban_list.txt"
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if len(line) < 11:
+                        continue
+                    line = line[:12].strip()
+                    BANNED_ONLINE_SUPPORT_CODES.append(line)
         settings = pati.ConnectionData.unpack(data)
         self.server.debug("Connection: {!r}".format(settings))
         pat_ticket = settings.pat_ticket if "pat_ticket" in settings else \

@@ -7,3 +7,5 @@
 event/*.dat
 event_whitelist/*.dat
 logs
+ban_list.txt
+whitelist.txt
