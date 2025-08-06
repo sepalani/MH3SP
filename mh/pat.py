@@ -1806,8 +1806,6 @@ class PatRequestHandler(server.BasicPatHandler):
             unk1, = unpacker.struct(">B")
             info = unpacker.MessageInfo()
             message = unpacker.lp2_string()
-        self.server.debug("NtcLayerChat: {}, {!r}, {}".format(
-            unk1, info, message))
         self.sendNtcLayerChat(unk1, info, message, seq)
 
     def sendNtcLayerChat(self, unk1, info, message, seq):
@@ -1825,6 +1823,15 @@ class PatRequestHandler(server.BasicPatHandler):
         info.text_color = pati.Long(LAYER_CHAT_COLORS[self.session.layer])
         info.sender_id = pati.String(self.session.capcom_id)
         info.sender_name = pati.String(self.session.hunter_name)
+
+        self.server.debug(
+            "Chat - server{},gate{},city{},ip{},supportcode{},capcomid{} {}: {}".format(
+                self.session.local_info['server_id'], self.session.local_info['gate_id'],
+                self.session.local_info['city_id'], self.client_address[0],
+                self.session.online_support_code, self.session.capcom_id,
+                self.session.hunter_name, message
+            )
+        )
 
         data += info.pack()
         data += pati.lp2_string(message)
