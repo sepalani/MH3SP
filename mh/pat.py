@@ -911,8 +911,9 @@ class PatRequestHandler(server.BasicPatHandler):
             hunter_name = pati.unpack_string(user_obj.hunter_name)
         self.session.use_user(slot_index, hunter_name)
         user_obj.capcom_id = pati.String(self.session.capcom_id)
-        self.server.info("Client {} Capcom ID `{}`".format(self.client_address, 
-                                                         self.session.capcom_id))
+        self.server.info("Login - ip{},supportcode{},capcomid{}".format(
+            self.client_address[0], self.session.get_support_code(), self.session.capcom_id
+        ))
         self.sendAnsUserObject(is_slot_empty, slot_index, user_obj, seq)
 
     def sendAnsUserObject(self, is_slot_empty, slot_index, user_obj, seq):
