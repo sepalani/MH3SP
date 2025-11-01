@@ -42,7 +42,7 @@ class PatServer(server.BasicPatServer, Logger):
 
     def __init__(self, address, handler_class, max_thread_count=0,
                  logger=None, debug_mode=False, ssl_cert=None, ssl_key=None,
-                 no_timeout=False):
+                 no_timeout=False, **kwargs):
         server.BasicPatServer.__init__(
             self, address, handler_class, max_thread_count,
             ssl_cert=ssl_cert, ssl_key=ssl_key

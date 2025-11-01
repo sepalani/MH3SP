@@ -6,21 +6,17 @@
 
 from collections import OrderedDict
 
-try:
-    from collections.abc import Callable  # noqa: F401
-    from typing import TYPE_CHECKING, Any
-    IS_PYTHON2 = False
-except ImportError:
-    TYPE_CHECKING = False  # type: ignore
-    IS_PYTHON2 = True  # type: ignore
+from other.python import PYTHON_VERSION, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Callable  # noqa: F401
+    from typing import Any
     OrderedDictT = OrderedDict[str, Any]
     from configparser import RawConfigParser
     from argparse import ArgumentParser  # noqa: F401
 else:  # workaround to avoid some type hinting issues
     OrderedDictT = OrderedDict
-    if IS_PYTHON2:
+    if PYTHON_VERSION == 2:
         from ConfigParser import RawConfigParser
     else:
         from configparser import RawConfigParser
@@ -112,8 +108,9 @@ class ConfigSection(OrderedDictT):
 
 
 class BaseServerConfig(ConfigSection):
+    SERVER_NAMES = tuple()  # type: tuple[str, ...]
     INT = ("Port",)
-    BOOL = ("UseSSL", "LogToConsole", "LogToFile", "LogToWindow")
+    BOOL = ("UseSSL", "LogToConsole", "LogToFile", "LogToWindow", "Enabled")
     STR = ("IP", "ExternalIP", "Name", "LogFilename")
     SP = {
         "SSLCert":
@@ -124,9 +121,18 @@ class BaseServerConfig(ConfigSection):
             or cfg.get("SSL", "DefaultKey")
     }
 
+    def to_argument_parser(self):
+        # type: () -> ArgumentParser
+        """Create a generic ArgumentParser from the server config.
+
+        It can be used in a main function to parse command-line arguments."""
+        # TODO: Move the code here when the refactoring is completed
+        return argparse_from_config(self)
+
 
 class ServerConfig(BaseServerConfig):
     """OPN/LMP/FMP/RFP server config."""
+    SERVER_NAMES = ("OPN", "LMP", "FMP", "RFP")
     INT = BaseServerConfig.INT + ("MaxThread",)
 
 
@@ -162,6 +168,15 @@ class MySQLConfig(ConfigSection):
 
 
 # TODO: Backport latest_patch and central config code
+
+
+def config_from_name(name):
+    # type: (str) -> ServerConfig | CentralConfig
+    """Return the server config based on its name."""
+    if name in ServerConfig.SERVER_NAMES:
+        return ServerConfig(name)
+    else:
+        raise NotImplementedError()
 
 
 def argparse_from_config(config):

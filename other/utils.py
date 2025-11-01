@@ -13,7 +13,7 @@ import traceback
 from collections import namedtuple
 from functools import partial
 from logging.handlers import TimedRotatingFileHandler
-from other.config import ServerConfig, argparse_from_config
+from other.config import config_from_name
 from other.debug import register_debug_signal, dry_run
 
 try:
@@ -32,34 +32,40 @@ class Logger(object):
     """Generic logging class."""
 
     def set_logger(self, logger):
+        # type: (Logger) -> None
         """Set logger."""
         self.logger = logger
 
     def debug(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a debug message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.info(msg, *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a warning message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.warning(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log an error message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.error(msg, *args, **kwargs)
 
     def critical(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a critical message."""
         if not hasattr(self, "logger"):
             return
@@ -282,7 +288,7 @@ def create_server(server_class, server_handler,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
                   log_to_console=True, log_to_window=False,
-                  debug_mode=False, no_timeout=False):
+                  debug_mode=False, no_timeout=False, **kwargs):
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG if debug_mode else logging.INFO,
@@ -295,7 +301,8 @@ def create_server(server_class, server_handler,
     return server_class(
         (address, port), server_handler,
         max_thread_count=max_thread, logger=logger, debug_mode=debug_mode,
-        ssl_cert=ssl_cert, ssl_key=ssl_key, no_timeout=no_timeout
+        ssl_cert=ssl_cert, ssl_key=ssl_key, no_timeout=no_timeout,
+        **kwargs
     )
 
 
@@ -307,9 +314,11 @@ def create_server_from_base(name, server_class, server_handler, args=None):
 
     If args is None, sys.argv is used (see ArgumentParser.parser_args).
     """
-    config = ServerConfig(name)
+    config = config_from_name(name)
+    if not config["Enabled"]:
+        return None, args
     # TODO: Backport central config code if needed
-    parser = argparse_from_config(config)
+    parser = config.to_argument_parser()
     args = parser.parse_args(args)
     kwargs = {
         k: v for k, v in vars(args).items()
@@ -324,6 +333,7 @@ def server_main(name, server_class, server_handler):
 
     server, args = create_server_from_base(name, server_class,
                                            server_handler)
+    assert server, "Server disabled by the config file"
 
     try:
         import threading
