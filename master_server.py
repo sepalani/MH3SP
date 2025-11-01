@@ -23,8 +23,9 @@ def create_servers(server_args):
     has_ui = False
     for module in (OPN, LMP, FMP, RFP):
         server, args = create_server_from_base(*module.BASE, args=server_args)
-        has_ui = has_ui or args.log_to_window
-        servers.append(server)
+        if server:
+            has_ui = has_ui or args.log_to_window
+            servers.append(server)
     return servers, has_ui
 
 
@@ -73,7 +74,7 @@ def main(args):
         if args.interactive:
             t.join()
     except KeyboardInterrupt:
-        print("Interrupt key was pressed, closing server...")
+        print("Interrupt key was pressed, closing servers...")
     except Exception:
         print('Unexpected exception caught...')
         traceback.print_exc()

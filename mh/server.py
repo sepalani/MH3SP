@@ -374,4 +374,4 @@ class BasicPatServer(object):
         self.selector = None
         self.worker_threads = []
         self.__shutdown_request = False
-        self.info('Server Closed')
+        self.info('Server closed')
