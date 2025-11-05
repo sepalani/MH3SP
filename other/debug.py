@@ -17,17 +17,23 @@ https://wiki.python.org/moin/PythonDebuggingTools
 import traceback
 import signal
 
-try:
-    # Python 2
-    import ConfigParser
-except ImportError:
-    # Python 3
-    import configparser as ConfigParser
+from other.python import PYTHON_VERSION, TYPE_CHECKING
+
+if TYPE_CHECKING or PYTHON_VERSION == 3:
+    from configparser import RawConfigParser
+else:
+    from ConfigParser import RawConfigParser
+
+if TYPE_CHECKING:
+    from collections.abc import Callable  # noqa: F401
+    from types import FrameType  # noqa: F401
+    from typing import Any  # noqa: F401
 
 DEBUG_INI_PATH = "debug.ini"
 
 
 def debugpy_handler(sig, frame, addr="127.0.0.1", port="5678", **kwargs):
+    # type: (int, FrameType, str, str, **Any) -> None
     """Handler for debugpy on Visual Studio and VS Code.
 
     References:
@@ -35,7 +41,7 @@ def debugpy_handler(sig, frame, addr="127.0.0.1", port="5678", **kwargs):
     https://code.visualstudio.com/docs/python/debugging
     https://learn.microsoft.com/visualstudio/python/debugging-python-in-visual-studio
     """
-    import debugpy
+    import debugpy  # type: ignore
     s = (addr, int(port))  # config's items are str
     debugpy.listen(s)
     print("Waiting for client on {}:{}\n".format(*s))
@@ -43,6 +49,7 @@ def debugpy_handler(sig, frame, addr="127.0.0.1", port="5678", **kwargs):
 
 
 def trepan_handler(sig, frame, **kwargs):
+    # type: (int, FrameType, **Any) -> None
     """Handler for trepan2/trepan3k.
 
     References:
@@ -50,22 +57,24 @@ def trepan_handler(sig, frame, **kwargs):
     https://github.com/rocky/python3-trepan/
     https://python2-trepan.readthedocs.io/en/latest/entry-exit.html
     """
-    from trepan.api import debug
+    from trepan.api import debug  # type: ignore
     debug()
 
 
 def pudb_handler(sig, frame, **kwargs):
+    # type: (int, FrameType, **Any) -> None
     """Handler for pudb on Linux and Cygwin.
 
     References:
     https://github.com/inducer/pudb
     https://documen.tician.de/pudb/
     """
-    import pudb
+    import pudb  # type: ignore
     pudb.set_trace()
 
 
 def breakpoint_handler(sig, frame, **kwargs):
+    # type: (int, FrameType, **Any) -> None
     """PDB/breakpoint handler.
 
     References:
@@ -80,6 +89,7 @@ def breakpoint_handler(sig, frame, **kwargs):
 
 
 def code_interact_handler(sig, frame, **kwargs):
+    # type: (int, FrameType, **Any) -> None
     """Python interpreter handler.
 
     References:
@@ -99,25 +109,29 @@ DEBUG_HANDLERS = {
     "PUDB": pudb_handler,
     "BREAKPOINT": breakpoint_handler,
     "CODE": code_interact_handler
-}
+}  # type: dict[str, Callable[..., Any]]
 
 
 def load_config(path=DEBUG_INI_PATH):
-    config = ConfigParser.RawConfigParser()
+    # type: (str) -> RawConfigParser
+    config = RawConfigParser()
     config.read(path)
     return config
 
 
 def load_handler_config(name, config):
+    # type: (str, RawConfigParser) -> dict[str, str] | None
     if config.has_section(name) and config.getboolean(name, "Enabled"):
         return {
             k.lower(): v
             for k, v in config.items(name)
             if k.lower() != "enabled"
         }
+    return None
 
 
 def debug_signal_handler(sig, frame):
+    # type: (int, FrameType) -> None
     """Default debug signal handler.
 
     Might raise EINTR/IOError when occuring during some syscalls on Python 2.
@@ -148,6 +162,7 @@ def debug_signal_handler(sig, frame):
 
 
 def register_debug_signal(fn=debug_signal_handler):
+    # type: (Callable[..., Any]) -> None
     """Register a debug handler on SIGBREAK (Windows) or SIGUSR1 (Linux).
 
     On Windows, press CTRL+Pause/Break to trigger.
@@ -156,17 +171,19 @@ def register_debug_signal(fn=debug_signal_handler):
     Will raise ValueError exception if not called from the main thread.
     """
     if hasattr(signal, "SIGBREAK"):
-        signal.signal(signal.SIGBREAK, fn)
+        signal.signal(signal.SIGBREAK, fn)  # type: ignore
     else:
-        signal.signal(signal.SIGUSR1, fn)
+        signal.signal(signal.SIGUSR1, fn)  # type: ignore
 
 
 def dry_run(delay=10.):
+    # type: (float) -> None
     """Dry run test."""
     from threading import Timer
-    try:
-        from thread import interrupt_main
-    except ImportError:
+
+    if TYPE_CHECKING or PYTHON_VERSION == 3:
         from _thread import interrupt_main
+    else:
+        from thread import interrupt_main
 
     Timer(delay, interrupt_main).start()

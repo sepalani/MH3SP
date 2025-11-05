@@ -15,14 +15,17 @@ from functools import partial
 from logging.handlers import TimedRotatingFileHandler
 from other.config import config_from_name
 from other.debug import register_debug_signal, dry_run
+from other.python import PYTHON_VERSION, TYPE_CHECKING
 
-try:
-    # Python 2
-    basestring  # str, unicode
-except NameError:
-    # Python 3
-    basestring = str
-    from typing import Any  # noqa: F401
+if TYPE_CHECKING or PYTHON_VERSION == 3:
+    basestring = str  # Python 2: str, unicode
+if TYPE_CHECKING:
+    from argparse import Namespace  # noqa: F401
+    from collections.abc import Sequence  # noqa: F401
+    from ssl import SSLSocket  # noqa: F401
+    from typing import Any, NamedTuple  # noqa: F401
+
+    from mh.pat import PatServer, PatRequestHandler
 
 
 LOG_FOLDER = "logs"
@@ -137,6 +140,7 @@ class GenericUnpacker(object):
 
 
 def to_bytearray(data):
+    # type: (Any) -> bytearray
     """Python2/3 bytearray helper."""
     if isinstance(data, basestring):
         return bytearray((ord(c) % 256 for c in data))
@@ -147,10 +151,12 @@ def to_bytearray(data):
 
 
 def to_bytes(data):
+    # type: (Any) -> bytes
     return bytes(to_bytearray(data))
 
 
 def to_str(data):
+    # type: (Any) -> str
     """Python2/3 str helper."""
     if isinstance(data, str):
         return data
@@ -158,20 +164,24 @@ def to_str(data):
 
 
 def pad(s, size, p=b'\0'):
+    # type: (bytes, int, bytes) -> bytearray
     data = bytearray(s + p * max(0, size-len(s)))
     data[-1] = 0
     return data
 
 
 def hexdump(data):
+    # type: (bytes | bytearray) -> str
     """Get data hexdump."""
     data = bytearray(data)
     line_format = "{line:08x} | {hex:47} | {ascii}"
 
     def hex_helper(b):
+        # type: (int) -> str
         return "{:02x}".format(b)
 
     def ascii_helper(b):
+        # type: (int) -> str
         return chr(b) if 0x20 <= b < 0x7F else '.'
 
     return "\n".join(
@@ -186,6 +196,7 @@ def hexdump(data):
 
 def create_logger(name, level=logging.DEBUG, log_to_file="",
                   log_to_console=False, log_to_window=False):
+    # type: (str, int, str, bool, bool) -> logging.Logger
     """Create a logger."""
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -248,6 +259,7 @@ def get_external_ip(config):
 
 
 def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
+    # type: (socket.socket, str, str) -> SSLSocket
     """SSL wrapper for network sockets aiming Wii compatibility.
 
     References:
@@ -289,6 +301,7 @@ def create_server(server_class, server_handler,
                   log_to_file=True, log_filename="server.log",
                   log_to_console=True, log_to_window=False,
                   debug_mode=False, no_timeout=False, **kwargs):
+    # type: (type[PatServer], type[PatRequestHandler], str, int, str, int, bool, str | None, str | None, bool, str, bool, bool, bool, bool, **Any) -> PatServer  # noqa: E501
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG if debug_mode else logging.INFO,
@@ -306,20 +319,29 @@ def create_server(server_class, server_handler,
     )
 
 
-server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
+if TYPE_CHECKING:
+    # Python 2 doesn't support the class syntax
+    server_base = NamedTuple("server_base", [
+        ("name", str),
+        ("cls", type[PatServer]),
+        ("handler", type[PatRequestHandler])
+    ])
+else:
+    server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
 
 
-def create_server_from_base(name, server_class, server_handler, args=None):
+def create_server_from_base(name, server_class, server_handler, cmd_args=None):
+    # type: (str, type[PatServer], type[PatRequestHandler], Sequence[str] | None) -> tuple[PatServer, Namespace] | tuple[None, None]  # noqa: E501
     """Create a server based on its config parameters and supplied args.
 
     If args is None, sys.argv is used (see ArgumentParser.parser_args).
     """
     config = config_from_name(name)
     if not config["Enabled"]:
-        return None, args
+        return None, None
     # TODO: Backport central config code if needed
     parser = config.to_argument_parser()
-    args = parser.parse_args(args)
+    args = parser.parse_args(cmd_args)
     kwargs = {
         k: v for k, v in vars(args).items()
         if k not in ("interactive", "dry_run")
@@ -328,12 +350,13 @@ def create_server_from_base(name, server_class, server_handler, args=None):
 
 
 def server_main(name, server_class, server_handler):
+    # type: (str, type[PatServer], type[PatRequestHandler]) -> None
     """Create a server main based on its config parameters."""
     register_debug_signal()
 
     server, args = create_server_from_base(name, server_class,
                                            server_handler)
-    assert server, "Server disabled by the config file"
+    assert server and args, "Server disabled by the config file"
 
     try:
         import threading
@@ -350,11 +373,13 @@ def server_main(name, server_class, server_handler):
 
         if args.log_to_window:
             from other.ui import update as ui_update
+        else:
+            def ui_update():
+                pass
 
         while thread.is_alive():
             thread.join(0.1)  # Timeout allows main thread to handle signals
-            if args.log_to_window:
-                ui_update()
+            ui_update()
     except KeyboardInterrupt:
         server.info("Interrupt key was pressed, closing server...")
     except Exception:
