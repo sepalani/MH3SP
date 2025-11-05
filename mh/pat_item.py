@@ -7,10 +7,11 @@
 import struct
 
 from collections import OrderedDict
+
 from mh.constants import pad
-from other.utils import to_bytearray, get_config, get_external_ip, \
-    GenericUnpacker
-from mh.database import Server, Gate, City
+from mh.state_models import Server, Gate, City
+from other.config import ServerConfig
+from other.utils import to_bytearray, get_external_ip, GenericUnpacker
 
 
 class ItemType:
@@ -354,6 +355,8 @@ def unpack_bytes(data, offset=0):
 
 
 class PatData(OrderedDict):
+    # TODO: type hint the whole module and add OrderedDict generic stub
+    # see https://mypy.readthedocs.io/en/stable/runtime_troubles.html
     """Pat structure holding items."""
     FIELDS = (
         (1, "field_0x01"),
@@ -363,9 +366,11 @@ class PatData(OrderedDict):
     )
 
     def __len__(self):
+        # type: () -> int
         return len(self.pack())
 
     def __repr__(self):
+        # type: () -> str
         items = [
             (index, value)
             for index, value in self.items()
@@ -380,6 +385,7 @@ class PatData(OrderedDict):
         )
 
     def __getattr__(self, name):
+        # type: (str) -> Item
         for field_id, field_name in self.FIELDS:
             if name == field_name:
                 if field_id not in self:
@@ -388,6 +394,7 @@ class PatData(OrderedDict):
         raise AttributeError("Unknown field: {}".format(name))
 
     def __setattr__(self, name, value):
+        # type: (str, Item) -> None
         for field_id, field_name in self.FIELDS:
             if name == field_name:
                 if not isinstance(value, Item):
@@ -399,6 +406,7 @@ class PatData(OrderedDict):
         raise AttributeError("Cannot set unknown field: {}".format(name))
 
     def __delattr__(self, name):
+        # type: (str) -> None
         for field_id, field_name in self.FIELDS:
             if name == field_name:
                 del self[field_id]
@@ -406,13 +414,19 @@ class PatData(OrderedDict):
         return OrderedDict.__delattr__(self, name)
 
     def __setitem__(self, key, value):
+        # type: (int, Item) -> None
         if not isinstance(key, int) or not (0 <= key <= 255):
             raise IndexError("index must be a valid numeric value")
         elif not isinstance(value, Item):
             raise ValueError("{!r} not a valid PAT item".format(value))
         return OrderedDict.__setitem__(self, key, value)
 
+    def __getitem__(self, key):
+        # type: (int) -> Item
+        return OrderedDict.__getitem__(self, key)
+
     def __contains__(self, key):
+        # type: (int | str | object) -> bool
         if isinstance(key, str):
             for field_id, field_name in self.FIELDS:
                 if field_name == key:
@@ -426,13 +440,19 @@ class PatData(OrderedDict):
 
         return OrderedDict.__contains__(self, key)
 
+    def items(self):
+        # type: () -> list[tuple[int, Item]]
+        return OrderedDict.items(self)
+
     def field_name(self, index):
+        # type: (int) -> str
         for field_id, field_name in self.FIELDS:
             if index == field_id:
                 return field_name
         return "field_0x{:02x}".format(index)
 
     def pack(self):
+        # type: () -> bytes
         """Pack PAT items."""
         items = [
             (index, value)
@@ -445,6 +465,7 @@ class PatData(OrderedDict):
         )
 
     def pack_fields(self, fields):
+        # type: (set[int]) -> bytes
         """Pack PAT items specified fields."""
         items = [
             (index, value)
@@ -458,6 +479,7 @@ class PatData(OrderedDict):
 
     @classmethod
     def unpack(cls, data, offset=0):
+        # type: (type[PatData], bytes, int) -> PatData
         obj = cls()
         field_count, = struct.unpack_from(">B", data, offset)
         offset += 1
@@ -489,10 +511,35 @@ class PatData(OrderedDict):
         return obj
 
     def assert_fields(self, fields):
-        items = set(self.keys())
+        # type: (set[int]) -> None
+        items = set(self.keys())  # type: set[int]
         fields = set(fields)
         message = "Fields mismatch: {}\n -> Expected: {}".format(items, fields)
         assert items == fields, message
+
+    def filter_fields(self, fields):
+        # type: (set[int]) -> list[tuple[int, str, Item]]
+        """Filter PatData excess of information.
+
+        Places using this method should be investigated to make sure there is
+        no oversight (or more reverse engineering needed) regarding the
+        data structure and packet used.
+        """
+        items = set(self.keys())  # type: set[int]
+        fields = set(fields)
+        missing_fields = fields - items
+        message = "Can't filter missing fields: {}\n".format(", ".join(
+            self.field_name(field_id) for field_id in missing_fields
+        ))
+        assert not missing_fields, message
+        new_fields = items - fields
+        filtered_fields = []  # type: list[tuple[int, str, Item]]
+        for field_id in new_fields:
+            filtered_fields.append(
+                (field_id, self.field_name(field_id), self[field_id])
+            )
+            del self[field_id]
+        return filtered_fields
 
 
 class DummyData(PatData):
@@ -586,6 +633,10 @@ class UserSearchInfo(PatData):
         (0x0f, "info_mine_0x0f"),
         (0x10, "info_mine_0x10"),
     )
+
+
+# FIXME: Both LayerPath and LayerData introduce a strong dependency on
+# mh.state_models, which should be avoided for this module.
 
 
 class LayerPath(object):
@@ -976,7 +1027,7 @@ class HunterSettings(object):
 def get_fmp_servers(session, first_index, count):
     assert first_index > 0, "Invalid list index"
 
-    config = get_config("FMP")
+    config = ServerConfig("FMP")
     fmp_addr = get_external_ip(config)
     fmp_port = config["Port"]
 

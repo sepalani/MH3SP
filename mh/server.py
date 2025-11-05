@@ -12,14 +12,13 @@ import threading
 import traceback
 
 from mh.time_utils import Timer
+from other.python import PYTHON_VERSION, TYPE_CHECKING
 from other.utils import wii_ssl_wrap_socket
 
-try:
-    # Python 3
+if TYPE_CHECKING or PYTHON_VERSION == 3:
     import queue
     import selectors
-except ImportError:
-    # Python 2
+else:
     import Queue as queue
     import externals.selectors2 as selectors
 
@@ -183,11 +182,7 @@ class BasicPatServer(object):
         return self.socket.fileno()
 
     def initialize_workers(self):
-        """Initialize workers queues/threads.
-
-        This needs to be deferred, otherwise the close method might try to
-        join threads that aren't started yet when an error occurs early.
-        """
+        """Initialize workers queues/threads."""
         for n in range(self.max_threads):
             thread_queue = queue.Queue()
             thread = threading.Thread(
@@ -368,10 +363,11 @@ class BasicPatServer(object):
             q.put((None, None, None), block=True)
 
         for t in self.worker_threads:
-            t.join()
+            if t.is_alive():
+                t.join()
 
         self.worker_queues = []
         self.selector = None
         self.worker_threads = []
         self.__shutdown_request = False
-        self.info('Server Closed')
+        self.info('Server closed')

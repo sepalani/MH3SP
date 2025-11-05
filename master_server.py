@@ -14,21 +14,33 @@ import fmp_server as FMP
 import rfp_server as RFP
 
 from other.debug import register_debug_signal, dry_run
+from other.python import TYPE_CHECKING
 from other.utils import create_server_from_base
+
+if TYPE_CHECKING:
+    from argparse import Namespace  # noqa: F401
+    from collections.abc import Sequence  # noqa: F401
+    from typing import Any  # noqa: F401
+
+    from mh.server import BasicPatServer  # noqa: F401
 
 
 def create_servers(server_args):
+    # type: (Sequence[str]) -> tuple[list[BasicPatServer], bool]
     """Create servers and check if it has ui."""
-    servers = []
+    servers = []  # type: list[BasicPatServer]
     has_ui = False
     for module in (OPN, LMP, FMP, RFP):
-        server, args = create_server_from_base(*module.BASE, args=server_args)
-        has_ui = has_ui or args.log_to_window
-        servers.append(server)
+        server, args = create_server_from_base(*module.BASE,
+                                               cmd_args=server_args)  # type: ignore[misc]  # noqa: E501
+        if server and args:
+            has_ui = has_ui or args.log_to_window
+            servers.append(server)
     return servers, has_ui
 
 
 def main(args):
+    # type: (Namespace) -> None
     """Master server main function."""
     register_debug_signal()
 
@@ -41,39 +53,42 @@ def main(args):
         for server in servers
     ]
     # TODO: Backport cache's logic (i.e. new thread, maintain_connection)
-    for thread in threads:
-        thread.start()
 
     def interactive_mode(local=locals()):
+        # type: (dict[str, Any]) -> None
         """Run an interactive python interpreter in another thread."""
         import code
         code.interact(local=local)
 
+    repl_thread = threading.Thread(target=interactive_mode)
+
     if has_ui:
         from other.ui import update as ui_update
-        ui_update()
+    else:
+        def ui_update():
+            pass
 
     try:
+        ui_update()
+        for server_thread in threads:
+            server_thread.start()
+
         if args.interactive:
-            t = threading.Thread(target=interactive_mode)
-            t.start()
+            repl_thread.start()
 
         if args.dry_run:
             dry_run()
 
         while threads:
-            for thread in threads:
-                if has_ui:
-                    ui_update()
-                if not thread.is_alive():
-                    threads.remove(thread)
+            for server_thread in threads:
+                ui_update()
+                if not server_thread.is_alive():
+                    threads.remove(server_thread)
                     break
-                thread.join(0.1)
+                server_thread.join(0.1)
 
-        if args.interactive:
-            t.join()
     except KeyboardInterrupt:
-        print("Interrupt key was pressed, closing server...")
+        print("Interrupt key was pressed, closing servers...")
     except Exception:
         print('Unexpected exception caught...')
         traceback.print_exc()
@@ -81,6 +96,8 @@ def main(args):
     finally:
         for server in servers:
             server.close()
+        if args.interactive and repl_thread.is_alive():
+            repl_thread.join()
 
 
 if __name__ == "__main__":
