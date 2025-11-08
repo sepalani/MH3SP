@@ -28,8 +28,8 @@ class FmpServer(PatServer):
 class FmpRequestHandler(PatRequestHandler):
     """Basic FMP server request handler class."""
 
-    def on_init(self):
-        PatRequestHandler.on_init(self)
+    def setup(self):
+        super(FmpRequestHandler, self).setup()
         self.session = FMPSession(self.session)
 
     def recvAnsConnection(self, packet_id, data, seq):

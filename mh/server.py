@@ -6,14 +6,15 @@
 
 import multiprocessing
 import random
-import socket
-import struct
+import sys
 import threading
 import traceback
 
 from mh.time_utils import Timer
+from other.net_utils import \
+    PacketHandler, WiiSSLHandlerMixIn, SelectorsBaseServer
 from other.python import PYTHON_VERSION, TYPE_CHECKING
-from other.utils import wii_ssl_wrap_socket
+from other.utils import Logger
 
 if TYPE_CHECKING or PYTHON_VERSION == 3:
     import queue
@@ -22,169 +23,120 @@ else:
     import Queue as queue
     import externals.selectors2 as selectors
 
+if TYPE_CHECKING:
+    from typing import Any
 
-class BasicPatHandler(object):
-    def __init__(self, socket, client_address, server):
-        # type: (socket.socket, tuple[str, int], BasicPatServer)  -> None
-        self.socket = socket
-        self.client_address = client_address
-        self.server = server
-        self.finished = False
-        self.rw = threading.Lock()
-        self.setup()
+    # noinspection PyCompatibility
+    PacketQueue = queue.Queue[
+        tuple["BasicPatHandler", Any, int]
+        | tuple[None, None, None]
+    ]
+else:
+    PacketQueue = queue.Queue
 
-    def fileno(self):
-        # type: () -> int
-        return self.socket.fileno()
 
+class BasicPatHandler(WiiSSLHandlerMixIn, PacketHandler):  # type: ignore[misc]
+    """Dummy queueable PAT packet handler class."""
+
+    # Prevents indefinite recv from invalid headers
+    timeout = 2.0
+
+    # noinspection PyAttributeOutsideInit
     def setup(self):
-        self.rfile = self.socket.makefile('rb', -1)
-        self.wfile = self.socket.makefile('wb', 0)
+        # type: () -> None
+        """Prepare the handler and its default properties."""
+        self.worker_index = 0
+        return super(BasicPatHandler, self).setup()
 
-        self.on_init()
+    def handle_packet(self, seq, packet_id, data):  # type: ignore[override]
+        # type: (int, int, bytes) -> None
+        """Add the received packet to the server's queue."""
+        assert isinstance(self.server, BasicPatServer)
+        self.server.queue_work(self, (packet_id, data, seq),
+                               selectors.EVENT_READ)
 
-    def on_init(self):
-        """Called after setup"""
-        pass
+    def send_packet(self, packet_id, data, seq):  # type: ignore[override]
+        # type: (int, bytes, int) -> None
+        """Change parameters order to match the generic one."""
+        return super(BasicPatHandler, self).send_packet(seq, packet_id, data)
 
-    def on_exception(self, e):
-        # type: (Exception) -> None
-        """Called when during recv/write an exception ocurred"""
-        pass
+    def on_packet(self, packet_id, data, seq):
+        # type: (int, bytes, int) -> None
+        """Called when there is a packet to be handled
 
-    def on_recv(self):
-        """Called when the socket have bytes to be readed
-
-        ** This method would be called by the server thread
-
-        """
-        header = self.rfile.read(8)
-        if not len(header):
-            # The socket was closed by externally
-            return None
-
-        if len(header) < 8:
-            # Invalid packet header
-            return None
-
-        return self.recv_packet(header)
-
-    def on_packet(self, data):
-        """ Called when there is a packet to be handled
-
-        ** This method would be called from a worker thread (Not Thread Safe)
-
-        """
-
-    def recv_packet(self, header):
-        """Receive PAT packet."""
-        size, seq, packet_id = struct.unpack(">HHI", header)
-        data = self.rfile.read(size)
-        return packet_id, data, seq
-
-    def send_packet(self, packet_id=0, data=b'', seq=0):
-        """Send PAT packet."""
-        self.wfile.write(struct.pack(
-            ">HHI",
-            len(data), seq, packet_id
-        ))
-        if data:
-            self.wfile.write(data)
-
-    def on_tick(self):
-        """Called every time the server tick
-
-        ** Currently executed from the server thread
-
+        This method would be called from a worker thread (Not Thread Safe)
         """
         pass
 
-    def on_finish(self):
-        """Called before finish"""
-        pass
 
-    def is_finished(self):
-        return self.finished
+class BasicPatServer(SelectorsBaseServer, Logger):
+    """Basic PAT packet server with worker threads."""
 
-    def finish(self):
-        """Called when the handler is being disposed"""
+    # noinspection PyAttributeOutsideInit
+    def server_activate(self):
+        # type: () -> None
+        """Set the server default properties."""
+        self._random = random.SystemRandom()
+        self.write_watch = Timer()
+        self.write_timeout = 1  # Seconds
+        self.worker_threads = []  # type: list[threading.Thread]
+        self.worker_queues = []  # type: list[PacketQueue]
+        self.max_thread = \
+            self.kwargs.get("max_thread") or multiprocessing.cpu_count()
+        return super(BasicPatServer, self).server_activate()
 
-        if self.finished:
+    # noinspection PyBroadException
+    def _worker_target(self, work_queue):
+        # type: (PacketQueue) -> None
+        """Worker thread main loop to handle a PacketQueue."""
+        try:
+            while not self.is_shut_down():
+                try:
+                    handler, packet, event = work_queue.get(block=True)
+                except queue.Empty:
+                    continue
+
+                if self.is_shut_down() or handler is None or \
+                        packet is None:  # extra check for type checkers
+                    break  # shutting down
+
+                if handler.is_finished():
+                    continue
+
+                assert event == selectors.EVENT_READ
+
+                try:
+                    try:
+                        handler.on_packet(*packet)
+                    except Exception as e:
+                        handler.on_exception(e)
+
+                    if handler.is_finished():
+                        self.shutdown_request(handler)
+                except:  # noqa: E722
+                    self.error(
+                        "Worker failure with %s:\n%s", handler,
+                        traceback.format_exc().rstrip('\n')
+                    )
+                    raise
+        finally:
+            self.info("Worker(%s) exiting...",
+                      threading.current_thread().name)
+
+    def queue_work(self, handler, work_data, event):
+        # type: (BasicPatHandler, Any, int) -> None
+        """Add a packet to the handler's PacketQueue."""
+        if handler.is_finished():
             return
 
-        try:
-            self.on_finish()
-        except Exception:
-            self.server.error(traceback.format_exc())
-
-        self.finished = True
-
-        try:
-            self.wfile.close()
-        except Exception:
-            pass
-
-        try:
-            self.rfile.close()
-        except Exception:
-            pass
-
-
-class BasicPatServer(object):
-
-    socket_queue_size = 5
-
-    address_family = socket.AF_INET
-
-    socket_type = socket.SOCK_STREAM
-
-    def __init__(self, server_address, RequestHandlerClass, max_threads,
-                 bind_and_activate=True, ssl_cert=None, ssl_key=None):
-        # type: (tuple[str, int], BasicPatHandler, int, bool, str|None, str|None) -> None  # noqa: E501
-        """Constructor.  May be extended, do not override."""
-        self.server_address = server_address
-        self.RequestHandlerClass = RequestHandlerClass
-        self.__is_shut_down = threading.Event()
-        self.__is_shut_down.set()
-        self.__shutdown_request = False
-        self.socket = socket.socket(self.address_family, self.socket_type)
-        self._random = random.SystemRandom()  # type: random.SystemRandom
-        self.handlers = []  # type: list[BasicPatHandler]
-        self.worker_threads = []  # type: list[threading.Thread]
-        self.worker_queues = []  # type: list[queue.queue]
-        self.selector = selectors.DefaultSelector()
-        self.max_threads = max_threads or multiprocessing.cpu_count()
-        self.ssl_cert = ssl_cert
-        self.ssl_key = ssl_key
-        # TODO: Backport change required by central/cache if any
-
-        if bind_and_activate:
-            try:
-                self.server_bind()
-                self.server_activate()
-            except Exception:
-                self.close()
-                raise
-
-    def server_bind(self):
-        self.socket.bind(self.server_address)
-        self.server_address = self.socket.getsockname()
-
-    def server_activate(self):
-        self.socket.listen(0)
-
-    def fileno(self):
-        """Return server socket file descriptor.
-
-        Interface required by selector.
-
-        """
-        return self.socket.fileno()
+        thread_queue = self.worker_queues[handler.worker_index]
+        thread_queue.put((handler, work_data, event), block=True)
 
     def initialize_workers(self):
+        # type: () -> None
         """Initialize workers queues/threads."""
-        for n in range(self.max_threads):
-            thread_queue = queue.Queue()
+        for n in range(self.max_thread):
+            thread_queue = PacketQueue()
             thread = threading.Thread(
                 target=self._worker_target,
                 args=(thread_queue,),
@@ -194,180 +146,84 @@ class BasicPatServer(object):
             self.worker_threads.append(thread)
             thread.start()
 
-    def serve_forever(self):
-        self.__is_shut_down.clear()
-        try:
-            self.initialize_workers()
+    def finish_request(self, handler, client_address):  # type: ignore[override]  # noqa: E501
+        # type: (BasicPatHandler, tuple[str, int]) -> None
+        """Finish the request handler construction."""
+        handler.worker_index = self._random.randint(0,
+                                                    len(self.worker_queues)-1)
+        return super(BasicPatServer, self).finish_request(handler,
+                                                          client_address)
 
-            with self.selector as selector:
-                selector.register(self, selectors.EVENT_READ)
+    def serve_forever(self, poll_interval=0.5):
+        # type: (float) -> None
+        """Start the worker threads and the server main loop."""
+        self.initialize_workers()
+        return super(BasicPatServer, self).serve_forever(poll_interval)
 
-                write_watch = Timer()
-                write_timeout = 1  # Seconds
-                while not self.__shutdown_request:
-                    ready = selector.select(write_timeout)
-                    if self.__shutdown_request:
-                        break
+    # noinspection PyBroadException
+    def service_actions(self):
+        # type: () -> None
+        """Called on each server loop.
+
+        Alternative to monitor write events which is CPU intensive.
+
+        Reminder: MUST NOT RAISE EXCEPTIONS.
+        """
+        if self.write_watch.elapsed() >= self.write_timeout:
+            try:
+                for handler in self.get_handlers():
+                    assert isinstance(handler, BasicPatHandler)
 
                     try:
-                        for (key, event) in ready:
-                            selected = key.fileobj
-                            if selected == self:
-                                self.accept_new_connection()
-                            else:
-                                assert event == selectors.EVENT_READ
-                                try:
-                                    packet = selected.on_recv()
-                                    if packet is None:
-                                        if selected.is_finished():
-                                            self.remove_handler(selected)
-                                        continue
+                        handler.on_send()
+                    except Exception as e:
+                        handler.on_exception(e)
 
-                                    self._queue_work(selected, packet, event)
-                                except Exception as e:
-                                    selected.on_exception(e)
-                                    if selected.is_finished():
-                                        self.remove_handler(selected)
-                    except Exception:
-                        self.error(traceback.format_exc())
-
-                    if write_watch.elapsed() >= write_timeout:
-                        try:
-                            for handler in self.handlers:
-                                try:
-                                    handler.on_tick()
-                                except Exception as e:
-                                    handler.on_exception(e)
-
-                                if handler.is_finished():
-                                    self.remove_handler(handler)
-                        except Exception:
-                            self.error(traceback.format_exc())
-                        finally:
-                            write_watch.restart()
-        except Exception:
-            self.error(traceback.format_exc())
-        finally:
-            self.__is_shut_down.set()
-
-    def _worker_target(self, work_queue):
-        # type: (queue.Queue) -> None
-
-        while not self.__shutdown_request:
-            try:
-                handler, packet, event = work_queue.get(block=True)
-            except queue.Empty:
-                continue
-
-            if self.__shutdown_request:
-                break
-
-            if handler.is_finished():
-                continue
-
-            assert event == selectors.EVENT_READ
-
-            try:
-                try:
-                    handler.on_packet(packet)
-                except Exception as e:
-                    handler.on_exception(e)
-
-                if handler.is_finished():
-                    self.remove_handler(handler)
+                    if handler.is_finished():
+                        self.shutdown_request(handler)
             except Exception:
-                self.error(traceback.format_exc())
+                self.error("%s", traceback.format_exc().rstrip('\n'))
+            finally:
+                self.write_watch.restart()
+        return super(BasicPatServer, self).service_actions()
 
-    def accept_new_connection(self):
+    def server_close(self):
         # type: () -> None
-
+        """Clean up the server and its worker threads."""
         try:
-            client_socket, client_address = self.socket.accept()
-        except Exception as e:
-            self.error('Error accepting connection (1). {}'.format(e))
-            return
+            super(BasicPatServer, self).server_close()
+        finally:
+            if not hasattr(self, "worker_queues"):
+                return  # Server startup interrupted (bind error?)
 
-        try:
-            # TODO: Find a cleaner way to process ill-formed packets.
-            # Currently, they get stuck on `packet = selected.on_recv()`,
-            # thus blocking the `serve_forever` method.
-            client_socket.settimeout(2.0)
+            for q in self.worker_queues:
+                q.put((None, None, None), block=True)
 
-            # TODO: Ensure this is the correct way to fix the server not
-            # accepting SSL connection anymore.
-            #
-            # See https://stackoverflow.com/a/68214507
-            if self.ssl_cert and self.ssl_key:
-                client_socket = wii_ssl_wrap_socket(
-                    client_socket, self.ssl_cert, self.ssl_key
-                )
-            handler = self.RequestHandlerClass(client_socket, client_address,
-                                               self)
-        except Exception as e:
-            self.error('Error accepting connection (2). {}'.format(e))
-            return
+            for t in self.worker_threads:
+                if t.is_alive():
+                    t.join()
 
-        handler.__worker_thread = \
-            self._random.randint(0, len(self.worker_queues)-1)
+            self.worker_queues = []
+            self.worker_threads = []
 
-        self.selector.register(handler, selectors.EVENT_READ)
-        self.handlers.append(handler)
+            self.info('Server closed')
 
-    def _queue_work(self, handler, work_data, event):
-        # type: (BasicPatHandler, any, int) -> None
-        if handler.is_finished():
-            return
+    def handle_error(self, handler=None, client_address=None):  # type: ignore[override]  # noqa: E501
+        # type: (None | BasicPatHandler, None | tuple[str, int]) -> None
+        """Custom error handler to use server's logger.
 
-        thread_queue = self.worker_queues[handler.__worker_thread]
-        thread_queue.put((handler, work_data, event), block=True)
-
-    def remove_handler(self, handler):
-        # type: (BasicPatHandler) -> None
-        try:
-            self.handlers.remove(handler)
-        except Exception:
-            pass
-
-        try:
-            self.selector.unregister(handler)
-        except Exception:
-            pass
-
-        try:
-            handler.finish()
-        except Exception:
-            pass
-
-        try:
-            handler.socket.close()
-        except Exception:
-            pass
-
-    def close(self):
-        """Called to clean-up the server.
-
-        May be overridden.
-
+        MUST NOT RAISE EXCEPTIONS.
         """
-        self.__shutdown_request = True
-        self.socket.close()
-        self.__is_shut_down.wait()
-
-        for h in self.handlers:
-            try:
-                h.finish()
-            except Exception:
-                pass
-
-        for q in self.worker_queues:
-            q.put((None, None, None), block=True)
-
-        for t in self.worker_threads:
-            if t.is_alive():
-                t.join()
-
-        self.worker_queues = []
-        self.selector = None
-        self.worker_threads = []
-        self.__shutdown_request = False
-        self.info('Server closed')
+        active_exception = sys.exc_info()[1]
+        # Handle client related exceptions
+        if handler and active_exception is not None:
+            handler.on_exception(active_exception)
+            return
+        # Handle server related exceptions
+        message = "Exception occurred during processing of {}".format(
+            handler if handler else "accepting client"
+        )
+        if handler:
+            message += " from {}".format(client_address) if client_address \
+                 else " shutdown"
+        self.error("%s\n%s", message, traceback.format_exc().rstrip('\n'))

@@ -45,13 +45,13 @@ def main(args):
     register_debug_signal()
 
     servers, has_ui = create_servers(server_args=args.args)
-    threads = [
-        threading.Thread(
+    threads_map = {
+        server: threading.Thread(
             target=server.serve_forever,
             name="{}.serve_forever".format(server.__class__.__name__)
         )
         for server in servers
-    ]
+    }
     # TODO: Backport cache's logic (i.e. new thread, maintain_connection)
 
     def interactive_mode(local=locals()):
@@ -66,12 +66,15 @@ def main(args):
         from other.ui import update as ui_update
     else:
         def ui_update():
+            # type: () -> None
+            """No-op."""
             pass
 
+    # noinspection PyBroadException
     try:
         ui_update()
-        for server_thread in threads:
-            server_thread.start()
+        for thread in threads_map.values():
+            thread.start()
 
         if args.interactive:
             repl_thread.start()
@@ -79,13 +82,15 @@ def main(args):
         if args.dry_run:
             dry_run()
 
-        while threads:
-            for server_thread in threads:
+        while threads_map:
+            for server, thread in threads_map.items():
                 ui_update()
-                if not server_thread.is_alive():
-                    threads.remove(server_thread)
+                if not thread.is_alive():
+                    server.error("Server thread died: %s", thread.name)
+                    del threads_map[server]
+                    # TODO: Add restart option?
                     break
-                server_thread.join(0.1)
+                thread.join(0.1)
 
     except KeyboardInterrupt:
         print("Interrupt key was pressed, closing servers...")
@@ -95,7 +100,8 @@ def main(args):
         sys.exit(1)
     finally:
         for server in servers:
-            server.close()
+            server.shutdown()
+            server.server_close()
         if args.interactive and repl_thread.is_alive():
             repl_thread.join()
 
@@ -114,5 +120,4 @@ if __name__ == "__main__":
     #  - no_timeout is currently available as a server argument as follows:
     parser.add_argument("args", nargs='*',
                         help="arguments forwarded to all servers")
-    args = parser.parse_args()
-    main(args)
+    main(parser.parse_args())

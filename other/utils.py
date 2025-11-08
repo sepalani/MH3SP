@@ -22,7 +22,6 @@ if TYPE_CHECKING or PYTHON_VERSION == 3:
 if TYPE_CHECKING:
     from argparse import Namespace  # noqa: F401
     from collections.abc import Sequence  # noqa: F401
-    from ssl import SSLSocket  # noqa: F401
     from typing import Any, NamedTuple  # noqa: F401
 
     from mh.pat import PatServer, PatRequestHandler
@@ -258,43 +257,6 @@ def get_external_ip(config):
     return config["ExternalIP"] or get_ip(config["IP"])
 
 
-def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
-    # type: (socket.socket, str, str) -> SSLSocket
-    """SSL wrapper for network sockets aiming Wii compatibility.
-
-    References:
-    https://docs.python.org/2.7/library/ssl.html
-    https://docs.python.org/3/library/ssl.html
-    https://www.openssl.org/docs/man1.0.2/man1/ciphers.html
-    https://www.openssl.org/docs/man1.1.1/man1/ciphers.html
-    https://www.openssl.org/docs/man3.0/man1/openssl-ciphers.html
-    """
-    import ssl
-
-    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-
-    if hasattr(ssl, "TLSVersion"):  # Since Python 3.7
-        # Required since Python 3.10
-        context.minimum_version = ssl.TLSVersion.SSLv3
-    wii_ciphers = ":".join([
-        "AES128-SHA", "AES256-SHA",
-        # The following ones are often unavailable
-        "DES-CBC-SHA", "3DES-CBC-SHA",
-        "RC4-MD5", "RC4-SHA"
-        # NB: Python might enforce additional (unsupported) ciphers
-        # for security reasons
-        # TODO: Disable them in Dolphin to emulate the Wii accurately
-    ])
-
-    # Try to enforce legacy ciphers/weak cert chain (OpenSSL >= 1.1 only)
-    if ssl.OPENSSL_VERSION_INFO >= (1, 1):
-        wii_ciphers += ":@SECLEVEL=0"
-
-    context.set_ciphers(wii_ciphers)
-    context.load_cert_chain(ssl_cert, ssl_key)
-    return context.wrap_socket(sock, server_side=True)
-
-
 def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
@@ -313,7 +275,7 @@ def create_server(server_class, server_handler,
         ssl_key = None
     return server_class(
         (address, port), server_handler,
-        max_thread_count=max_thread, logger=logger, debug_mode=debug_mode,
+        max_thread=max_thread, logger=logger, debug_mode=debug_mode,
         ssl_cert=ssl_cert, ssl_key=ssl_key, no_timeout=no_timeout,
         **kwargs
     )
@@ -387,4 +349,5 @@ def server_main(name, server_class, server_handler):
         traceback.print_exc()
         sys.exit(1)
     finally:
-        server.close()
+        server.shutdown()
+        server.server_close()

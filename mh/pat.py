@@ -9,7 +9,7 @@ import traceback
 from datetime import timedelta
 
 from other.config import ServerConfig
-from other.utils import Logger, get_external_ip, hexdump, to_str
+from other.utils import get_external_ip, hexdump, to_str
 from mh.quest_utils import QuestLoader
 
 import mh.pat_item as pati
@@ -37,17 +37,12 @@ g_circle_info_set = None
 g_binary_loader = QuestLoader("event/quest_rotation.json")
 
 
-class PatServer(server.BasicPatServer, Logger):
+class PatServer(server.BasicPatServer):
     """Generic PAT server class."""
 
-    def __init__(self, address, handler_class, max_thread_count=0,
-                 logger=None, debug_mode=False, ssl_cert=None, ssl_key=None,
+    def __init__(self, address, handler_class, logger=None, debug_mode=False,
                  no_timeout=False, **kwargs):
-        server.BasicPatServer.__init__(
-            self, address, handler_class, max_thread_count,
-            ssl_cert=ssl_cert, ssl_key=ssl_key
-        )
-        Logger.__init__(self)
+        server.BasicPatServer.__init__(self, address, handler_class, **kwargs)
         if logger:
             self.set_logger(logger)
         self.info("Running on {} port {}".format(*address))
@@ -122,7 +117,7 @@ class PatRequestHandler(server.BasicPatHandler):
     inaccurate. `unk` stands for `unknown`.
     """
 
-    def on_init(self):
+    def setup(self):
         """Default PAT handler."""
         self.server.info("Handle client from {}".format(self.client_address))
         self.server.add_to_debug(self)
@@ -134,6 +129,7 @@ class PatRequestHandler(server.BasicPatHandler):
         self.game_id = None
         self.natneg_url = b"natneg1.gs.nintendowifi.net"
         self.game_patched = True
+        return super(PatRequestHandler, self).setup()
 
     def try_send_packet(self, packet_id=0, data=b'', seq=0):
         """Send PAT packet and catch exceptions."""
@@ -215,7 +211,9 @@ class PatRequestHandler(server.BasicPatHandler):
                 # message is too long.
         except Exception:
             # Probably unreachable and was disconnected
-            self.server.warning("Failed to send a complete error message")
+            self.server.warning(
+                "Failed to send a complete error message to %s", self
+            )
         finally:
             self.session.request_reconnection = False
             self.finish()
@@ -2845,25 +2843,32 @@ class PatRequestHandler(server.BasicPatHandler):
 
     def on_exception(self, e):
         # type: (Exception) -> None
-        self.server.error(traceback.format_exc())
+        self.server.error(
+            "Exception occurred during processing of %s:\n%s",
+            self, traceback.format_exc().rstrip('\n')
+        )
         self.send_error("{}: {}".format(type(e).__name__, str(e)))
 
-    def on_finish(self):
-        if isinstance(self.session, FMPSession):
-            self.notify_layer_departure(True)
-        # TODO: Backport session_layer_end
-        self.session.disconnect()
-        self.session.delete()
-
-        self.server.del_from_debug(self)
-        self.server.info("Client finished!")
-
-    def on_packet(self, data):
-        if not data:
-            self.finish()
+    def finish(self):
+        if self.is_finished():
             return
+        try:
+            if isinstance(self.session, FMPSession):
+                self.notify_layer_departure(True)
+            # TODO: Backport session_layer_end
+            self.session.disconnect()
+            self.session.delete()
+        except Exception:
+            self.server.error(
+                "Failed to finish %s:\n%s", self,
+                traceback.format_exc().rstrip('\n')
+            )
+        finally:
+            super(PatRequestHandler, self).finish()
+            self.server.del_from_debug(self)
+            self.server.info("%s finished!", self)
 
-        packet_id, data, seq = data
+    def on_packet(self, packet_id, data, seq):
         self.server.info(
             "RECV %s[ID=%08x; Seq=%04x]",
             PAT_NAMES.get(packet_id, "Packet"),
@@ -2873,6 +2878,7 @@ class PatRequestHandler(server.BasicPatHandler):
         self.dispatch(packet_id, data, seq)
 
     def send_packet(self, packet_id=0, data=b'', seq=0):
+        # type: (int, bytes, int) -> None
         super(PatRequestHandler, self).send_packet(packet_id, data, seq)
         self.server.info(
             "SEND %s[ID=%08x; Seq=%04x]",
@@ -2895,7 +2901,7 @@ class PatRequestHandler(server.BasicPatHandler):
         handler = getattr(self, name)
         return handler(packet_id, data, seq)
 
-    def on_tick(self):
+    def on_send(self):
         if not self.requested_connection:
             # TODO: Investigate why do we need to wait a certain amount of
             #       seconds before sending the `ReqConnection` packet?
