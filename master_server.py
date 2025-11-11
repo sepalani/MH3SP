@@ -14,73 +14,96 @@ import fmp_server as FMP
 import rfp_server as RFP
 
 from other.debug import register_debug_signal, dry_run
+from other.python import TYPE_CHECKING
 from other.utils import create_server_from_base
+
+if TYPE_CHECKING:
+    from argparse import Namespace  # noqa: F401
+    from collections.abc import Sequence  # noqa: F401
+    from typing import Any  # noqa: F401
+
+    from mh.server import BasicPatServer  # noqa: F401
 
 
 def create_servers(server_args):
+    # type: (Sequence[str]) -> tuple[list[BasicPatServer], bool]
     """Create servers and check if it has ui."""
-    servers = []
+    servers = []  # type: list[BasicPatServer]
     has_ui = False
     for module in (OPN, LMP, FMP, RFP):
-        server, args = create_server_from_base(*module.BASE, args=server_args)
-        has_ui = has_ui or args.log_to_window
-        servers.append(server)
+        server, args = create_server_from_base(*module.BASE,
+                                               cmd_args=server_args)  # type: ignore[misc]  # noqa: E501
+        if server and args:
+            has_ui = has_ui or args.log_to_window
+            servers.append(server)
     return servers, has_ui
 
 
 def main(args):
+    # type: (Namespace) -> None
     """Master server main function."""
     register_debug_signal()
 
     servers, has_ui = create_servers(server_args=args.args)
-    threads = [
-        threading.Thread(
+    threads_map = {
+        server: threading.Thread(
             target=server.serve_forever,
             name="{}.serve_forever".format(server.__class__.__name__)
         )
         for server in servers
-    ]
+    }
     # TODO: Backport cache's logic (i.e. new thread, maintain_connection)
-    for thread in threads:
-        thread.start()
 
     def interactive_mode(local=locals()):
+        # type: (dict[str, Any]) -> None
         """Run an interactive python interpreter in another thread."""
         import code
         code.interact(local=local)
 
+    repl_thread = threading.Thread(target=interactive_mode)
+
     if has_ui:
         from other.ui import update as ui_update
-        ui_update()
+    else:
+        def ui_update():
+            # type: () -> None
+            """No-op."""
+            pass
 
+    # noinspection PyBroadException
     try:
+        ui_update()
+        for thread in threads_map.values():
+            thread.start()
+
         if args.interactive:
-            t = threading.Thread(target=interactive_mode)
-            t.start()
+            repl_thread.start()
 
         if args.dry_run:
             dry_run()
 
-        while threads:
-            for thread in threads:
-                if has_ui:
-                    ui_update()
+        while threads_map:
+            for server, thread in threads_map.items():
+                ui_update()
                 if not thread.is_alive():
-                    threads.remove(thread)
+                    server.error("Server thread died: %s", thread.name)
+                    del threads_map[server]
+                    # TODO: Add restart option?
                     break
                 thread.join(0.1)
 
-        if args.interactive:
-            t.join()
     except KeyboardInterrupt:
-        print("Interrupt key was pressed, closing server...")
+        print("Interrupt key was pressed, closing servers...")
     except Exception:
         print('Unexpected exception caught...')
         traceback.print_exc()
         sys.exit(1)
     finally:
         for server in servers:
-            server.close()
+            server.shutdown()
+            server.server_close()
+        if args.interactive and repl_thread.is_alive():
+            repl_thread.join()
 
 
 if __name__ == "__main__":
@@ -97,5 +120,4 @@ if __name__ == "__main__":
     #  - no_timeout is currently available as a server argument as follows:
     parser.add_argument("args", nargs='*',
                         help="arguments forwarded to all servers")
-    args = parser.parse_args()
-    main(args)
+    main(parser.parse_args())

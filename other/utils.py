@@ -13,19 +13,20 @@ import traceback
 from collections import namedtuple
 from functools import partial
 from logging.handlers import TimedRotatingFileHandler
+from other.config import config_from_name
 from other.debug import register_debug_signal, dry_run
+from other.python import PYTHON_VERSION, TYPE_CHECKING
 
-try:
-    # Python 2
-    basestring  # str, unicode
-    import ConfigParser
-except NameError:
-    # Python 3
-    basestring = str
-    import configparser as ConfigParser
-    from typing import Any  # noqa: F401
+if TYPE_CHECKING or PYTHON_VERSION == 3:
+    basestring = str  # Python 2: str, unicode
+if TYPE_CHECKING:
+    from argparse import Namespace  # noqa: F401
+    from collections.abc import Sequence  # noqa: F401
+    from typing import Any, NamedTuple  # noqa: F401
 
-CONFIG_FILE = "config.ini"
+    from mh.pat import PatServer, PatRequestHandler
+
+
 LOG_FOLDER = "logs"
 
 
@@ -33,34 +34,40 @@ class Logger(object):
     """Generic logging class."""
 
     def set_logger(self, logger):
+        # type: (Logger) -> None
         """Set logger."""
         self.logger = logger
 
     def debug(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a debug message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.info(msg, *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a warning message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.warning(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log an error message."""
         if not hasattr(self, "logger"):
             return
         return self.logger.error(msg, *args, **kwargs)
 
     def critical(self, msg, *args, **kwargs):
+        # type: (str, *Any, **Any) -> None
         """Log a critical message."""
         if not hasattr(self, "logger"):
             return
@@ -132,6 +139,7 @@ class GenericUnpacker(object):
 
 
 def to_bytearray(data):
+    # type: (Any) -> bytearray
     """Python2/3 bytearray helper."""
     if isinstance(data, basestring):
         return bytearray((ord(c) % 256 for c in data))
@@ -142,10 +150,12 @@ def to_bytearray(data):
 
 
 def to_bytes(data):
+    # type: (Any) -> bytes
     return bytes(to_bytearray(data))
 
 
 def to_str(data):
+    # type: (Any) -> str
     """Python2/3 str helper."""
     if isinstance(data, str):
         return data
@@ -153,20 +163,24 @@ def to_str(data):
 
 
 def pad(s, size, p=b'\0'):
+    # type: (bytes, int, bytes) -> bytearray
     data = bytearray(s + p * max(0, size-len(s)))
     data[-1] = 0
     return data
 
 
 def hexdump(data):
+    # type: (bytes | bytearray) -> str
     """Get data hexdump."""
     data = bytearray(data)
     line_format = "{line:08x} | {hex:47} | {ascii}"
 
     def hex_helper(b):
+        # type: (int) -> str
         return "{:02x}".format(b)
 
     def ascii_helper(b):
+        # type: (int) -> str
         return chr(b) if 0x20 <= b < 0x7F else '.'
 
     return "\n".join(
@@ -181,6 +195,7 @@ def hexdump(data):
 
 def create_logger(name, level=logging.DEBUG, log_to_file="",
                   log_to_console=False, log_to_window=False):
+    # type: (str, int, str, bool, bool) -> logging.Logger
     """Create a logger."""
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -216,59 +231,6 @@ def create_logger(name, level=logging.DEBUG, log_to_file="",
     return logger
 
 
-def get_config(name, config_file=CONFIG_FILE):
-    """Get server config."""
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read(config_file)
-    return {
-        "IP": config.get(name, "IP"),
-        "ExternalIP": config.get(name, "ExternalIP"),
-        "Port": config.getint(name, "Port"),
-        "Name": config.get(name, "Name"),
-        "MaxThread": config.getint(name, "MaxThread"),
-        "UseSSL": config.getboolean(name, "UseSSL"),
-        "SSLCert":
-            config.get(name, "SSLCert") or
-            config.get("SSL", "DefaultCert"),
-        "SSLKey":
-            config.get(name, "SSLKey") or
-            config.get("SSL", "DefaultKey"),
-        "LogFilename": config.get(name, "LogFilename"),
-        "LogToConsole": config.getboolean(name, "LogToConsole"),
-        "LogToFile": config.getboolean(name, "LogToFile"),
-        "LogToWindow": config.getboolean(name, "LogToWindow"),
-    }
-
-
-def get_mysql_config(name, config_file=CONFIG_FILE):
-    """Get MySQL config."""
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read(config_file)
-    ssl_ca = config.get(name, "ssl_ca") or None
-    from mysql.connector.constants import ClientFlag
-    return {
-        "charset": "utf8",
-        "autocommit": True,
-        "user": config.get(name, "User"),
-        "password": config.get(name, "Password"),
-        "host": config.get(name, "Host"),
-        "database": config.get(name, "database"),
-        "client_flags": [ClientFlag.SSL] if ssl_ca else None,
-        "ssl_ca": ssl_ca,
-        "ssl_cert": config.get(name, "ssl_cert") or None,
-        "ssl_key": config.get(name, "ssl_key") or None
-    }
-
-
-def is_mysql_enabled(name, config_file=CONFIG_FILE):
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read(config_file)
-    return config.getboolean(name, "Enabled")
-
-
-# TODO: Backport latest_patch and central config code
-
-
 def get_default_ip():
     # type: () -> str
     """Get the default IP address"""
@@ -295,111 +257,13 @@ def get_external_ip(config):
     return config["ExternalIP"] or get_ip(config["IP"])
 
 
-def argparse_from_config(config):
-    """Argument parser from config."""
-    import argparse
-
-    def typebool(s):
-        if isinstance(s, bool):
-            return s
-        s = s.lower()
-        if s in ("on", "yes", "y", "true", "t", "1"):
-            return True
-        elif s in ("off", "no", "n", "false", "f", "0"):
-            return False
-        else:
-            raise argparse.ArgumentTypeError("Boolean value expected.")
-
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-i", "--interactive", action="store_true",
-                        dest="interactive",
-                        help="create an interactive shell")
-    parser.add_argument("-d", "--debug_mode", action="store_true",
-                        dest="debug_mode",
-                        help="enable debug mode, disabling timeouts and \
-                        lower logging verbosity level")
-    parser.add_argument("-a", "--address", action="store", type=str,
-                        default=config["IP"], dest="address",
-                        help="set server address")
-    parser.add_argument("-p", "--port", action="store", type=int,
-                        default=config["Port"], dest="port",
-                        help="set server port")
-    parser.add_argument("-n", "--name", action="store", type=str,
-                        default=config["Name"], dest="name",
-                        help="set server name")
-    parser.add_argument("-s", "--use-ssl", action="store", type=typebool,
-                        default=config["UseSSL"], dest="use_ssl",
-                        help="use SSL protocol")
-    parser.add_argument("-c", "--ssl-cert", action="store", type=str,
-                        default=config["SSLCert"], dest="ssl_cert",
-                        help="set server SSL certificate")
-    parser.add_argument("-k", "--ssl-key", action="store", type=str,
-                        default=config["SSLKey"], dest="ssl_key",
-                        help="set server SSL private key")
-    parser.add_argument("-l", "--log-filename", action="store", type=str,
-                        default=config["LogFilename"], dest="log_filename",
-                        help="set server log filename")
-    parser.add_argument("--log-to-file", action="store", type=typebool,
-                        default=config["LogToFile"], dest="log_to_file",
-                        help="log output to file")
-    parser.add_argument("--log-to-console", action="store", type=typebool,
-                        default=config["LogToConsole"], dest="log_to_console",
-                        help="log output to console")
-    parser.add_argument("--log-to-window", action="store", type=typebool,
-                        default=config["LogToWindow"], dest="log_to_window",
-                        help="log output to a new window")
-    parser.add_argument("--dry-run", action="store_true",
-                        dest="dry_run",
-                        help="dry run to test the server")
-    parser.add_argument("-t", "--no-timeout", action="store_true",
-                        dest="no_timeout",
-                        help="disable player timeouts")
-    return parser
-
-
-def wii_ssl_wrap_socket(sock, ssl_cert, ssl_key):
-    """SSL wrapper for network sockets aiming Wii compatibility.
-
-    References:
-    https://docs.python.org/2.7/library/ssl.html
-    https://docs.python.org/3/library/ssl.html
-    https://www.openssl.org/docs/man1.0.2/man1/ciphers.html
-    https://www.openssl.org/docs/man1.1.1/man1/ciphers.html
-    https://www.openssl.org/docs/man3.0/man1/openssl-ciphers.html
-    """
-    import ssl
-
-    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-
-    if hasattr(ssl, "TLSVersion"):  # Since Python 3.7
-        # Required since Python 3.10
-        context.minimum_version = ssl.TLSVersion.SSLv3
-    wii_ciphers = ":".join([
-        "AES128-SHA", "AES256-SHA",
-        # The following ones are often unavailable
-        "DES-CBC-SHA", "3DES-CBC-SHA",
-        "RC4-MD5", "RC4-SHA"
-        # NB: Python might enforce additional (unsupported) ciphers
-        # for security reasons
-        # TODO: Disable them in Dolphin to emulate the Wii accurately
-    ])
-
-    # Try to enforce legacy ciphers/weak cert chain (OpenSSL >= 1.1 only)
-    if ssl.OPENSSL_VERSION_INFO >= (1, 1):
-        wii_ciphers += ":@SECLEVEL=0"
-
-    context.set_ciphers(wii_ciphers)
-    context.load_cert_chain(ssl_cert, ssl_key)
-    return context.wrap_socket(sock, server_side=True)
-
-
 def create_server(server_class, server_handler,
                   address="0.0.0.0", port=8200, name="Server", max_thread=0,
                   use_ssl=True, ssl_cert="server.crt", ssl_key="server.key",
                   log_to_file=True, log_filename="server.log",
-                  log_to_console=True, log_to_window=False, legacy_ssl=False,
-                  debug_mode=False, no_timeout=False):
+                  log_to_console=True, log_to_window=False,
+                  debug_mode=False, no_timeout=False, **kwargs):
+    # type: (type[PatServer], type[PatRequestHandler], str, int, str, int, bool, str | None, str | None, bool, str, bool, bool, bool, bool, **Any) -> PatServer  # noqa: E501
     """Create a server, its logger and the SSL context if needed."""
     logger = create_logger(
         name, level=logging.DEBUG if debug_mode else logging.INFO,
@@ -409,23 +273,37 @@ def create_server(server_class, server_handler,
     if not use_ssl:
         ssl_cert = None
         ssl_key = None
-    return server_class((address, port), server_handler, max_thread, logger,
-                        debug_mode, ssl_cert=ssl_cert, ssl_key=ssl_key,
-                        no_timeout=no_timeout)
+    return server_class(
+        (address, port), server_handler,
+        max_thread=max_thread, logger=logger, debug_mode=debug_mode,
+        ssl_cert=ssl_cert, ssl_key=ssl_key, no_timeout=no_timeout,
+        **kwargs
+    )
 
 
-server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
+if TYPE_CHECKING:
+    # Python 2 doesn't support the class syntax
+    server_base = NamedTuple("server_base", [
+        ("name", str),
+        ("cls", type[PatServer]),
+        ("handler", type[PatRequestHandler])
+    ])
+else:
+    server_base = namedtuple("ServerBase", ["name", "cls", "handler"])
 
 
-def create_server_from_base(name, server_class, server_handler, args=None):
+def create_server_from_base(name, server_class, server_handler, cmd_args=None):
+    # type: (str, type[PatServer], type[PatRequestHandler], Sequence[str] | None) -> tuple[PatServer, Namespace] | tuple[None, None]  # noqa: E501
     """Create a server based on its config parameters and supplied args.
 
     If args is None, sys.argv is used (see ArgumentParser.parser_args).
     """
-    config = get_config(name)
+    config = config_from_name(name)
+    if not config["Enabled"]:
+        return None, None
     # TODO: Backport central config code if needed
-    parser = argparse_from_config(config)
-    args = parser.parse_args(args)
+    parser = config.to_argument_parser()
+    args = parser.parse_args(cmd_args)
     kwargs = {
         k: v for k, v in vars(args).items()
         if k not in ("interactive", "dry_run")
@@ -434,11 +312,13 @@ def create_server_from_base(name, server_class, server_handler, args=None):
 
 
 def server_main(name, server_class, server_handler):
+    # type: (str, type[PatServer], type[PatRequestHandler]) -> None
     """Create a server main based on its config parameters."""
     register_debug_signal()
 
     server, args = create_server_from_base(name, server_class,
                                            server_handler)
+    assert server and args, "Server disabled by the config file"
 
     try:
         import threading
@@ -455,11 +335,13 @@ def server_main(name, server_class, server_handler):
 
         if args.log_to_window:
             from other.ui import update as ui_update
+        else:
+            def ui_update():
+                pass
 
         while thread.is_alive():
             thread.join(0.1)  # Timeout allows main thread to handle signals
-            if args.log_to_window:
-                ui_update()
+            ui_update()
     except KeyboardInterrupt:
         server.info("Interrupt key was pressed, closing server...")
     except Exception:
@@ -467,4 +349,5 @@ def server_main(name, server_class, server_handler):
         traceback.print_exc()
         sys.exit(1)
     finally:
-        server.close()
+        server.shutdown()
+        server.server_close()

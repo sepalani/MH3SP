@@ -9,17 +9,28 @@ import struct
 import mh.pat_item as pati
 from mh.constants import PatID4
 from mh.pat import PatRequestHandler, PatServer
+from mh.session import FMPSession
+from mh.state import State
 from other.utils import hexdump, server_base, server_main, to_str
 
 
 class FmpServer(PatServer):
     """Basic FMP server class."""
     # TODO: Backport close cache logic
-    pass
+    def __init__(self, *args, **kwargs):
+        PatServer.__init__(self, *args, **kwargs)
+        self.fmp_state = State()
+        # TODO: Backport the cache server registration logic instead
+        import mh.database as db
+        db.get_instance().servers = self.fmp_state.servers
 
 
 class FmpRequestHandler(PatRequestHandler):
     """Basic FMP server request handler class."""
+
+    def setup(self):
+        super(FmpRequestHandler, self).setup()
+        self.session = FMPSession(self.session)
 
     def recvAnsConnection(self, packet_id, data, seq):
         """AnsConnection packet."""
