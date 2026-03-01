@@ -9,6 +9,28 @@ import mh.pat_item as pati
 
 from other.utils import to_bytearray, to_str
 
+try:
+    from typing import Any, TypedDict, TYPE_CHECKING  # noqa: F401
+
+    if TYPE_CHECKING:
+        from mh.state import State  # noqa: F401
+
+    SessionLocalInfo = TypedDict(
+        "SessionLocalInfo", {
+            "server_id": None | int,
+            "server_name": None | str,  # maybe bytes to support accents?
+            "gate_id": None | int,
+            "gate_name": None | str,  # ditto regarding special characters
+            "city_id": None | int,
+            "city_name": None | str,  # ditto regarding special characters
+            "city_size": int,
+            "city_capacity": int,
+            "circle_id": None | int,
+        }
+    )
+except (ImportError, TypeError):
+    pass
+
 DB = db.get_instance()
 
 
@@ -25,6 +47,9 @@ class SessionState:
 class Session(object):
     """Server session class.
 
+    The goal of this class is to help writing the PAT packet logic by
+    handling complex interactions between servers/database behind the scene.
+
     TODO:
      - Finish the implementation
     """
@@ -40,7 +65,7 @@ class Session(object):
             "city_size": 0,
             "city_capacity": 0,
             "circle_id": None,
-        }
+        }  # type: SessionLocalInfo
         self.connection = connection_handler
         self.online_support_code = None
         self.request_reconnection = False
@@ -52,8 +77,81 @@ class Session(object):
         self.state = SessionState.UNKNOWN
         self.binary_setting = b""
         self.search_payload = None
-        # TODO: Backport the server_id and serialisation logic
+        # TODO: Backport the server_id logic
         self.hunter_info = pati.HunterSettings()
+
+    def serialize(self):
+        # type: () -> dict[str, Any]
+        return {
+            "pat_ticket": self.pat_ticket,
+            # TODO: local_info should be safe to serialize on its own as dict
+            "local_info_server_id": self.local_info["server_id"],
+            "local_info_server_name": self.local_info["server_name"],
+            "local_info_gate_id": self.local_info["gate_id"],
+            "local_info_gate_name": self.local_info["gate_name"],
+            "local_info_city_id": self.local_info["city_id"],
+            "local_info_city_name": self.local_info["city_name"],
+            "local_info_city_size": self.local_info["city_size"],
+            "local_info_city_capacity": self.local_info["city_capacity"],
+            "local_info_circle_id": self.local_info["circle_id"],
+            "online_support_code": self.online_support_code,
+            "capcom_id": self.capcom_id,
+            "hunter_name": self.hunter_name,
+            "hunter_stats": self.hunter_stats,
+            "layer": self.layer,
+            "state": self.state,
+            "binary_setting": self.binary_setting,
+            "hunter_info": to_str(self.hunter_info.pack())
+        }
+
+    @staticmethod
+    def deserialize(obj):
+        # type: (dict[str, Any]) -> Session
+        session = Session(None)
+        session.pat_ticket = \
+            str(obj["pat_ticket"]) \
+            if obj["pat_ticket"] else obj["pat_ticket"]
+        session.local_info["server_id"] = \
+            int(obj["local_info_server_id"]) \
+            if obj["local_info_server_id"] else obj["local_info_server_id"]
+        session.local_info["server_name"] = \
+            str(obj["local_info_server_name"]) \
+            if obj["local_info_server_name"] else obj["local_info_server_name"]
+        session.local_info["gate_id"] = \
+            int(obj["local_info_gate_id"]) \
+            if obj["local_info_gate_id"] else obj["local_info_gate_id"]
+        session.local_info["gate_name"] = \
+            str(obj["local_info_gate_name"]) \
+            if obj["local_info_gate_name"] else obj["local_info_gate_name"]
+        session.local_info["city_id"] = \
+            int(obj["local_info_city_id"]) \
+            if obj["local_info_city_id"] else obj["local_info_city_id"]
+        session.local_info["city_name"] = \
+            str(obj["local_info_city_name"]) \
+            if obj["local_info_city_name"] else obj["local_info_city_name"]
+        session.local_info["city_size"] = \
+            int(obj["local_info_city_size"]) \
+            if obj["local_info_city_size"] else obj["local_info_city_size"]
+        session.local_info["city_capacity"] = \
+            int(obj["local_info_city_capacity"]) \
+            if obj["local_info_city_capacity"] \
+            else obj["local_info_city_capacity"]
+        session.local_info["circle_id"] = \
+            int(obj["local_info_circle_id"]) \
+            if obj["local_info_circle_id"] else obj["local_info_circle_id"]
+        session.online_support_code =  \
+            str(obj["online_support_code"]) \
+            if obj["online_support_code"] else obj["online_support_code"]
+        session.capcom_id = str(obj["capcom_id"])
+        session.hunter_name = str(obj["hunter_name"])
+        session.hunter_stats = obj["hunter_stats"]
+        session.layer = int(obj["layer"])
+        session.state = int(obj["state"])
+        session.binary_setting = obj["binary_setting"]
+        h_settings = bytearray(obj["hunter_info"], encoding='ISO-8859-1')
+        session.hunter_info = pati.HunterSettings().unpack(h_settings,
+                                                           len(h_settings))
+        return session
 
     def get(self, connection_data):
         """Return the session associated with the connection data, if any."""
@@ -68,6 +166,7 @@ class Session(object):
             )
         session = DB.get_session(self.pat_ticket) or self
         if session != self:
+            # TODO: Use a less error-prone check
             assert session.connection is None, "Session is already in use"
             session.connection = self.connection
             self.connection = None
@@ -118,25 +217,111 @@ class Session(object):
     def use_user(self, index, name):
         DB.use_user(self, index, name)
 
+    def find_user_by_capcom_id(self, capcom_id):
+        sessions = DB.find_users(capcom_id=capcom_id)
+        if sessions:
+            return sessions[0]
+        return None
+
+    def find_users(self, capcom_id, hunter_name, first_index, count):
+        users = DB.find_users(capcom_id, hunter_name)
+        start = first_index - 1
+        return users[start:start+count]
+
+    def get_user_name(self, capcom_id):
+        return DB.get_user_name(capcom_id)
+
+    def add_friend_request(self, capcom_id):
+        return DB.add_friend_request(self.capcom_id, capcom_id)
+
+    def accept_friend(self, capcom_id, accepted=True):
+        return DB.accept_friend(self.capcom_id, capcom_id, accepted)
+
+    def delete_friend(self, capcom_id):
+        return DB.delete_friend(self.capcom_id, capcom_id)
+
+    def get_friends(self, first_index=None, count=None):
+        return DB.get_friends(self.capcom_id, first_index, count)
+
     # TODO: server_index and recall logic
 
     def get_servers(self):
-        return DB.get_servers()
+        """LMP servers can request the server list"""
+        return DB.servers  # FIXME: See FmpServer constructor
+
+
+class FMPSession(Session):
+    """Specialized session wrapper for FMP server.
+
+    Most methods should be unrelated to DB.
+    This prevent other servers to trigger FMP related features.
+    """
+    def __init__(self, session):
+        # type: (Session) -> None
+        self._session = session
+        self._fmp_state = session.connection.server.fmp_state  # type: State
+
+    def __getattr__(self, name):
+        # type: (str) -> Any
+        """Called when the default attribute access fails."""
+        return getattr(self._session, name)
+
+    def __setattr__(self, name, value):
+        # type: (str, Any) -> None
+        if name.startswith("_"):
+            return object.__setattr__(self, name, value)
+        return setattr(self._session, name, value)
+
+    def __eq__(self, other):
+        # type: (Session) -> bool
+        """Avoid comparison issues when wrapping around the session.
+
+        For instance, list removal is done by equality not identity,
+        in other words, FMPSession instances can get Session instances to be
+        removed from a list.
+        """
+        if isinstance(other, FMPSession):
+            other = other._session
+        elif not isinstance(other, Session):
+            return NotImplemented
+        return self._session == other
+
+    def __ne__(self, other):
+        # type: (Session) -> bool
+        x = self.__eq__(other)
+        if x is NotImplemented:
+            return NotImplemented
+        return not x
+
+    def get(self, connection_data):
+        """Wrap existing session if needed"""
+        session = Session.get(self, connection_data)
+        if not isinstance(session, FMPSession):
+            session = FMPSession(session)
+        return session
+
+    def FMP(self):
+        # type: () -> State
+        """Wrapper that can be repurposed later for cache/error handling."""
+        return self._fmp_state
+
+    def get_servers(self):
+        return self.FMP().get_servers()
 
     def get_server(self):
         assert self.local_info['server_id'] is not None
-        return DB.get_server(self.local_info['server_id'])
+        return self.FMP().get_server(self.local_info['server_id'])
 
     def get_gate(self):
         assert self.local_info['gate_id'] is not None
-        return DB.get_gate(self.local_info['server_id'],
-                           self.local_info['gate_id'])
+        return self.FMP().get_gate(self.local_info['server_id'],
+                                   self.local_info['gate_id'])
 
     def get_city(self):
         assert self.local_info['city_id'] is not None
-        return DB.get_city(self.local_info['server_id'],
-                           self.local_info['gate_id'],
-                           self.local_info['city_id'])
+        return self.FMP().get_city(self.local_info['server_id'],
+                                   self.local_info['gate_id'],
+                                   self.local_info['city_id'])
 
     def get_circle(self):
         assert self.local_info['circle_id'] is not None
@@ -197,10 +382,10 @@ class Session(object):
             (field_id, value)
             for field_id, field_type, value in detailed_fields
         ]  # Convert detailed to simple optional fields
-        return DB.layer_detail_search(server_type, fields)
+        return self.FMP().layer_detail_search(server_type, fields)
 
     def join_server(self, server_id):
-        return DB.join_server(self, server_id)
+        return self.FMP().join_server(self, server_id)
 
     def get_layer_children(self):
         if self.layer == 0:
@@ -218,74 +403,63 @@ class Session(object):
 
     def find_users_by_layer(self, server_id, gate_id, city_id,
                             first_index, count, recursive=False):
-        if recursive:
-            players = DB.get_all_users(server_id, gate_id, city_id)
-        else:
-            layer = \
-                DB.get_city(server_id, gate_id, city_id) if city_id else \
-                DB.get_gate(server_id, gate_id) if gate_id else \
-                DB.get_server(server_id)
-            players = list(layer.players)
         start = first_index - 1
+        if recursive:
+            players = self.FMP().get_all_users(server_id, gate_id, city_id)
+            return players[start:start+count]
+
+        layer = \
+            self.FMP().get_city(server_id, gate_id, city_id) if city_id else \
+            self.FMP().get_gate(server_id, gate_id) if gate_id else \
+            self.FMP().get_server(server_id)
+        players = list(layer.players)
         return players[start:start+count]
 
-    def find_user_by_capcom_id(self, capcom_id):
-        sessions = DB.find_users(capcom_id=capcom_id)
-        if sessions:
-            return sessions[0]
-        return None
-
-    def find_users(self, capcom_id, hunter_name, first_index, count):
-        users = DB.find_users(capcom_id, hunter_name)
-        start = first_index - 1
-        return users[start:start+count]
-
-    def get_user_name(self, capcom_id):
-        return DB.get_user_name(capcom_id)
-
     def leave_server(self):
-        DB.leave_server(self, self.local_info["server_id"])
+        self.FMP().leave_server(self, self.local_info["server_id"])
 
     def get_gates(self):
-        return DB.get_gates(self.local_info["server_id"])
+        return self.FMP().get_gates(self.local_info["server_id"])
 
     def join_gate(self, gate_id):
-        DB.join_gate(self, self.local_info["server_id"], gate_id)
+        self.FMP().join_gate(self, self.local_info["server_id"], gate_id)
         self.state = SessionState.GATE
 
     def leave_gate(self):
-        DB.leave_gate(self)
+        self.FMP().leave_gate(self)
         self.state = SessionState.LOG_IN
 
     def get_cities(self):
-        return DB.get_cities(self.local_info["server_id"],
-                             self.local_info["gate_id"])
+        return self.FMP().get_cities(self.local_info["server_id"],
+                                     self.local_info["gate_id"])
 
     def is_city_empty(self, city_id):
-        return DB.get_city(self.local_info["server_id"],
-                           self.local_info["gate_id"],
-                           city_id).get_state() == db.LayerState.EMPTY
+        return self.FMP().get_city(
+            self.local_info["server_id"],
+            self.local_info["gate_id"],
+            city_id
+        ).is_empty()
 
     def reserve_city(self, city_id, reserve):
-        return DB.reserve_city(self.local_info["server_id"],
-                               self.local_info["gate_id"],
-                               city_id, reserve)
+        return self.FMP().reserve_city(self.local_info["server_id"],
+                                       self.local_info["gate_id"],
+                                       city_id, reserve)
 
     def create_city(self, city_id, settings, optional_fields):
-        return DB.create_city(self,
-                              self.local_info["server_id"],
-                              self.local_info["gate_id"],
-                              city_id, settings, optional_fields)
+        return self.FMP().create_city(
+            self, self.local_info["server_id"], self.local_info["gate_id"],
+            city_id, settings, optional_fields
+        )
 
     def join_city(self, city_id):
-        DB.join_city(self,
-                     self.local_info["server_id"],
-                     self.local_info["gate_id"],
-                     city_id)
+        self.FMP().join_city(self,
+                             self.local_info["server_id"],
+                             self.local_info["gate_id"],
+                             city_id)
         self.state = SessionState.CITY
 
     def leave_city(self):
-        DB.leave_city(self)
+        self.FMP().leave_city(self)
         self.state = SessionState.GATE
 
     def try_transfer_city_leadership(self):
@@ -386,15 +560,3 @@ class Session(object):
                 (1, (weapon_type << 24) | location),
                 (2, hunter_rank << 16)
         ]
-
-    def add_friend_request(self, capcom_id):
-        return DB.add_friend_request(self.capcom_id, capcom_id)
-
-    def accept_friend(self, capcom_id, accepted=True):
-        return DB.accept_friend(self.capcom_id, capcom_id, accepted)
-
-    def delete_friend(self, capcom_id):
-        return DB.delete_friend(self.capcom_id, capcom_id)
-
-    def get_friends(self, first_index=None, count=None):
-        return DB.get_friends(self.capcom_id, first_index, count)

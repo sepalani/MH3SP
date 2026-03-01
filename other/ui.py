@@ -5,19 +5,28 @@
 """UI helper module."""
 
 import logging
-try:
-    # Python 3.x
+
+from other.python import PYTHON_VERSION, TYPE_CHECKING
+
+if TYPE_CHECKING or PYTHON_VERSION == 3:
     import tkinter as tk
     import tkinter.scrolledtext as ScrolledText
     from queue import Queue
-except ImportError:
-    # Python 2.x
+elif PYTHON_VERSION == 2:
     import Tkinter as tk
     import ScrolledText
     from Queue import Queue
 
-WINDOWS = []
-EMITTERS = Queue()
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from typing import Any
+    QueueT = Queue[Callable[[], Any]]
+else:
+    QueueT = Queue
+
+
+WINDOWS = []  # type: list[LoggerTk]
+EMITTERS = QueueT()
 
 
 class LoggingHandler(logging.Handler):
@@ -29,10 +38,12 @@ class LoggingHandler(logging.Handler):
     """
 
     def __init__(self, text):
+        # type: (ScrolledText.ScrolledText) -> None
         logging.Handler.__init__(self)
         self.text = text
 
     def emit(self, record):
+        # type: (logging.LogRecord) -> None
         msg = self.format(record)
 
         def append():
@@ -40,7 +51,8 @@ class LoggingHandler(logging.Handler):
             self.text.configure(state='normal')
             self.text.insert(tk.END, msg + '\n')
             self.text.configure(state='disabled')
-            self.text.yview(tk.END)  # Autoscroll to the bottom
+            # Autoscroll to the bottom
+            self.text.yview(tk.END)  # type: ignore
 
         # Won't work on Python3.x
         # self.text.after(0, append)
@@ -51,6 +63,7 @@ class LoggerTk(tk.Tk):
     """Create a logging window."""
 
     def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
         tk.Tk.__init__(self, *args, **kwargs)
 
         text = ScrolledText.ScrolledText(self, state='disabled')
@@ -63,10 +76,12 @@ class LoggerTk(tk.Tk):
         self.handler = LoggingHandler(text)
 
     def get_handler(self):
+        # type: () -> LoggingHandler
         """Return the window's logging.Handler instance."""
         return self.handler
 
     def set_logger(self, logger):
+        # type: (logging.Logger) -> None
         """Add the window's logging.Handler to the logger."""
         logger.addHandler(self.handler)
 

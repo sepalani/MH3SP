@@ -280,7 +280,7 @@ VULGARITY_INFO = b""
 FMP_VERSION = 1
 # TODO: Backport central and NATNEG constants
 
-TIME_STATE = 0
+TIME_STATE = 0  # FIXME: Unused since quest rotation added, see time_utils
 IS_JAP = False
 
 
