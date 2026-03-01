@@ -7,11 +7,23 @@
 import inspect
 import random
 import sqlite3
+import time
 
 from threading import local as thread_local
 
 from other import utils
 from other.config import MySQLConfig
+from other.python import TYPE_CHECKING
+
+try:
+    import mysql.connector
+except ImportError:
+    pass
+
+if TYPE_CHECKING:
+    from mysql.connector.pooling import PooledMySQLConnection  # noqa: F401
+    from mysql.connector.abstracts import \
+        MySQLConnectionAbstract, MySQLCursorAbstract  # noqa: F401
 
 
 CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -28,6 +40,11 @@ BLANK_CAPCOM_ID = "******"
 
 def new_random_str(length=6):
     return "".join(random.choice(CHARSET) for _ in range(length))
+
+
+class DatabaseError(Exception):
+    """Database exception class."""
+    pass
 
 
 class TempDatabase(object):
@@ -401,6 +418,65 @@ class TempSQLiteDatabase(TempDatabase):
         return self.parent.delete_friend(capcom_id, friend_id)
 
 
+class SafeMySQLConnection(object):
+    """Proxy object to safely reconnect to MySQL database.
+
+    TODO: If the logic needs to be duplicated, we can move it into a
+    dedicated annotation/metaclass.
+    """
+
+    def __init__(self, attempts=3, cooldown=60.0):
+        # type: (int, float) -> None
+        """Reconnection attempts before waiting a cooldown time."""
+        self.__attempts = attempts
+        self.__cooldown = cooldown
+        self.__connection = None  # noqa: E501  # type: MySQLConnectionAbstract | PooledMySQLConnection | None
+        self.__time = None  # type: float | None
+        self.__restart()
+
+    def __restart(self):
+        # type: () -> None
+        """Reload the config and restart the connection."""
+        if self.__connection:
+            # noinspection PyBroadException
+            try:
+                self.__connection.close()
+            except Exception:
+                pass
+            finally:
+                self.__connection = None
+
+        self.__connection = mysql.connector.connect(
+            **MySQLConfig().connect_kwargs()
+        )
+
+    def cursor(self):
+        # type: () -> MySQLCursorAbstract
+        """Override the cursor method."""
+        # noinspection PyBroadException
+        try:
+            c = self.__connection.cursor()  # type: ignore
+            self.__time = None
+            return c
+        except Exception:
+            now = time.time()
+            if self.__time and (now - self.__time) < self.__cooldown:
+                raise DatabaseError("Connection lost, reconnection cooldown")
+
+        self.__time = now
+        for _ in range(self.__attempts):
+            # noinspection PyBroadException
+            try:
+                self.__restart()
+                if self.__connection is not None:
+                    c = self.__connection.cursor()
+                    self.__time = None
+                    return c
+            except Exception:
+                pass
+        raise DatabaseError("Connection lost, reconnection attempts failed")
+
+
 class MySQLDatabase(TempDatabase):
     """Hybrid MySQL/TempDatabase.
 
@@ -416,10 +492,7 @@ class MySQLDatabase(TempDatabase):
     def __init__(self):
         self.parent = super(MySQLDatabase, self)
         self.parent.__init__()
-        from mysql import connector
-        self.connection = connector.connect(
-            **MySQLConfig().connect_kwargs()
-        )
+        self.connection = SafeMySQLConnection()
         self.create_database()
         self.populate_database()
 
