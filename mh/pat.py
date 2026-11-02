@@ -2382,7 +2382,9 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ検索詳細データ要求
         TR: Layer detail search data request
 
-        TODO: Handle this request.
+        The client asks for the rows of the city list one at a time: offset
+        is the 1-based position of the first row wanted and count the number
+        of rows wanted from there.
         """
         offset, count = struct.unpack_from(">II", data)
         self.sendAnsLayerDetailSearchData(offset, count, seq)
@@ -2394,12 +2396,14 @@ class PatRequestHandler(server.BasicPatHandler):
         JP: レイヤ検索詳細データ返答
         TR: Layer detail search data response
 
-        TODO: Handle this response.
+        Only the requested rows are sent back. Returning the whole search
+        result made the client display the first city on every row.
         """
         unk = 0
-        cities = self.search_data
+        first = max(offset - 1, 0)
+        cities = self.search_data[first:first + count]
         data = struct.pack(">II", unk, len(cities))
-        for i, city in enumerate(cities):
+        for i, city in enumerate(cities, first):
             with city.lock():
                 layer_data = pati.LayerData.create_from(i, city)
                 layer_data.assert_fields(self.search_info["layer_fields"])

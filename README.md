@@ -30,7 +30,7 @@ The project is kinda functionnal, multiplayer isn't supported yet.
 - [ ] Gate server
   - [x] Spawning at the gate
   - [ ] Chat system
-  - [ ] City search
+  - [x] City search
   - [x] City selection
 - [ ] City
   - [x] Create a city
